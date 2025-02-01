@@ -14,10 +14,6 @@
     <PackageReference Include="swashbuckle.AspNetCore" Version="7.2.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Data\Mappings\" />
-  </ItemGroup>
-
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
