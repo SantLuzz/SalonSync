@@ -12,35 +12,37 @@ public class TransactionMapping : IEntityTypeConfiguration<Transaction>
         builder.HasKey(x => x.Id);
         
         builder.Property(x => x.UserId)
-            .IsRequired(true)
+            .IsRequired()
             .HasColumnName("UserId")
-            .HasColumnType("NVARCHAR")
-            .HasMaxLength(160);
-        
-        builder.Property(x => x.Description)
-            .IsRequired(false)
-            .HasColumnName("Description")
-            .HasColumnType("NVARCHAR")
-            .HasMaxLength(255);
-        
-        builder.Property(x => x.CreatedAt)
-            .IsRequired(true)
-            .HasColumnName("CreatedAt")
-            .HasColumnType("DATETIME2");
+            .HasColumnType("NVARCHAR(160)");
 
+        builder.Property(x => x.Description)
+            .HasColumnName("Description")
+            .HasColumnType("NVARCHAR(255)");
+
+        builder.Property(x => x.CreatedAt)
+            .IsRequired()
+            .HasColumnName("CreatedAt")
+            .HasColumnType("DATETIME2")
+            .HasDefaultValueSql("GETDATE()"); // Usa o horário do banco
+        
         builder.Property(x => x.PaidOrReceivedAt)
-            .IsRequired(false)
             .HasColumnName("PaidOrReceivedAt")
             .HasColumnType("DATETIME2");
         
         builder.Property(x => x.Amount)
-            .IsRequired(true)
+            .IsRequired()
             .HasColumnName("Amount")
             .HasColumnType("MONEY");
         
         builder.Property(x => x.CostCenterId)
-            .IsRequired(true)
+            .IsRequired()
             .HasColumnName("CostCenterId")
-            .HasColumnType("INT");   
+            .HasColumnType("BIGINT"); // Melhor usar BIGINT para IDs longos
+        
+        builder.HasOne(x => x.CostCenter)
+            .WithMany()
+            .HasForeignKey(x => x.CostCenterId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

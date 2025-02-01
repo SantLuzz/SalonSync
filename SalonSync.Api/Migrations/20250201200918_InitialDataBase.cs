@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace SalonSync.Api.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class InitialDataBase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -74,12 +74,12 @@ namespace SalonSync.Api.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<string>(type: "NVARCHAR(160)", maxLength: 160, nullable: false),
-                    Description = table.Column<string>(type: "NVARCHAR(255)", maxLength: 255, nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "DATETIME2", nullable: false),
+                    UserId = table.Column<string>(type: "NVARCHAR(160)", nullable: false),
+                    Description = table.Column<string>(type: "NVARCHAR(255)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "DATETIME2", nullable: false, defaultValueSql: "GETDATE()"),
                     PaidOrReceivedAt = table.Column<DateTime>(type: "DATETIME2", nullable: true),
                     Amount = table.Column<decimal>(type: "MONEY", nullable: false),
-                    CostCenterId = table.Column<int>(type: "INT", nullable: false)
+                    CostCenterId = table.Column<long>(type: "BIGINT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -89,7 +89,7 @@ namespace SalonSync.Api.Migrations
                         column: x => x.CostCenterId,
                         principalTable: "CostCenters",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(

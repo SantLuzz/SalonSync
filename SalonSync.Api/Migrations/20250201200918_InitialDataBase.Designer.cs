@@ -12,8 +12,8 @@ using SalonSync.Api.Data;
 namespace SalonSync.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250201195457_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20250201200918_InitialDataBase")]
+    partial class InitialDataBase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -285,17 +285,18 @@ namespace SalonSync.Api.Migrations
                         .HasColumnType("MONEY")
                         .HasColumnName("Amount");
 
-                    b.Property<int>("CostCenterId")
-                        .HasColumnType("INT")
+                    b.Property<long>("CostCenterId")
+                        .HasColumnType("BIGINT")
                         .HasColumnName("CostCenterId");
 
                     b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("DATETIME2")
-                        .HasColumnName("CreatedAt");
+                        .HasColumnName("CreatedAt")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(255)
-                        .HasColumnType("NVARCHAR")
+                        .HasColumnType("NVARCHAR(255)")
                         .HasColumnName("Description");
 
                     b.Property<DateTime?>("PaidOrReceivedAt")
@@ -304,8 +305,7 @@ namespace SalonSync.Api.Migrations
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasMaxLength(160)
-                        .HasColumnType("NVARCHAR")
+                        .HasColumnType("NVARCHAR(160)")
                         .HasColumnName("UserId");
 
                     b.HasKey("Id");
@@ -363,7 +363,7 @@ namespace SalonSync.Api.Migrations
                     b.HasOne("SalonSync.Core.Models.Financial.CostCenter", "CostCenter")
                         .WithMany()
                         .HasForeignKey("CostCenterId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("CostCenter");

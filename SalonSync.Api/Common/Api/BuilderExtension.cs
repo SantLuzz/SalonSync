@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SalonSync.Api.Data;
+using SalonSync.Api.Handlers.Financial;
 using SalonSync.Api.Models;
 using SalonSync.Core;
+using SalonSync.Core.Handlers.Financial;
 
 namespace SalonSync.Api.Common.Api
 {
@@ -50,7 +52,8 @@ namespace SalonSync.Api.Common.Api
 
         public static void AddServices(this WebApplicationBuilder builder)
         {
-            
+            builder.Services.AddTransient<ICostCenterHandler, CostCenterHandler>();
+            builder.Services.AddTransient<ITransactionHandler, TransactionHandler>();
         }
 
         public static void AddCrossOrigin(this WebApplicationBuilder builder)
