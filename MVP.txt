@@ -1,0 +1,68 @@
+# MVP - Sistema de Gestão para Barbearias
+
+## 1. Cadastro de Clientes
+**Funcionalidade:** Permitir o cadastro de clientes com informações essenciais como nome, telefone e e-mail.
+
+**Motivo:** Fundamental para criar um relacionamento com os clientes, agendar serviços e acompanhar o histórico de atendimentos.
+
+---
+
+## 2. Agendamento de Serviços
+**Funcionalidade:** Permitir o agendamento de serviços (corte de cabelo, barba, etc.) com os profissionais disponíveis.
+
+**Motivo:** Organiza o fluxo de trabalho e melhora a experiência do cliente, evitando esperas desnecessárias.
+
+---
+
+## 3. Gestão de Senhas e Fila de Atendimento
+**Funcionalidade:** Implementar um sistema de senhas, onde os clientes retiram um número e o sistema exibe o atendimento atual.
+
+**Motivo:** Facilita a organização da fila de espera, tornando o atendimento mais eficiente.
+
+---
+
+## 4. Gestão de Caixa
+**Funcionalidade:** Controle de entradas e saídas financeiras, permitindo registrar os valores recebidos por serviços e produtos, assim como despesas operacionais.
+
+**Motivo:** Essencial para manter o controle financeiro da barbearia e garantir a saúde financeira do negócio.
+
+---
+
+## 5. Cadastro de Funcionários (Barbeiros)
+**Funcionalidade:** Permitir o cadastro dos barbeiros, incluindo informações como nome e serviços oferecidos.
+
+**Motivo:** Necessário para vincular agendamentos e calcular comissões futuras.
+
+---
+
+## 6. Interface Simples e Intuitiva
+**Funcionalidade:** Interface fácil de usar, sem necessidade de treinamento avançado.
+
+**Motivo:** Facilita a adoção rápida do sistema pelos donos da barbearia e pelos profissionais.
+
+---
+
+## 7. Painel de Relatórios Básicos
+**Funcionalidade:** Relatórios simples sobre vendas, fluxo de caixa e agendamentos por período.
+
+**Motivo:** Ajuda os donos da barbearia a tomar decisões estratégicas baseadas em dados reais.
+
+---
+
+## 8. Controle de Mensalidade
+**Funcionalidade:** Criar pacotes de serviços para clientes frequentes, permitindo agendamentos automáticos.
+
+**Motivo:** Fideliza clientes e gera previsibilidade financeira para o negócio.
+
+---
+
+## 9. Contas a Pagar
+**Funcionalidade:** Registro de despesas recorrentes, como aluguel, salários e contas.
+
+**Motivo:** Mantém a organização financeira e evita esquecimentos de pagamentos importantes.
+
+---
+
+## Conclusão
+Este MVP foca nas funcionalidades essenciais para digitalizar a gestão de uma barbearia, melhorando a eficiência operacional e a experiência dos clientes. Com essa base sólida, o sistema pode ser expandido futuramente com funcionalidades mais avançadas.
+

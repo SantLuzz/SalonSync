@@ -1,0 +1,11 @@
+using System.ComponentModel.DataAnnotations;
+
+namespace SalonSync.Core.Requests.Entities.Employees;
+
+public class UpdateImageEmployeeRequest : Request
+{
+    public long Id { get; set; }
+    
+    [Required(ErrorMessage = "Informe a imagem do funcionário!")]
+    public string Base64Image { get; set; } = string.Empty;
+}
