@@ -1,4 +1,5 @@
 ﻿using SalonSync.Api.Common.Api;
+using SalonSync.Api.Endpoints.Financial.CostCenters;
 using SalonSync.Api.Endpoints.Identity;
 using SalonSync.Api.Models;
 
@@ -24,6 +25,17 @@ namespace SalonSync.Api.Endpoints
                 .WithTags("Identity")
                 .MapEndpoints<LogoutEndpoint>()
                 .MapEndpoints<GetRolesEndpoint>();
+
+            endpoint.MapGroup("v1/costs-centers")
+                .WithTags("Costs")
+                .RequireAuthorization()
+                .MapEndpoints<CreateCostCenterEndpoint>()
+                .MapEndpoints<DeleteCostCenterEndpoint>()
+                .MapEndpoints<UpdateCostCenterEndpoint>()
+                .MapEndpoints<GetAllCostCenterEndpoint>()
+                .MapEndpoints<GetAllCostCentersByTypeEndpoint>()
+                .MapEndpoints<GetCostCenterByIdEndpoint>();
+
         }
 
         private static IEndpointRouteBuilder MapEndpoints<TEndpoint> (this IEndpointRouteBuilder app) where TEndpoint : IEndpoint
