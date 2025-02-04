@@ -10,6 +10,11 @@
                 .RequireAuthorization();
         }
 
+        public static void UseFiles(this WebApplication app)
+        {
+            app.UseStaticFiles();
+        }
+        
         public static void UseSecurity(this WebApplication app)
         {
             app.UseAuthentication();

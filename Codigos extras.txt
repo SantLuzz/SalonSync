@@ -1,0 +1,91 @@
+📌 Professionals (Profissionais)
+Id (GUID, PK)
+Name (String)
+Email (String, Único)
+Phone (String)
+
+📌 Clients (Clientes)
+Id (GUID, PK)
+Name (String)
+Email (String, Único)
+Phone (String)
+
+📌 Services (Serviços)
+Id (GUID, PK)
+Name (String)
+Duration (Int, minutos)
+Price (Decimal)
+
+📌 Packages (Pacotes mensais)
+Id (GUID, PK)
+Name (String)
+ServiceId (FK -> Services)
+Sessions (Int, número de atendimentos no período)
+Price (Decimal)
+
+📌 ClientPackages (Pacotes adquiridos pelos clientes)
+Id (GUID, PK)
+ClientId (FK -> Clients)
+PackageId (FK -> Packages)
+StartDate (Date)
+EndDate (Date)
+RemainingSessions (Int)
+
+📌 Schedule (Agenda e Agendamentos unificados)
+Id (GUID, PK)
+ProfessionalId (FK -> Professionals)
+ClientId (FK -> Clients, pode ser NULL se livre)
+ServiceId (FK -> Services, pode ser NULL se livre)
+Date (Date)
+StartTime (Time)
+EndTime (Time)
+Status (Enum: Livre, Agendado, Concluído, Cancelado)
+
+📌 ClientPackageAppointments (Uso do pacote em agendamentos automáticos)
+Id (GUID, PK)
+ClientPackageId (FK -> ClientPackages)
+ScheduleId (FK -> Schedule)
+
+
+public async Task<IActionResult> UploadImage(
+            [FromBody]UploadImageViewModel model,
+            [FromServices]BlogDataContext context)
+        {
+            var fileName = $"{Guid.NewGuid().ToString()}.jpg";
+            //tratando possíveis erros vindo do frontend
+            var data = new Regex(@"^data:image/[a-z]+;base64,")
+                .Replace(model.Base64Image, string.Empty);
+
+            //convertendo para byte array
+            var bytes = Convert.FromBase64String(data);
+
+            try
+            {
+                await System.IO.File.WriteAllBytesAsync($"wwwroot/images/{fileName}", bytes);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ResultViewModel<string>("05X04 - Falha interna no servidor!"));
+            }
+
+            var user = await context
+                .Users
+                .FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
+
+            if (user == null)
+                return NotFound(new ResultViewModel<User>("Usuário não encontrado!"));
+
+            user.Image = $"https://localhost:0000/images/{fileName}";
+
+            try
+            {
+                context.Users.Update(user);
+                await context.SaveChangesAsync();
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, new ResultViewModel<string>("05X04 - Falha interna no servidor!"));
+            }
+
+            return Ok(new ResultViewModel<string>("Imagem Alterada com sucesso!"));
+        }

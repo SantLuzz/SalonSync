@@ -1,4 +1,6 @@
 ﻿using SalonSync.Api.Common.Api;
+using SalonSync.Api.Endpoints.Entities.Clients;
+using SalonSync.Api.Endpoints.Entities.Employees;
 using SalonSync.Api.Endpoints.Financial.CostCenters;
 using SalonSync.Api.Endpoints.Identity;
 using SalonSync.Api.Models;
@@ -26,6 +28,28 @@ namespace SalonSync.Api.Endpoints
                 .MapEndpoints<LogoutEndpoint>()
                 .MapEndpoints<GetRolesEndpoint>();
 
+            endpoint.MapGroup("v1/clients")
+                .WithTags("Clients")
+                .RequireAuthorization()
+                .MapEndpoints<CreateClientEndpoint>()
+                .MapEndpoints<UpdateClientEndpoint>()
+                .MapEndpoints<UpdateImageClientEndpoint>()
+                .MapEndpoints<UpdateLastedProcedreClientEndpoint>()
+                .MapEndpoints<DeleteClientEndpoint>()
+                .MapEndpoints<GetClientByIdEndpoint>()
+                .MapEndpoints<GetAllClientsEndpoint>()
+                .MapEndpoints<GetAllClientsByTypeEndpoint>();
+
+            endpoint.MapGroup("v1/employees")
+                .WithTags("Employees")
+                .RequireAuthorization()
+                .MapEndpoints<CreateEmployeeEndpoint>()
+                .MapEndpoints<UpdateEmployeeEndpoint>()
+                .MapEndpoints<UpdateImageEmployeeEndpoint>()
+                .MapEndpoints<DeleteEmployeeEndpoint>()
+                .MapEndpoints<GetEmployeeByIdEndpoint>()
+                .MapEndpoints<GetAllEmployeesEndpoint>();
+            
             endpoint.MapGroup("v1/costs-centers")
                 .WithTags("Costs")
                 .RequireAuthorization()

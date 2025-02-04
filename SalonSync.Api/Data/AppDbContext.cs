@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using SalonSync.Api.Models;
+using SalonSync.Core.Models.Entities;
 using SalonSync.Core.Models.Financial;
 
 namespace SalonSync.Api.Data;
@@ -20,8 +21,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     >(options)
 {
 
+    public DbSet<Client> Clients { get; set; } = null!;
+    public DbSet<Employee> Employees { get; set; } = null!;
     public DbSet<CostCenter> CostCenters { get; set; } = null!;
     public DbSet<Transaction> Transactions { get; set; } = null!;
+    
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

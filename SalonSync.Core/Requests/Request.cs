@@ -1,4 +1,6 @@
-﻿namespace SalonSync.Core.Requests
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace SalonSync.Core.Requests
 {
     public abstract class Request
     {

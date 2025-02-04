@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <Folder Include="Endpoints\Financial\" />
+    <Folder Include="wwwroot\uploads\" />
   </ItemGroup>
 
   <PropertyGroup>
