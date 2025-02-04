@@ -104,7 +104,7 @@ public class EmployeeHandler(AppDbContext context) : IEmployeeHandler
             {
                 await System.IO.File.WriteAllBytesAsync($"{ApiConfiguration.FileFolder}{fileName}", bytes);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return new Response<Employee?>(null, 500, "(SSE004) Não foi possível gravar a imagem do funcionário!");
             }

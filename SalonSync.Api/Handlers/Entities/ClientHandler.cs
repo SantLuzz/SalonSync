@@ -102,9 +102,9 @@ public class ClientHandler(AppDbContext context) : IClientHandler
 
             try
             {
-                await System.IO.File.WriteAllBytesAsync($"{ApiConfiguration.FileFolder}{fileName}", bytes);
+                await File.WriteAllBytesAsync($"{ApiConfiguration.FileFolder}{fileName}", bytes);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return new Response<Client?>(null, 500, "(SSCL004) Não foi possível gravar a imagem do cliente!");
             }

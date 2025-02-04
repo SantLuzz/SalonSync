@@ -1,3 +1,52 @@
+📌 Professionals (Profissionais)
+Id (GUID, PK)
+Name (String)
+Email (String, Único)
+Phone (String)
+
+📌 Clients (Clientes)
+Id (GUID, PK)
+Name (String)
+Email (String, Único)
+Phone (String)
+
+📌 Services (Serviços)
+Id (GUID, PK)
+Name (String)
+Duration (Int, minutos)
+Price (Decimal)
+
+📌 Packages (Pacotes mensais)
+Id (GUID, PK)
+Name (String)
+ServiceId (FK -> Services)
+Sessions (Int, número de atendimentos no período)
+Price (Decimal)
+
+📌 ClientPackages (Pacotes adquiridos pelos clientes)
+Id (GUID, PK)
+ClientId (FK -> Clients)
+PackageId (FK -> Packages)
+StartDate (Date)
+EndDate (Date)
+RemainingSessions (Int)
+
+📌 Schedule (Agenda e Agendamentos unificados)
+Id (GUID, PK)
+ProfessionalId (FK -> Professionals)
+ClientId (FK -> Clients, pode ser NULL se livre)
+ServiceId (FK -> Services, pode ser NULL se livre)
+Date (Date)
+StartTime (Time)
+EndTime (Time)
+Status (Enum: Livre, Agendado, Concluído, Cancelado)
+
+📌 ClientPackageAppointments (Uso do pacote em agendamentos automáticos)
+Id (GUID, PK)
+ClientPackageId (FK -> ClientPackages)
+ScheduleId (FK -> Schedule)
+
+
 public async Task<IActionResult> UploadImage(
             [FromBody]UploadImageViewModel model,
             [FromServices]BlogDataContext context)
