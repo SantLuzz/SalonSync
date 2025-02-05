@@ -59,6 +59,16 @@ public class EmployeeMapping : IEntityTypeConfiguration<Employee>
             .HasColumnType("NVARCHAR")
             .HasMaxLength(255);
         
+        builder.Property(x => x.StartTime)
+            .IsRequired(false)
+            .HasColumnName("StartTime")
+            .HasColumnType("TIME");
+        
+        builder.Property(x => x.EndTime)
+            .IsRequired(false)
+            .HasColumnName("EndTime")
+            .HasColumnType("TIME");
+        
         builder.Property(x => x.UserId)
             .IsRequired()
             .HasColumnName("UserId")

@@ -29,6 +29,8 @@ public class EmployeeHandler(AppDbContext context) : IEmployeeHandler
                 Admission = request.Admission,
                 Commission = request.Commission,
                 UserId = request.UserId,
+                StartTime = request.StartTime,
+                EndTime = request.EndTime,
             };
             
             await context.Employees.AddAsync(employee);
@@ -69,6 +71,8 @@ public class EmployeeHandler(AppDbContext context) : IEmployeeHandler
             employee.Commission = request.Commission;
             employee.UserId = request.UserId;
             employee.UpdatedAt = DateTime.Now;
+            employee.StartTime = request.StartTime;
+            employee.EndTime = request.EndTime;
 
             context.Employees.Update(employee);
             await context.SaveChangesAsync();
@@ -148,6 +152,20 @@ public class EmployeeHandler(AppDbContext context) : IEmployeeHandler
 
     public async Task<Response<Employee?>> GetByIdAsync(GetEmployeeByIdRequest request)
     {
+        DateTime startOfWeek;
+        DateTime endOfWeek;
+        try
+        {
+            var today = DateTime.UtcNow.Date;
+            startOfWeek = today.AddDays(-(int)today.DayOfWeek + (int)DayOfWeek.Monday);
+            endOfWeek = startOfWeek.AddDays(6);
+        }
+        catch 
+        {
+           startOfWeek = DateTime.Today;
+           endOfWeek = DateTime.Today.AddDays(6);
+        }
+        
         try
         {
             var employee = await context
@@ -155,10 +173,20 @@ public class EmployeeHandler(AppDbContext context) : IEmployeeHandler
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.UserId == request.UserId
                                           && x.Id == request.Id);
+
+            if (employee is null)
+                return new Response<Employee?>(null, 404, "Funcionário não encontrado!");
             
-            return employee is null
-                ? new Response<Employee?>(null, 404, "Funcionário não encontrado!")
-                : new Response<Employee?>(employee, message:"Funcionário encontrado com sucesso!");
+            employee.Appointments = await context
+                .Appointments
+                .AsNoTracking()
+                .Where(a => a.EmployeeId == employee.Id
+                    && a.UserId == request.UserId
+                    && a.Date.Date >= startOfWeek && a.Date.Date <= endOfWeek)
+                .ToListAsync();
+            
+            
+            return new Response<Employee?>(employee, message:"Funcionário encontrado com sucesso!");
         }
         catch (Exception)
         {

@@ -2,6 +2,7 @@ using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 using SalonSync.Api.Common.Api;
 using SalonSync.Api.Data;
+using SalonSync.Core.Enums;
 using SalonSync.Core.Handlers.Entities;
 using SalonSync.Core.Models.Entities;
 using SalonSync.Core.Requests.Entities.Clients;
@@ -179,9 +180,23 @@ public class ClientHandler(AppDbContext context) : IClientHandler
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.UserId == request.UserId
                                           && x.Id == request.Id);
-                return  client is null 
-                    ? new Response<Client?>(null, 404, "Cliente não encontrado!")
-                    : new Response<Client?>(client, message: "Cliente encontrado com sucesso!");
+
+            if (client is null)
+                return new Response<Client?>(null, 404, "Cliente não encontrado!");
+
+            if (client is { Type: EClientType.Monthly })
+            {
+                client.ClientPackages = await context
+                    .ClientPackages
+                    .AsNoTracking()
+                    .Include(x => x.Package)
+                    .Where(x => x.ClientId == client.Id
+                        && x.UserId == request.UserId
+                        && x.Status == EPackageStatus.Active)
+                    .ToListAsync();    
+            }
+            
+            return new Response<Client?>(client, message: "Cliente encontrado com sucesso!");
         }
         catch (Exception)
         {

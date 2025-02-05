@@ -1,0 +1,42 @@
+🟢 1. Regras Gerais para Todos os Agendamentos
+O agendamento deve sempre ter um Profissional, um Serviço (exceto se for apenas reserva de horário) e um Cliente (exceto se for um horário livre).
+O tempo de cada serviço é definido pelo campo Duration na entidade Service.
+O horário do agendamento deve estar dentro do horário de trabalho do profissional.
+O status do agendamento pode ser:
+Livre: O horário está disponível para agendamento.
+Agendado: O horário foi reservado por um cliente.
+Concluído: O serviço foi realizado com sucesso.
+Cancelado: O cliente ou profissional cancelou a reserva.
+
+🟠 2. Agendamento Manual (Sem Pacote)
+O cliente escolhe um serviço, um profissional e um horário disponível.
+
+Regras
+O cliente deve selecionar um horário livre (Status = Livre) na tabela Schedule.
+O sistema verifica se o profissional está disponível no horário escolhido.
+Se estiver disponível, o agendamento é confirmado e o status passa para Agendado.
+O cliente paga pelo serviço individualmente, sem relação com pacotes.
+Fluxo do Agendamento Manual
+Cliente escolhe um profissional e um serviço.
+Sistema mostra os horários livres.
+Cliente seleciona um horário.
+Se o horário estiver livre, o sistema cria o agendamento.
+🔵 3. Agendamento Automático (Uso de Pacote)
+O cliente já comprou um pacote de serviços e deseja utilizar uma das sessões disponíveis.
+
+Regras
+O cliente deve ter um pacote ativo (StartDate <= Data Atual <= EndDate).
+O pacote deve ter sessões disponíveis (RemainingSessions > 0).
+O sistema encontra horários livres e sugere ao cliente.
+Ao confirmar, o agendamento é criado automaticamente e vinculado ao ClientPackageAppointment.
+O número de sessões restantes (RemainingSessions) é reduzido em 1.
+Fluxo do Agendamento Automático
+Cliente solicita um agendamento pelo pacote.
+O sistema verifica pacotes ativos e sessões restantes.
+O sistema sugere horários livres.
+Cliente escolhe um horário.
+O sistema cria o agendamento e associa ao pacote.
+🔴 4. Regras de Cancelamento e Reagendamento
+Cancelamento antes do horário: O cliente pode cancelar e liberar o horário. Se for um agendamento de pacote, a sessão é devolvida (RemainingSessions++).
+Cancelamento após o horário: O status muda para Cancelado, mas a sessão não é devolvida.
+Reagendamento: Somente permitido se houver um horário livre dentro do período do pacote.

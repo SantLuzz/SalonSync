@@ -1,4 +1,5 @@
 using SalonSync.Core.Enums;
+using SalonSync.Core.Models.Packages;
 
 namespace SalonSync.Core.Models.Entities;
 
@@ -16,4 +17,5 @@ public class Client
     public DateTime? LastProcedure { get; set; }
     public string? Image { get; set; }
     public string UserId { get; set; } = string.Empty;
+    public List<ClientPackage> ClientPackages { get; set; } = [];
 }
