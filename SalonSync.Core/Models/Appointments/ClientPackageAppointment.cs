@@ -8,6 +8,7 @@ public class ClientPackageAppointment
     public string UserId { get; set; } = string.Empty;
     public long ClientPackageId { get; set; }
     public long AppointmentId { get; set; }
+    
     public ClientPackage? ClientPackages { get; set; }
-    public List<Appointment> Appointments { get; set; } = [];
+    public Appointment? Appointment { get; set; }
 }

@@ -2,6 +2,7 @@ using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 using SalonSync.Api.Common.Api;
 using SalonSync.Api.Data;
+using SalonSync.Api.Handlers.Appointments;
 using SalonSync.Core.Enums;
 using SalonSync.Core.Handlers.Entities;
 using SalonSync.Core.Models.Entities;
@@ -12,6 +13,7 @@ namespace SalonSync.Api.Handlers.Entities;
 
 public class ClientHandler(AppDbContext context) : IClientHandler
 {
+    private ClientPackageAppointmentHandler _clientAppointmentHandler = new ClientPackageAppointmentHandler(context);
     public async Task<Response<Client?>> CreateAsync(CreateClientRequest request)
     {
         try
@@ -193,7 +195,10 @@ public class ClientHandler(AppDbContext context) : IClientHandler
                     .Where(x => x.ClientId == client.Id
                         && x.UserId == request.UserId
                         && x.Status == EPackageStatus.Active)
-                    .ToListAsync();    
+                    .ToListAsync();
+
+                client.Historic = await _clientAppointmentHandler
+                    .GetHistoricClient(client.Id, request.UserId);
             }
             
             return new Response<Client?>(client, message: "Cliente encontrado com sucesso!");

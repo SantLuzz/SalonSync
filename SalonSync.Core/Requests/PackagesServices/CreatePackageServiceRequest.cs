@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SalonSync.Core.Requests.PackagesServices;
 
-public class CreatePackageServicesRequest : Request
+public class CreatePackageServiceRequest : Request
 {
     [Required(ErrorMessage = "O pacote é obrigatório!")]
     public long PackageId { get; set; }

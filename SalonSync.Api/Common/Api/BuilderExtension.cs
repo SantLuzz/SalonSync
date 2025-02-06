@@ -1,12 +1,18 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SalonSync.Api.Data;
+using SalonSync.Api.Handlers.Appointments;
 using SalonSync.Api.Handlers.Entities;
 using SalonSync.Api.Handlers.Financial;
+using SalonSync.Api.Handlers.Packages;
+using SalonSync.Api.Handlers.Services;
 using SalonSync.Api.Models;
 using SalonSync.Core;
+using SalonSync.Core.Handlers.Appointments;
 using SalonSync.Core.Handlers.Entities;
 using SalonSync.Core.Handlers.Financial;
+using SalonSync.Core.Handlers.Packages;
+using SalonSync.Core.Handlers.Services;
 
 namespace SalonSync.Api.Common.Api
 {
@@ -58,6 +64,11 @@ namespace SalonSync.Api.Common.Api
             builder.Services.AddTransient<ITransactionHandler, TransactionHandler>();
             builder.Services.AddTransient<IClientHandler, ClientHandler>();
             builder.Services.AddTransient<IEmployeeHandler, EmployeeHandler>();
+            builder.Services.AddTransient<IServiceHandler, ServiceHandler>();
+            builder.Services.AddTransient<IPackageHandler, PackageHandler>();
+            builder.Services.AddTransient<IPackageServiceHandler, PackageServiceHandler>();
+            builder.Services.AddTransient<IClientPackageHandler, ClientPackageHandler>();
+            builder.Services.AddTransient<IAppointmentHandler, AppointmentHandler>();
         }
 
         public static void AddCrossOrigin(this WebApplicationBuilder builder)

@@ -6,11 +6,6 @@ public class UpdatePackageServiceRequest : Request
 {
     public long Id { get; set; }
     
-    [Required(ErrorMessage = "O nome do service deve ser informado!")]
-    [MinLength(3, ErrorMessage = "O nome deve conter no minimo 3 caracteres!")]
-    [MaxLength(160, ErrorMessage = "O nome deve conter no máximo 160 caracteres!")]
-    public string Name { get; set; } = string.Empty;
-    
-    [Required(ErrorMessage = "Informe o valor do pacote!")]
-    public decimal Price { get; set; }
+    [Required(ErrorMessage = "Informe a quantidade de sessões para o serviço!")]
+    public int SessionsPerService { get; set; }
 }

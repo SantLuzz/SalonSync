@@ -13,5 +13,4 @@ public interface IAppointmentHandler
     Task<Response<SchedulingClosedDTO?>> FinishAsync(FinishSchedulingRequest request);
     Task<PagedResponse<List<EmployeeAvailabilitySlotsDTO>?>> GetEmployeesWithOpenScheduleAsync(GetEmployeesWithOpenScheduleRequest request);
     Task<PagedResponse<List<Appointment>?>> GetByEmployeeAsync(GetAppointmentByEmployeeRequest request);
-    
 }

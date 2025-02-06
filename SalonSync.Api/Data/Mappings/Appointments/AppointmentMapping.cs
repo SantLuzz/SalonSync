@@ -52,5 +52,9 @@ public class AppointmentMapping : IEntityTypeConfiguration<Appointment>
         builder.Property(x => x.ServiceId)
             .IsRequired()
             .HasColumnName("ServiceId");
+        
+        builder.Property(x => x.AppointmentGroupId)
+            .IsRequired(false)
+            .HasColumnName("AppointmentGroupId");
     }
 }

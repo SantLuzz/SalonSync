@@ -16,7 +16,8 @@ public class EmployeeHandler(AppDbContext context) : IEmployeeHandler
         try
         {
             if(await MethodsExtensions.CheckFieldInUse(context.Employees, 
-                   x => x.Email.Equals(request.Email, StringComparison.OrdinalIgnoreCase)))
+                   x => x.Email.Equals(request.Email, StringComparison.OrdinalIgnoreCase)
+                   && x.UserId == request.UserId))
                 return new Response<Employee?>(null, 400, "O e-Mail informado já está vinculado a outro funcionário!");
             
             var employee = new Employee
@@ -59,7 +60,8 @@ public class EmployeeHandler(AppDbContext context) : IEmployeeHandler
             if (!employee.Email.Equals(request.Email, StringComparison.OrdinalIgnoreCase))
             {
                 if(await MethodsExtensions.CheckFieldInUse(context.Employees, 
-                       x => x.Email.Equals(request.Email, StringComparison.OrdinalIgnoreCase)))
+                       x => x.Email.Equals(request.Email, StringComparison.OrdinalIgnoreCase)
+                            && x.UserId == request.UserId))
                     return new Response<Employee?>(null, 400, "O e-Mail informado já está vinculado a outro Funcionário!");
             }
 

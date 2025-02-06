@@ -31,6 +31,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     public DbSet<PackageService> PackageServices { get; set; } = null!;
     public DbSet<ClientPackage> ClientPackages { get; set; } = null!;
     public DbSet<Appointment> Appointments { get; set; } = null!;
+    public DbSet<AppointmentGroup> AppointmentGroups { get; set; } = null!;
     public DbSet<ClientPackageAppointment> ClientPackageAppointments { get; set; } = null!;
     public DbSet<CostCenter> CostCenters { get; set; } = null!;
     public DbSet<Transaction> Transactions { get; set; } = null!;

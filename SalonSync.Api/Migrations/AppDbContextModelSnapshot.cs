@@ -244,12 +244,13 @@ namespace SalonSync.Api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
+                    b.Property<long?>("AppointmentGroupId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("AppointmentGroupId");
+
                     b.Property<long>("ClientId")
                         .HasColumnType("bigint")
                         .HasColumnName("ClientId");
-
-                    b.Property<long?>("ClientPackageAppointmentId")
-                        .HasColumnType("bigint");
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("DATETIME2")
@@ -285,15 +286,40 @@ namespace SalonSync.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ClientId");
+                    b.HasIndex("AppointmentGroupId");
 
-                    b.HasIndex("ClientPackageAppointmentId");
+                    b.HasIndex("ClientId");
 
                     b.HasIndex("EmployeeId");
 
                     b.HasIndex("ServiceId");
 
                     b.ToTable("Appointments", (string)null);
+                });
+
+            modelBuilder.Entity("SalonSync.Core.Models.Appointments.AppointmentGroup", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("Date");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("EmployeeId");
+
+                    b.Property<int>("TotalDuration")
+                        .HasColumnType("int")
+                        .HasColumnName("TotalDuration");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AppointmentGroups", (string)null);
                 });
 
             modelBuilder.Entity("SalonSync.Core.Models.Appointments.ClientPackageAppointment", b =>
@@ -308,6 +334,9 @@ namespace SalonSync.Api.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("AppointmentId");
 
+                    b.Property<long?>("ClientId")
+                        .HasColumnType("bigint");
+
                     b.Property<long>("ClientPackageId")
                         .HasColumnType("bigint")
                         .HasColumnName("ClientPackageId");
@@ -319,6 +348,10 @@ namespace SalonSync.Api.Migrations
                         .HasColumnName("UserId");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AppointmentId");
+
+                    b.HasIndex("ClientId");
 
                     b.HasIndex("ClientPackageId");
 
@@ -730,15 +763,15 @@ namespace SalonSync.Api.Migrations
 
             modelBuilder.Entity("SalonSync.Core.Models.Appointments.Appointment", b =>
                 {
+                    b.HasOne("SalonSync.Core.Models.Appointments.AppointmentGroup", "AppointmentGroup")
+                        .WithMany()
+                        .HasForeignKey("AppointmentGroupId");
+
                     b.HasOne("SalonSync.Core.Models.Entities.Client", "Client")
                         .WithMany()
                         .HasForeignKey("ClientId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("SalonSync.Core.Models.Appointments.ClientPackageAppointment", null)
-                        .WithMany("Appointments")
-                        .HasForeignKey("ClientPackageAppointmentId");
 
                     b.HasOne("SalonSync.Core.Models.Entities.Employee", "Employee")
                         .WithMany("Appointments")
@@ -752,6 +785,8 @@ namespace SalonSync.Api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("AppointmentGroup");
+
                     b.Navigation("Client");
 
                     b.Navigation("Employee");
@@ -761,11 +796,23 @@ namespace SalonSync.Api.Migrations
 
             modelBuilder.Entity("SalonSync.Core.Models.Appointments.ClientPackageAppointment", b =>
                 {
+                    b.HasOne("SalonSync.Core.Models.Appointments.Appointment", "Appointment")
+                        .WithMany()
+                        .HasForeignKey("AppointmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SalonSync.Core.Models.Entities.Client", null)
+                        .WithMany("Historic")
+                        .HasForeignKey("ClientId");
+
                     b.HasOne("SalonSync.Core.Models.Packages.ClientPackage", "ClientPackages")
                         .WithMany()
                         .HasForeignKey("ClientPackageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Appointment");
 
                     b.Navigation("ClientPackages");
                 });
@@ -802,11 +849,13 @@ namespace SalonSync.Api.Migrations
 
             modelBuilder.Entity("SalonSync.Core.Models.Packages.PackageService", b =>
                 {
-                    b.HasOne("SalonSync.Core.Models.Packages.Package", null)
+                    b.HasOne("SalonSync.Core.Models.Packages.Package", "Package")
                         .WithMany("PackageServices")
                         .HasForeignKey("PackageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Package");
                 });
 
             modelBuilder.Entity("SalonSync.Api.Models.User", b =>
@@ -814,14 +863,11 @@ namespace SalonSync.Api.Migrations
                     b.Navigation("Roles");
                 });
 
-            modelBuilder.Entity("SalonSync.Core.Models.Appointments.ClientPackageAppointment", b =>
-                {
-                    b.Navigation("Appointments");
-                });
-
             modelBuilder.Entity("SalonSync.Core.Models.Entities.Client", b =>
                 {
                     b.Navigation("ClientPackages");
+
+                    b.Navigation("Historic");
                 });
 
             modelBuilder.Entity("SalonSync.Core.Models.Entities.Employee", b =>

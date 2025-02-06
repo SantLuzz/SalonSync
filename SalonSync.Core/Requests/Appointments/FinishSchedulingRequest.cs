@@ -5,7 +5,7 @@ namespace SalonSync.Core.Requests.Appointments;
 public class FinishSchedulingRequest : Request
 {
     [Required(ErrorMessage = "Informe o horário Incial do agendamento!")]
-    public TimeOnly StartDate { get; set; }
+    public TimeOnly StartTime { get; set; }
     
     [Required(ErrorMessage = "Informe o serviço a ser executado")]
     public long ServiceId { get; set; }
