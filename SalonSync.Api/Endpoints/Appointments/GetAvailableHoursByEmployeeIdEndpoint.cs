@@ -14,7 +14,7 @@ public class GetAvailableHoursByEmployeeIdEndpoint : IEndpoint
         => app.MapGet("/employees-available-hours/", HandlerAsync)
             .WithName("Appointments: Get available hours for employee id")
             .WithDescription("Get available hours for employee id.")
-            .WithOrder(4)
+            .WithOrder(5)
             .Produces<PagedResponse<List<EmployeeAvailabilitySlotsDTO>?>>();
 
     private static async Task<IResult> HandlerAsync(

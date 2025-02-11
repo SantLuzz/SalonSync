@@ -14,7 +14,7 @@ public class GetEmployeesWithOpenScheduleEndpoint : IEndpoint
         => app.MapGet("/employees-open-schedule/{date:datetime}", HandlerAsync)
             .WithName("Appointments: Get employees with open schedule")
             .WithDescription("Get employees with open schedule.")
-            .WithOrder(3)
+            .WithOrder(4)
             .Produces<PagedResponse<List<EmployeeAvailabilitySlotsDTO>?>>();
 
     private static async Task<IResult> HandlerAsync(

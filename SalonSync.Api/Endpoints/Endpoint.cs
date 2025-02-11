@@ -113,6 +113,7 @@ namespace SalonSync.Api.Endpoints
                 .WithTags("Appointments")
                 .RequireAuthorization()
                 .MapEndpoints<OpenAppointmentByEmployeeEndpoint>()
+                .MapEndpoints<GenerateScheduleWithEmployeeEndpoint>()
                 .MapEndpoints<GetAvailableDateEndpoint>()
                 .MapEndpoints<GetEmployeesWithOpenScheduleEndpoint>()
                 .MapEndpoints<GetAvailableHoursByEmployeeIdEndpoint>();

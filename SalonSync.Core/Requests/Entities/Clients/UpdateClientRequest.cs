@@ -29,4 +29,6 @@ public class UpdateClientRequest : Request
     public EClientType Type { get; set; } = EClientType.Common;
     
     public DateTime? LastProcedure { get; set; }
+    
+    public DateTime? Birthdate { get; set; }
 }

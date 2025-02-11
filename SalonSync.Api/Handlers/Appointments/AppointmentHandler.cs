@@ -5,6 +5,7 @@ using SalonSync.Core.DTOs;
 using SalonSync.Core.Enums;
 using SalonSync.Core.Handlers.Appointments;
 using SalonSync.Core.Models.Appointments;
+using SalonSync.Core.Models.Entities;
 using SalonSync.Core.Requests.Appointments;
 using SalonSync.Core.Responses;
 
@@ -109,6 +110,9 @@ public class AppointmentHandler(AppDbContext context) : IAppointmentHandler
             if (service is null)
                 return new Response<EmployeeAvailabilitySlotsDTO?>(null, 404, "Serviço não encontrado!");
 
+            var now = DateTime.Now;
+            bool isToday = request.Date.Date == now.Date;
+            
             var appointments = await context
                 .Appointments
                 .AsNoTracking()
@@ -116,12 +120,31 @@ public class AppointmentHandler(AppDbContext context) : IAppointmentHandler
                 .Where(x => x.UserId == request.UserId
                             && x.EmployeeId == request.EmployeeId
                             && x.Date == request.Date.Date
-                            && x.Status == EAppointmentStatus.Free)
+                            && x.Status == EAppointmentStatus.Free
+                            && (!isToday || x.StartTime >= TimeOnly.FromDateTime(now)))
                 .OrderBy(a => a.StartTime) // Ordenação essencial para agrupar consecutivos
                 .ToListAsync();
 
             if (!appointments.Any())
-                return new Response<EmployeeAvailabilitySlotsDTO?>(null, 404, "Agenda deste profissional não está aberta!");
+            {
+                DateTime? nextDay =  await context.Appointments
+                    .Where(a => a.EmployeeId == request.EmployeeId && a.Status == EAppointmentStatus.Free &&
+                                a.Date > request.Date)
+                    .OrderBy(a => a.Date)
+                    .Select(a => (DateTime?)a.Date)
+                    .FirstOrDefaultAsync();
+                    
+                return new Response<EmployeeAvailabilitySlotsDTO?>(new EmployeeAvailabilitySlotsDTO
+                {
+                    Id = employee.Id,
+                    Name = employee.Name,
+                    AvailableSlots = [],
+                    NextAvaliabeDate = nextDay,
+                    UserId = request.UserId
+                }, 404, 
+                    $"Não existem horários disponíveis para a data informada{(nextDay.HasValue ? $", próxima data disponível {nextDay.Value:dd/MM/yyyy}" : "!")}");
+            }
+                
 
             // Definir a duração do serviço em slots
             TimeSpan serviceDuration = TimeSpan.FromMinutes(service.Duration);
@@ -143,11 +166,11 @@ public class AppointmentHandler(AppDbContext context) : IAppointmentHandler
                 Date = request.Date,
                 UserId = request.UserId,
                 AvailableSlots = groupedSlots, // Apenas horários válidos
-                NextAvaliabeDate = context.Appointments
+                NextAvaliabeDate = await context.Appointments
                     .Where(a => a.EmployeeId == request.EmployeeId && a.Status == EAppointmentStatus.Free && a.Date > request.Date)
                     .OrderBy(a => a.Date)
                     .Select(a => (DateTime?)a.Date)
-                    .FirstOrDefault()
+                    .FirstOrDefaultAsync()
             };
 
             if (!employeeAvailability.AvailableSlots.Any())
@@ -234,19 +257,129 @@ public class AppointmentHandler(AppDbContext context) : IAppointmentHandler
         }
     }
     
-    public async Task<Response<Appointment?>> CreateAsync(GenerateScheduleWithEmployeeRequest request)
+    public async Task<Response<AppointmentCreatedDto?>> CreateAsync(GenerateScheduleWithEmployeeRequest request)
     {
         try
         {
-            return null;
+            var employee = await context
+                .Employees
+                .FirstOrDefaultAsync(x => x.UserId == request.UserId
+                                          && x.Id == request.EmployeeId);
+
+            if (employee is null)
+                return new Response<AppointmentCreatedDto?>(null, 404, "Profissíonal não encontrado!");
+            
+            var service = await context
+                .Services
+                .FirstOrDefaultAsync(x => x.UserId == request.UserId
+                                          && x.Id == request.ServiceId);
+
+            if (service is null)
+                return new Response<AppointmentCreatedDto?>(null, 404, "Serviço não encontrado!");
+
+            var client = await context
+                .Clients
+                .FirstOrDefaultAsync(x => x.UserId == request.UserId
+                    && x.Id == request.ClientId);
+           
+            if (client is null)
+                return new Response<AppointmentCreatedDto?>(null, 404, "Cliente não encontrado!");
+            
+            var appointments = await context
+                .Appointments
+                .Where(x => x.UserId == request.UserId
+                            && x.EmployeeId == request.EmployeeId
+                            && x.Date == request.Date.Date
+                            && x.Status == EAppointmentStatus.Free
+                            && x.StartTime >= request.StartTime
+                            && x.EndTime <= request.EndTime)   
+                .OrderBy(x => x.StartTime) 
+                .ToListAsync();
+
+            if(!appointments.Any())
+                return new Response<AppointmentCreatedDto?>(null, 404, "Desculpe, mas o horário não está mais disponível!");
+
+            AppointmentGroup? group = null;
+            
+            if (appointments.Count > 1)
+            {
+                group = new()
+                {
+                    Date = request.Date,
+                    EmployeeId = request.EmployeeId,
+                    TotalDuration = service.Duration
+                };
+                
+                await context.AppointmentGroups.AddAsync(group);
+                await context.SaveChangesAsync();
+            }
+            
+            foreach (var appointment in appointments)
+            {
+                appointment.ClientId = request.ClientId;
+                appointment.Status = EAppointmentStatus.Scheduled;
+                appointment.ServiceId = request.ServiceId;
+                appointment.AppointmentGroupId = group?.Id ?? null;
+            }
+
+            try
+            {
+                context.Appointments.UpdateRange(appointments);
+                await context.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
+                if (group is not null)
+                {
+                    context.AppointmentGroups.Remove(group);
+                    await context.SaveChangesAsync();
+                }
+                return new Response<AppointmentCreatedDto?>(null, 500, "(SSA006) Não foi reservar os horários!");
+            }
+            
+            AppointmentCreatedDto appointmentCreatedDto = new ()
+            {
+                UserId  = request.UserId,
+                EmployeeId = request.EmployeeId,
+                EmployeeName = employee.Name,
+                ClientId = request.ClientId,
+                ClientName = client.Name,
+                ClientEmail = client.Email,
+                ServiceId = request.ServiceId,
+                ServiceDescription = service.Name,
+                Price = service.Price,
+                StartTime = request.StartTime,
+                EndTime = request.EndTime,
+                Appointments = appointments
+                    .Select(x => new AppointmentDto
+                    {
+                        Id = x.Id,
+                        UserId = x.UserId,
+                        Date = x.Date,
+                        StartTime = x.StartTime,
+                        EndTime = x.EndTime,
+                        Status = x.Status,
+                        ClientId = x.ClientId,
+                        EmployeeId = x.EmployeeId,
+                        ServiceId = x.ServiceId,
+                        AppointmentGroupId = x.AppointmentGroupId,
+                    }).ToList()
+            };
+            
+            return new Response<AppointmentCreatedDto?>(appointmentCreatedDto, message:"Agendamento realizado com sucesso!");
         }
         catch (Exception)
         {
-            return new Response<Appointment?>(null, 500, "(SSA005) Não foi possível criar o agendamento!");
+            return new Response<AppointmentCreatedDto?>(null, 500, "(SSA005) Não foi possível criar o agendamento!");
         }
     }
 
     public async Task<Response<SchedulingClosedDTO?>> FinishAsync(FinishSchedulingRequest request)
+    {
+        throw new NotImplementedException();
+    }
+    
+    public async Task<Response<SchedulingClosedDTO?>> CancelAsync(FinishSchedulingRequest request)
     {
         throw new NotImplementedException();
     }

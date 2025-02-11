@@ -13,7 +13,7 @@ public class GetAvailableDateEndpoint : IEndpoint
         => app.MapGet("/available-date/", HandlerAsync)
             .WithName("Appointments: Get Available Date")
             .WithDescription("Get Available Date.")
-            .WithOrder(2)
+            .WithOrder(3)
             .Produces<Response<AvailableDateDto?>>();
 
     private static async Task<IResult> HandlerAsync(
