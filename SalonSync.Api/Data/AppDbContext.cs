@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using SalonSync.Api.Models;
+using SalonSync.Core.Models;
 using SalonSync.Core.Models.Appointments;
 using SalonSync.Core.Models.Entities;
 using SalonSync.Core.Models.Financial;
@@ -23,7 +24,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
         IdentityUserToken<long>
     >(options)
 {
-
+    public DbSet<SystemConfig> SystemConfigs { get; set; } = null!;
     public DbSet<Client> Clients { get; set; } = null!;
     public DbSet<Employee> Employees { get; set; } = null!;
     public DbSet<Service> Services { get; set; } = null!;

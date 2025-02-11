@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SalonSync.Api.Data;
+using SalonSync.Api.Handlers;
 using SalonSync.Api.Handlers.Appointments;
 using SalonSync.Api.Handlers.Entities;
 using SalonSync.Api.Handlers.Financial;
@@ -8,6 +9,7 @@ using SalonSync.Api.Handlers.Packages;
 using SalonSync.Api.Handlers.Services;
 using SalonSync.Api.Models;
 using SalonSync.Core;
+using SalonSync.Core.Handlers;
 using SalonSync.Core.Handlers.Appointments;
 using SalonSync.Core.Handlers.Entities;
 using SalonSync.Core.Handlers.Financial;
@@ -60,6 +62,7 @@ namespace SalonSync.Api.Common.Api
 
         public static void AddServices(this WebApplicationBuilder builder)
         {
+            builder.Services.AddTransient<ISystemConfigHandler, SystemConfigHandler>();
             builder.Services.AddTransient<ICostCenterHandler, CostCenterHandler>();
             builder.Services.AddTransient<ITransactionHandler, TransactionHandler>();
             builder.Services.AddTransient<IClientHandler, ClientHandler>();

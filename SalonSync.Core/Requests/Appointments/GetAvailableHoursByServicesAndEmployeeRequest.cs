@@ -10,5 +10,5 @@ public class GetAvailableHoursByServicesAndEmployeeRequest : Request
     [Required(ErrorMessage = "Informe o serviço a ser executado!")]
     public long ServiceId { get; set; }
 
-    public DayOfWeek DayOfWeek { get; set; }
+    public DateTime Date { get; set; }
 }

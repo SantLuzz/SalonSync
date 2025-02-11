@@ -17,4 +17,7 @@ public class GenerateScheduleWithEmployeeRequest : Request
     
     [Required(ErrorMessage = "Informe a hora inicial do agendamento!")]
     public TimeOnly StartTime { get; set; }
+    
+    [Required(ErrorMessage = "Informe a hora final do agendamento!")]
+    public TimeOnly EndTime { get; set; }
 }

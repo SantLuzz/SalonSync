@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using SalonSync.Core.Enums;
 using SalonSync.Core.Models.Appointments;
+using SalonSync.Core.Models.Entities;
+using SalonSync.Core.Models.Services;
 
 namespace SalonSync.Api.Data.Mappings.Appointments;
 
@@ -42,7 +44,7 @@ public class AppointmentMapping : IEntityTypeConfiguration<Appointment>
             .HasDefaultValue(EAppointmentStatus.Free);
 
         builder.Property(x => x.ClientId)
-            .IsRequired()
+            .IsRequired(false)
             .HasColumnName("ClientId");
         
         builder.Property(x => x.EmployeeId)
@@ -50,7 +52,7 @@ public class AppointmentMapping : IEntityTypeConfiguration<Appointment>
             .HasColumnName("EmployeeId");
         
         builder.Property(x => x.ServiceId)
-            .IsRequired()
+            .IsRequired(false)
             .HasColumnName("ServiceId");
         
         builder.Property(x => x.AppointmentGroupId)

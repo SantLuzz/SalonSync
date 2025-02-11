@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using SalonSync.Api.Common.Api;
 using SalonSync.Api.Data;
 using SalonSync.Api.Handlers.Appointments;
+using SalonSync.Api.Services;
+using SalonSync.Core.DTOs;
 using SalonSync.Core.Enums;
 using SalonSync.Core.Handlers.Entities;
 using SalonSync.Core.Models.Entities;
@@ -13,7 +15,7 @@ namespace SalonSync.Api.Handlers.Entities;
 
 public class ClientHandler(AppDbContext context) : IClientHandler
 {
-    private ClientPackageAppointmentHandler _clientAppointmentHandler = new ClientPackageAppointmentHandler(context);
+    private readonly ClientPackageAppointmentHandler _clientAppointmentHandler = new ClientPackageAppointmentHandler(context);
     public async Task<Response<Client?>> CreateAsync(CreateClientRequest request)
     {
         try
@@ -32,6 +34,7 @@ public class ClientHandler(AppDbContext context) : IClientHandler
                 Type = request.Type,
                 CreatedAt = DateTime.Now,
                 UserId = request.UserId,
+                
             };
             
             await context.Clients.AddAsync(client);
@@ -206,6 +209,44 @@ public class ClientHandler(AppDbContext context) : IClientHandler
         catch (Exception)
         {
             return new Response<Client?>(null, 500, "(SSCL007) Não foi possível buscar o cliente!");
+        }
+    }
+
+    public async Task<PagedResponse<List<ClientBirthdaysDTO>?>> GetBirthdaysOfWeek(GetBirthdaysOfWeekRequest request)
+    {
+        DateService dateService;
+        try
+        {
+            dateService = new DateService();
+            dateService.GetCurrentWeekRange();
+        }
+        catch (Exception)
+        {
+            return new PagedResponse<List<ClientBirthdaysDTO>?>(null, 500, "(SSCL011) Não foi possível converter as datas!");
+        }
+        
+        
+        try
+        {
+            var clients = await context
+                .Clients
+                .AsNoTracking()
+                .Where(x => x.UserId == request.UserId
+                && x.Birthdate >= dateService.StartOfWeek && x.Birthdate <= dateService.EndOfWeek)
+                .ToListAsync();
+
+            return new PagedResponse<List<ClientBirthdaysDTO>?>(clients
+                    .Select(x => new ClientBirthdaysDTO
+                {
+                    Id = x.Id,
+                    Birthday = x.Birthdate,
+                    Name = x.Name ?? string.Empty,
+                }).ToList(), 
+                message:"Aniversáriantes encontrados com sucesso!");
+        }
+        catch (Exception)
+        {
+            return new PagedResponse<List<ClientBirthdaysDTO>?>(null, 500, "(SSCL010) Não foi possível buscar os aniversáriantes da semana!");
         }
     }
 

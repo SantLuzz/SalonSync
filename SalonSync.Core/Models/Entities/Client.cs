@@ -13,6 +13,7 @@ public class Client
     public string? PreferredService { get; set; }
     public string? Observations { get; set; }
     public EClientType Type { get; set; } = EClientType.Common;
+    public DateTime? Birthdate { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.Now;
     public DateTime? UpdatedAt { get; set; }
     public DateTime? LastProcedure { get; set; }

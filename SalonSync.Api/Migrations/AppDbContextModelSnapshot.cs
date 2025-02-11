@@ -248,7 +248,7 @@ namespace SalonSync.Api.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("AppointmentGroupId");
 
-                    b.Property<long>("ClientId")
+                    b.Property<long?>("ClientId")
                         .HasColumnType("bigint")
                         .HasColumnName("ClientId");
 
@@ -264,7 +264,7 @@ namespace SalonSync.Api.Migrations
                         .HasColumnType("TIME")
                         .HasColumnName("EndTime");
 
-                    b.Property<long>("ServiceId")
+                    b.Property<long?>("ServiceId")
                         .HasColumnType("bigint")
                         .HasColumnName("ServiceId");
 
@@ -366,6 +366,10 @@ namespace SalonSync.Api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
+                    b.Property<DateTime?>("Birthdate")
+                        .HasColumnType("DATETIME2")
+                        .HasColumnName("BirthDate");
+
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("DATETIME2")
@@ -458,6 +462,14 @@ namespace SalonSync.Api.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("NVARCHAR")
                         .HasColumnName("Image");
+
+                    b.Property<TimeOnly?>("LunchEnd")
+                        .HasColumnType("TIME")
+                        .HasColumnName("LunchEnd");
+
+                    b.Property<TimeOnly?>("LunchStart")
+                        .HasColumnType("TIME")
+                        .HasColumnName("LunchStart");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -718,6 +730,44 @@ namespace SalonSync.Api.Migrations
                     b.ToTable("Services", (string)null);
                 });
 
+            modelBuilder.Entity("SalonSync.Core.Models.SystemConfig", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("Friday")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Monday")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Saturday")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Sunday")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Thursday")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Tuesday")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("NVARCHAR(160)");
+
+                    b.Property<bool>("Wednesday")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SystemConfigs", (string)null);
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<long>", b =>
                 {
                     b.HasOne("SalonSync.Api.Models.User", null)
@@ -769,9 +819,7 @@ namespace SalonSync.Api.Migrations
 
                     b.HasOne("SalonSync.Core.Models.Entities.Client", "Client")
                         .WithMany()
-                        .HasForeignKey("ClientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ClientId");
 
                     b.HasOne("SalonSync.Core.Models.Entities.Employee", "Employee")
                         .WithMany("Appointments")
@@ -781,9 +829,7 @@ namespace SalonSync.Api.Migrations
 
                     b.HasOne("SalonSync.Core.Models.Services.Service", "Service")
                         .WithMany()
-                        .HasForeignKey("ServiceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ServiceId");
 
                     b.Navigation("AppointmentGroup");
 
@@ -799,7 +845,7 @@ namespace SalonSync.Api.Migrations
                     b.HasOne("SalonSync.Core.Models.Appointments.Appointment", "Appointment")
                         .WithMany()
                         .HasForeignKey("AppointmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("SalonSync.Core.Models.Entities.Client", null)

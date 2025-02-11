@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SalonSync.Api.Data;
+using SalonSync.Api.ViewModels;
 using SalonSync.Core.DTOs;
 using SalonSync.Core.Enums;
 using SalonSync.Core.Handlers.Appointments;
@@ -11,6 +12,9 @@ namespace SalonSync.Api.Handlers.Appointments;
 
 public class AppointmentHandler(AppDbContext context) : IAppointmentHandler
 {
+    private readonly SystemConfigHandler _systemConfigHandler = new (context);
+    private string _userId = string.Empty;
+    
     public async Task<Response<EmployeeAvailabilityScheduleDTO?>> OpenByEmployeeIdAsync(OpenAppointmentByEmployeeRequest request)
     {
         try
@@ -32,12 +36,21 @@ public class AppointmentHandler(AppDbContext context) : IAppointmentHandler
                 return new Response<EmployeeAvailabilityScheduleDTO?>(null, 400,
                     "Já existe uma agenda definida para esse profissional para o período especificado!");
 
-            var timeRange = SetTimeRange(employee.StartTime ?? new TimeOnly(8, 0),
-                employee?.EndTime ?? new TimeOnly(18, 0));
+            var employeeVm = new EmployeeScheduleVM
+            {
+                StartTime =  employee.StartTime ?? new TimeOnly(8, 0),
+                EndTime = employee?.EndTime ?? new TimeOnly(18, 0),
+                LunchStart = employee?.LunchStart ?? ApiConfiguration.DefaultStartLunchTime,
+                LunchEnd = employee?.LunchEnd ?? ApiConfiguration.DefaultEndLunchTime,
+            };
+            
+            var timeRange = SetTimeRange(employeeVm);
             if (!timeRange.Any())
                 return new Response<EmployeeAvailabilityScheduleDTO?>(null, 400,
                     "Não foi possível carregar o intervalo de horas!");
 
+            _userId = request.UserId;
+            
             var dateRange = SetDateRange(request.StartDate, request.EndDate);
             if (!dateRange.Any())
                 return new Response<EmployeeAvailabilityScheduleDTO?>(null, 400,
@@ -68,39 +81,182 @@ public class AppointmentHandler(AppDbContext context) : IAppointmentHandler
 
             return new Response<EmployeeAvailabilityScheduleDTO?>(dto, 201, "Agenda criada com sucesso!");
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             return new Response<EmployeeAvailabilityScheduleDTO?>(null, 500, "(SSA001) Não foi abrir a agenda do profissional!");
+        }
+    }
+
+    public async Task<Response<EmployeeAvailabilitySlotsDTO?>> GetAvailablesHoursByEmployeeIdAsync(GetAvailableHoursByServicesAndEmployeeRequest request)
+    {
+        try
+        {
+            var employee = await context
+                .Employees
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.UserId == request.UserId
+                    && x.Id == request.EmployeeId);
+
+            if (employee is null)
+                return new Response<EmployeeAvailabilitySlotsDTO?>(null, 404, "Profissíonal não encontrado!");
+            
+            var service = await context
+                .Services
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.UserId == request.UserId
+                && x.Id == request.ServiceId);
+
+            if (service is null)
+                return new Response<EmployeeAvailabilitySlotsDTO?>(null, 404, "Serviço não encontrado!");
+
+            var appointments = await context
+                .Appointments
+                .AsNoTracking()
+                .Include(x => x.Employee)
+                .Where(x => x.UserId == request.UserId
+                            && x.EmployeeId == request.EmployeeId
+                            && x.Date == request.Date.Date
+                            && x.Status == EAppointmentStatus.Free)
+                .OrderBy(a => a.StartTime) // Ordenação essencial para agrupar consecutivos
+                .ToListAsync();
+
+            if (!appointments.Any())
+                return new Response<EmployeeAvailabilitySlotsDTO?>(null, 404, "Agenda deste profissional não está aberta!");
+
+            // Definir a duração do serviço em slots
+            TimeSpan serviceDuration = TimeSpan.FromMinutes(service.Duration);
+            int slotDuration = ApiConfiguration.DefaultTimeByAppointment; // Ajuste conforme necessário (duração fixa de cada slot)
+            int requiredSlots = (int)Math.Ceiling(serviceDuration.TotalMinutes / slotDuration);
+
+            Dictionary<TimeOnly, TimeOnly> groupedSlots;
+
+            if (requiredSlots == 1)
+                groupedSlots = appointments
+                    .ToDictionary(x => x.StartTime, x => x.EndTime);
+            else
+                groupedSlots = GetConsecutiveAvailableSlots(appointments, requiredSlots);
+
+            var employeeAvailability = new EmployeeAvailabilitySlotsDTO
+            {
+                Id = request.EmployeeId,
+                Name = appointments.First().Employee?.Name ?? string.Empty,
+                Date = request.Date,
+                UserId = request.UserId,
+                AvailableSlots = groupedSlots, // Apenas horários válidos
+                NextAvaliabeDate = context.Appointments
+                    .Where(a => a.EmployeeId == request.EmployeeId && a.Status == EAppointmentStatus.Free && a.Date > request.Date)
+                    .OrderBy(a => a.Date)
+                    .Select(a => (DateTime?)a.Date)
+                    .FirstOrDefault()
+            };
+
+            if (!employeeAvailability.AvailableSlots.Any())
+                return new Response<EmployeeAvailabilitySlotsDTO?>(employeeAvailability, 404, "Nenhum horário disponível na data atual para o profissional.");
+
+            return new Response<EmployeeAvailabilitySlotsDTO?>(employeeAvailability, message: "Horários encontrados com sucesso!");
+        }
+        catch (Exception)
+        {
+            return new Response<EmployeeAvailabilitySlotsDTO?>(null, 500, "(SSA002) Não foi buscar os horários disponíveis do profissional!");
+        }
+    }
+    
+    public async Task<PagedResponse<List<EmployeeAvailabilitySlotsDTO>?>> GetEmployeesWithOpenScheduleAsync(GetEmployeesWithOpenScheduleRequest request)
+    {
+        try
+        {
+            var appointments = await context.Appointments
+                .AsNoTracking()
+                .Include(x => x.Employee)
+                .Where(x => x.UserId == request.UserId
+                            && x.Date == request.Date
+                            && x.Status == EAppointmentStatus.Free)
+                .OrderBy(x => x.EmployeeId)
+                .ThenBy(x => x.Date)
+                .ThenBy(x => x.StartTime)
+                .ToListAsync();
+            
+            var employeesAvailability = appointments
+                .GroupBy(x => x.EmployeeId)
+                .Select(group => new EmployeeAvailabilitySlotsDTO
+                {
+                    Id = group.Key,
+                    Name = group.First().Employee?.Name ?? string.Empty,
+                    Date = request.Date,
+                    UserId = request.UserId,
+                    AvailableSlots = group.ToDictionary(
+                        x => x.StartTime,
+                        x => x.EndTime
+                    ),
+                    NextAvaliabeDate = context.Appointments
+                        .AsNoTracking()
+                        .Where(a => a.EmployeeId == group.Key
+                                    && a.Status == EAppointmentStatus.Free
+                                    && a.Date > request.Date)
+                        .OrderBy(a => a.Date)
+                        .Select(a => (DateTime?)a.Date)
+                        .FirstOrDefault()
+                })
+                .ToList();
+
+            return appointments.Any()
+                ? new PagedResponse<List<EmployeeAvailabilitySlotsDTO>?>(employeesAvailability, message: "Profissíonais encontrados com sucesso!")
+                : new PagedResponse<List<EmployeeAvailabilitySlotsDTO>?>(null, 404, "Nenhum profissional com agenda aberta foi encontrado!");
+        }
+        catch (Exception)
+        {
+            return new PagedResponse<List<EmployeeAvailabilitySlotsDTO>?>(null, 500, "(SSA003) Não foi buscar os profissíonais disponíveis!");
+        }
+    }
+    
+    public async Task<Response<List<AvailableDateDto>?>> GetAvailableDatesAsync(GetAvailableDateRequest request)
+    {
+        try
+        {
+            var appointments = await context
+                .Appointments
+                .AsNoTracking()
+                .Where(x => x.UserId == request.UserId
+                    && x.Status == EAppointmentStatus.Free)
+                .GroupBy(x => x.Date)
+                .ToListAsync();
+
+            return appointments.Any()
+                ? new Response<List<AvailableDateDto>?>(appointments.Select(x => new AvailableDateDto
+                {
+                    Date = x.Key,
+                }).ToList(), message: "Dias recuperados com sucesso!")
+                : new Response<List<AvailableDateDto>?>(null,404, "Não existem agendas abertas no momento!");
+        }
+        catch (Exception)
+        {
+            return new Response<List<AvailableDateDto>?>(null, 500, "(SSA004) Não foi possível buscar os dias disponíveis!");
         }
     }
     
     public async Task<Response<Appointment?>> CreateAsync(GenerateScheduleWithEmployeeRequest request)
     {
-        throw new NotImplementedException();
+        try
+        {
+            return null;
+        }
+        catch (Exception)
+        {
+            return new Response<Appointment?>(null, 500, "(SSA005) Não foi possível criar o agendamento!");
+        }
     }
-
-    public async Task<Response<EmployeeAvailabilitySlotsDTO?>> GetAvailablesHoursByEmployeeIdAsync(GetAvailableHoursByServicesAndEmployeeRequest request)
-    {
-        throw new NotImplementedException();
-    }
-
-    
 
     public async Task<Response<SchedulingClosedDTO?>> FinishAsync(FinishSchedulingRequest request)
     {
         throw new NotImplementedException();
     }
-
-    public async Task<PagedResponse<List<EmployeeAvailabilitySlotsDTO>?>> GetEmployeesWithOpenScheduleAsync(GetEmployeesWithOpenScheduleRequest request)
-    {
-        throw new NotImplementedException();
-    }
-
+    
     public async Task<PagedResponse<List<Appointment>?>> GetByEmployeeAsync(GetAppointmentByEmployeeRequest request)
     {
         throw new NotImplementedException();
     }
 
+    #region Private Members
     private async Task<bool> CheckForScheduleConflictsAsync (OpenAppointmentByEmployeeRequest request)
     {
         try
@@ -114,23 +270,28 @@ public class AppointmentHandler(AppDbContext context) : IAppointmentHandler
 
             return conflict;
         }
-        catch (Exception)
+        catch
         {
             return false;
         }
     }
 
-    private Dictionary<TimeOnly, TimeOnly> SetTimeRange(TimeOnly startTime, TimeOnly endTime)
+    private Dictionary<TimeOnly, TimeOnly> SetTimeRange(EmployeeScheduleVM employeeTime)
     {
         try
         {
             Dictionary<TimeOnly, TimeOnly> timeRange = [];
 
-            for (TimeOnly hour = startTime; hour < endTime; hour = hour.AddMinutes(ApiConfiguration.DefaultTimeByAppointment))
+            for (TimeOnly hour = employeeTime.StartTime; hour < employeeTime.EndTime; hour = hour.AddMinutes(ApiConfiguration.DefaultTimeByAppointment))
             {
                 TimeOnly endInterval = hour.AddMinutes(ApiConfiguration.DefaultTimeByAppointment);
                 
-                timeRange.Add(hour, endInterval > endTime ? endTime : endInterval);
+                
+                if ((hour >= employeeTime.LunchStart && hour < employeeTime.LunchEnd) ||
+                    (endInterval > employeeTime.LunchStart && endInterval <= employeeTime.LunchEnd))
+                    continue;
+                
+                timeRange.Add(hour, endInterval > employeeTime.EndTime ? employeeTime.EndTime : endInterval);
             }
             
             return timeRange;
@@ -145,10 +306,21 @@ public class AppointmentHandler(AppDbContext context) : IAppointmentHandler
     {
         try
         {
+            if (string.IsNullOrWhiteSpace(_userId))
+                throw new ArgumentNullException("Informe o UserId para recuperar os dias de trabalho!");
+            
+            var daysOfWeek = _systemConfigHandler.GetDaysOfWeekAsync(_userId)
+                .GetAwaiter()
+                .GetResult();
+            
+            daysOfWeek = daysOfWeek.Any() 
+                ? daysOfWeek 
+                : ApiConfiguration.DefaultAvailableDays;
+            
             List<DateTime> days = days = Enumerable
                 .Range(0, (end - start).Days + 1)
                 .Select(x => start.AddDays(x).Date)
-                .Where(date => date.DayOfWeek != DayOfWeek.Sunday)
+                .Where(date => daysOfWeek.Contains(date.DayOfWeek))
                 .ToList();
 
             return days;
@@ -158,4 +330,39 @@ public class AppointmentHandler(AppDbContext context) : IAppointmentHandler
             return new List<DateTime>();
         }
     }
+    
+    private Dictionary<TimeOnly, TimeOnly> GetConsecutiveAvailableSlots(List<Appointment> appointments, int requiredSlots)
+    {
+        var availableSlots = new Dictionary<TimeOnly, TimeOnly>();
+        var orderedAppointments = appointments.OrderBy(a => a.StartTime).ToList();
+
+        for (int i = 0; i < orderedAppointments.Count; i++)
+        {
+            List<Appointment> tempGroup = new() { orderedAppointments[i] };
+            TimeOnly expectedEnd = orderedAppointments[i].EndTime;
+
+            for (int j = i + 1; j < orderedAppointments.Count; j++)
+            {
+                if (orderedAppointments[j].StartTime == expectedEnd) // Verifica se são consecutivos
+                {
+                    tempGroup.Add(orderedAppointments[j]);
+                    expectedEnd = orderedAppointments[j].EndTime;
+
+                    if (tempGroup.Count == requiredSlots) // Se atingiu o necessário, salva e sai do loop
+                    {
+                        availableSlots.Add(tempGroup.First().StartTime, tempGroup.Last().EndTime);
+                        i = j; // Atualiza o índice para continuar depois do último grupo salvo
+                        break;
+                    }
+                }
+                else
+                {
+                    break; // Se não for consecutivo, interrompe a busca
+                }
+            }
+        }
+
+        return availableSlots;
+    }
+    #endregion
 }

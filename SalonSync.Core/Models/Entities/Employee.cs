@@ -16,6 +16,8 @@ public class Employee
     public string? Image { get; set; }
     public TimeOnly? StartTime { get; set; }
     public TimeOnly? EndTime { get; set; }
+    public TimeOnly? LunchStart { get; set; }
+    public TimeOnly? LunchEnd { get; set; }
     public string UserId { get; set; } = string.Empty;
 
     public List<Appointment> Appointments { get; set; } = [];

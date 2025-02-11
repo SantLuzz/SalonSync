@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SalonSync.Core.Models.Appointments;
+using SalonSync.Core.Models.Packages;
 
 namespace SalonSync.Api.Data.Mappings.Appointments;
 
@@ -25,5 +26,10 @@ public class ClientPackageAppointmentMapping : IEntityTypeConfiguration<ClientPa
         builder.Property(x => x.AppointmentId)
             .IsRequired()
             .HasColumnName("AppointmentId");
+        
+        builder.HasOne(c => c.Appointment)
+            .WithMany() // ou .WithMany(a => a.ClientPackageAppointments) se o relacionamento for bidirecional
+            .HasForeignKey(c => c.AppointmentId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

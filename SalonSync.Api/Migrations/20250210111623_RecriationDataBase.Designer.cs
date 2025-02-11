@@ -12,8 +12,8 @@ using SalonSync.Api.Data;
 namespace SalonSync.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250203183527_EntitiesCamps")]
-    partial class EntitiesCamps
+    [Migration("20250210111623_RecriationDataBase")]
+    partial class RecriationDataBase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -239,6 +239,148 @@ namespace SalonSync.Api.Migrations
                     b.ToTable("IdentityUser", (string)null);
                 });
 
+            modelBuilder.Entity("SalonSync.Core.Models.Appointments.Appointment", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("AppointmentGroupId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("AppointmentGroupId");
+
+                    b.Property<long?>("AppointmentGroupId1")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("ClientId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("ClientId");
+
+                    b.Property<long?>("ClientId1")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("DATETIME2")
+                        .HasColumnName("Date");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("EmployeeId");
+
+                    b.Property<long?>("EmployeeId1")
+                        .HasColumnType("bigint");
+
+                    b.Property<TimeOnly>("EndTime")
+                        .HasColumnType("TIME")
+                        .HasColumnName("EndTime");
+
+                    b.Property<long?>("ServiceId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("ServiceId");
+
+                    b.Property<long?>("ServiceId1")
+                        .HasColumnType("bigint");
+
+                    b.Property<TimeOnly>("StartTime")
+                        .HasColumnType("TIME")
+                        .HasColumnName("StartTime");
+
+                    b.Property<short>("Status")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("SMALLINT")
+                        .HasDefaultValue((short)1)
+                        .HasColumnName("Status");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("NVARCHAR")
+                        .HasColumnName("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppointmentGroupId");
+
+                    b.HasIndex("AppointmentGroupId1");
+
+                    b.HasIndex("ClientId");
+
+                    b.HasIndex("ClientId1");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasIndex("EmployeeId1");
+
+                    b.HasIndex("ServiceId");
+
+                    b.HasIndex("ServiceId1");
+
+                    b.ToTable("Appointments", (string)null);
+                });
+
+            modelBuilder.Entity("SalonSync.Core.Models.Appointments.AppointmentGroup", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("Date");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("EmployeeId");
+
+                    b.Property<int>("TotalDuration")
+                        .HasColumnType("int")
+                        .HasColumnName("TotalDuration");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AppointmentGroups", (string)null);
+                });
+
+            modelBuilder.Entity("SalonSync.Core.Models.Appointments.ClientPackageAppointment", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("AppointmentId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("AppointmentId");
+
+                    b.Property<long?>("ClientId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("ClientPackageId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("ClientPackageId");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("NVARCHAR")
+                        .HasColumnName("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppointmentId");
+
+                    b.HasIndex("ClientId");
+
+                    b.HasIndex("ClientPackageId");
+
+                    b.ToTable("ClientsPackagesAppointments", (string)null);
+                });
+
             modelBuilder.Entity("SalonSync.Core.Models.Entities.Client", b =>
                 {
                     b.Property<long>("Id")
@@ -246,6 +388,10 @@ namespace SalonSync.Api.Migrations
                         .HasColumnType("bigint");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime?>("Birthdate")
+                        .HasColumnType("DATETIME2")
+                        .HasColumnName("BirthDate");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -289,6 +435,10 @@ namespace SalonSync.Api.Migrations
                         .HasColumnType("SMALLINT")
                         .HasDefaultValue((short)1);
 
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("DATETIME2")
+                        .HasColumnName("UpdatedAt");
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasMaxLength(160)
@@ -327,10 +477,22 @@ namespace SalonSync.Api.Migrations
                         .HasMaxLength(160)
                         .HasColumnType("NVARCHAR");
 
+                    b.Property<TimeOnly?>("EndTime")
+                        .HasColumnType("TIME")
+                        .HasColumnName("EndTime");
+
                     b.Property<string>("Image")
                         .HasMaxLength(255)
                         .HasColumnType("NVARCHAR")
                         .HasColumnName("Image");
+
+                    b.Property<TimeOnly?>("LunchEnd")
+                        .HasColumnType("TIME")
+                        .HasColumnName("LunchEnd");
+
+                    b.Property<TimeOnly?>("LunchStart")
+                        .HasColumnType("TIME")
+                        .HasColumnName("LunchStart");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -344,6 +506,14 @@ namespace SalonSync.Api.Migrations
                     b.Property<string>("Position")
                         .HasMaxLength(50)
                         .HasColumnType("NVARCHAR");
+
+                    b.Property<TimeOnly?>("StartTime")
+                        .HasColumnType("TIME")
+                        .HasColumnName("StartTime");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("DATETIME2")
+                        .HasColumnName("UpdatedAt");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -432,6 +602,195 @@ namespace SalonSync.Api.Migrations
                     b.ToTable("Transactions", (string)null);
                 });
 
+            modelBuilder.Entity("SalonSync.Core.Models.Packages.ClientPackage", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("ClientId")
+                        .HasColumnType("BIGINT")
+                        .HasColumnName("ClientId");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("DATETIME2")
+                        .HasColumnName("EndDate");
+
+                    b.Property<long>("PackageId")
+                        .HasColumnType("BIGINT")
+                        .HasColumnName("PackageId");
+
+                    b.Property<int>("RemainingSessions")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INT")
+                        .HasDefaultValue(0)
+                        .HasColumnName("RemainingSessions");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("DATETIME2")
+                        .HasColumnName("StartDate");
+
+                    b.Property<short>("Status")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("SMALLINT")
+                        .HasDefaultValue((short)1)
+                        .HasColumnName("Status");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("NVARCHAR")
+                        .HasColumnName("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClientId");
+
+                    b.HasIndex("PackageId");
+
+                    b.ToTable("ClientsPackages", (string)null);
+                });
+
+            modelBuilder.Entity("SalonSync.Core.Models.Packages.Package", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("NVARCHAR");
+
+                    b.Property<decimal>("Price")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("MONEY")
+                        .HasDefaultValue(0m)
+                        .HasColumnName("Price");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("NVARCHAR")
+                        .HasColumnName("UserId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Packages", (string)null);
+                });
+
+            modelBuilder.Entity("SalonSync.Core.Models.Packages.PackageService", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("PackageId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("PackageId");
+
+                    b.Property<long>("ServiceId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("ServiceId");
+
+                    b.Property<int>("SessionsPerService")
+                        .HasColumnType("int")
+                        .HasColumnName("SessionsPerService");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("NVARCHAR")
+                        .HasColumnName("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PackageId");
+
+                    b.ToTable("PackageServices", (string)null);
+                });
+
+            modelBuilder.Entity("SalonSync.Core.Models.Services.Service", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("Duration")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INT")
+                        .HasDefaultValue(30)
+                        .HasColumnName("Duration");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("NVARCHAR")
+                        .HasColumnName("Name");
+
+                    b.Property<decimal>("Price")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("MONEY")
+                        .HasDefaultValue(0m)
+                        .HasColumnName("Price");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("NVARCHAR")
+                        .HasColumnName("UserId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Services", (string)null);
+                });
+
+            modelBuilder.Entity("SalonSync.Core.Models.SystemConfig", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("Friday")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Monday")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Saturday")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Sunday")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Thursday")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Tuesday")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("NVARCHAR(160)");
+
+                    b.Property<bool>("Wednesday")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SystemConfigs", (string)null);
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<long>", b =>
                 {
                     b.HasOne("SalonSync.Api.Models.User", null)
@@ -475,6 +834,77 @@ namespace SalonSync.Api.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("SalonSync.Core.Models.Appointments.Appointment", b =>
+                {
+                    b.HasOne("SalonSync.Core.Models.Appointments.AppointmentGroup", null)
+                        .WithMany()
+                        .HasForeignKey("AppointmentGroupId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("SalonSync.Core.Models.Appointments.AppointmentGroup", "AppointmentGroup")
+                        .WithMany()
+                        .HasForeignKey("AppointmentGroupId1");
+
+                    b.HasOne("SalonSync.Core.Models.Entities.Client", null)
+                        .WithMany()
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("SalonSync.Core.Models.Entities.Client", "Client")
+                        .WithMany()
+                        .HasForeignKey("ClientId1");
+
+                    b.HasOne("SalonSync.Core.Models.Entities.Employee", null)
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SalonSync.Core.Models.Entities.Employee", "Employee")
+                        .WithMany("Appointments")
+                        .HasForeignKey("EmployeeId1");
+
+                    b.HasOne("SalonSync.Core.Models.Services.Service", null)
+                        .WithMany()
+                        .HasForeignKey("ServiceId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("SalonSync.Core.Models.Services.Service", "Service")
+                        .WithMany()
+                        .HasForeignKey("ServiceId1");
+
+                    b.Navigation("AppointmentGroup");
+
+                    b.Navigation("Client");
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("Service");
+                });
+
+            modelBuilder.Entity("SalonSync.Core.Models.Appointments.ClientPackageAppointment", b =>
+                {
+                    b.HasOne("SalonSync.Core.Models.Appointments.Appointment", "Appointment")
+                        .WithMany()
+                        .HasForeignKey("AppointmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SalonSync.Core.Models.Entities.Client", null)
+                        .WithMany("Historic")
+                        .HasForeignKey("ClientId");
+
+                    b.HasOne("SalonSync.Core.Models.Packages.ClientPackage", "ClientPackages")
+                        .WithMany()
+                        .HasForeignKey("ClientPackageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Appointment");
+
+                    b.Navigation("ClientPackages");
+                });
+
             modelBuilder.Entity("SalonSync.Core.Models.Financial.Transaction", b =>
                 {
                     b.HasOne("SalonSync.Core.Models.Financial.CostCenter", "CostCenter")
@@ -486,9 +916,56 @@ namespace SalonSync.Api.Migrations
                     b.Navigation("CostCenter");
                 });
 
+            modelBuilder.Entity("SalonSync.Core.Models.Packages.ClientPackage", b =>
+                {
+                    b.HasOne("SalonSync.Core.Models.Entities.Client", "Client")
+                        .WithMany("ClientPackages")
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SalonSync.Core.Models.Packages.Package", "Package")
+                        .WithMany()
+                        .HasForeignKey("PackageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Client");
+
+                    b.Navigation("Package");
+                });
+
+            modelBuilder.Entity("SalonSync.Core.Models.Packages.PackageService", b =>
+                {
+                    b.HasOne("SalonSync.Core.Models.Packages.Package", "Package")
+                        .WithMany("PackageServices")
+                        .HasForeignKey("PackageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Package");
+                });
+
             modelBuilder.Entity("SalonSync.Api.Models.User", b =>
                 {
                     b.Navigation("Roles");
+                });
+
+            modelBuilder.Entity("SalonSync.Core.Models.Entities.Client", b =>
+                {
+                    b.Navigation("ClientPackages");
+
+                    b.Navigation("Historic");
+                });
+
+            modelBuilder.Entity("SalonSync.Core.Models.Entities.Employee", b =>
+                {
+                    b.Navigation("Appointments");
+                });
+
+            modelBuilder.Entity("SalonSync.Core.Models.Packages.Package", b =>
+                {
+                    b.Navigation("PackageServices");
                 });
 #pragma warning restore 612, 618
         }

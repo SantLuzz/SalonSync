@@ -32,6 +32,8 @@ public class EmployeeHandler(AppDbContext context) : IEmployeeHandler
                 UserId = request.UserId,
                 StartTime = request.StartTime,
                 EndTime = request.EndTime,
+                LunchStart = request.LunchStart ?? ApiConfiguration.DefaultStartLunchTime,
+                LunchEnd = request.LunchEnd ?? ApiConfiguration.DefaultEndLunchTime,
             };
             
             await context.Employees.AddAsync(employee);
@@ -75,6 +77,8 @@ public class EmployeeHandler(AppDbContext context) : IEmployeeHandler
             employee.UpdatedAt = DateTime.Now;
             employee.StartTime = request.StartTime;
             employee.EndTime = request.EndTime;
+            employee.LunchStart = request.LunchStart ?? ApiConfiguration.DefaultStartLunchTime;
+            employee.LunchEnd = request.LunchEnd ?? ApiConfiguration.DefaultEndLunchTime;
 
             context.Employees.Update(employee);
             await context.SaveChangesAsync();

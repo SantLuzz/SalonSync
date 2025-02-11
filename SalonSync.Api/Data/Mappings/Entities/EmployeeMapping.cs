@@ -69,6 +69,16 @@ public class EmployeeMapping : IEntityTypeConfiguration<Employee>
             .HasColumnName("EndTime")
             .HasColumnType("TIME");
         
+        builder.Property(x => x.LunchStart)
+            .IsRequired(false)
+            .HasColumnName("LunchStart")
+            .HasColumnType("TIME");
+        
+        builder.Property(x => x.LunchEnd)
+            .IsRequired(false)
+            .HasColumnName("LunchEnd")
+            .HasColumnType("TIME");
+        
         builder.Property(x => x.UserId)
             .IsRequired()
             .HasColumnName("UserId")
