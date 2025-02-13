@@ -84,5 +84,8 @@ public class EmployeeMapping : IEntityTypeConfiguration<Employee>
             .HasColumnName("UserId")
             .HasColumnType("NVARCHAR")
             .HasMaxLength(160);
+
+        builder.Property(x => x.UniqueCode)
+            .IsRequired(false);
     }
 }

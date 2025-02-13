@@ -3,6 +3,7 @@ using SalonSync.Api.Endpoints.Appointments;
 using SalonSync.Api.Endpoints.ClientsPackages;
 using SalonSync.Api.Endpoints.Configs;
 using SalonSync.Api.Endpoints.Entities.Clients;
+using SalonSync.Api.Endpoints.Entities.Companies;
 using SalonSync.Api.Endpoints.Entities.Employees;
 using SalonSync.Api.Endpoints.Financial.CostCenters;
 using SalonSync.Api.Endpoints.Identity;
@@ -10,7 +11,6 @@ using SalonSync.Api.Endpoints.Packages;
 using SalonSync.Api.Endpoints.PackagesServices;
 using SalonSync.Api.Endpoints.Services;
 using SalonSync.Api.Models;
-using SalonSync.Core.Requests.Appointments;
 
 namespace SalonSync.Api.Endpoints
 {
@@ -54,6 +54,15 @@ namespace SalonSync.Api.Endpoints
                 .MapEndpoints<GetAllClientsByTypeEndpoint>()
                 .MapEndpoints<GetBirthdaysOfWeekEndpoint>();
 
+            endpoint.MapGroup("v1/companies")
+                .WithTags("Companies")
+                .RequireAuthorization()
+                .MapEndpoints<CreateCompanyEndpoint>()
+                .MapEndpoints<UpdateCompanyEndpoint>()
+                .MapEndpoints<GenerateCodeByCompanyEndpoint>()
+                .MapEndpoints<DeleteCompanyEndpoint>()
+                .MapEndpoints<GetCompanyEndpoint>();
+
             endpoint.MapGroup("v1/employees")
                 .WithTags("Employees")
                 .RequireAuthorization()
@@ -62,7 +71,8 @@ namespace SalonSync.Api.Endpoints
                 .MapEndpoints<UpdateImageEmployeeEndpoint>()
                 .MapEndpoints<DeleteEmployeeEndpoint>()
                 .MapEndpoints<GetEmployeeByIdEndpoint>()
-                .MapEndpoints<GetAllEmployeesEndpoint>();
+                .MapEndpoints<GetAllEmployeesEndpoint>()
+                .MapEndpoints<GenerateUniqueEmployeeEndpoint>();
             
             endpoint.MapGroup("v1/costs-centers")
                 .WithTags("Costs")
@@ -116,9 +126,12 @@ namespace SalonSync.Api.Endpoints
                 .MapEndpoints<GenerateScheduleWithEmployeeEndpoint>()
                 .MapEndpoints<GetAvailableDateEndpoint>()
                 .MapEndpoints<GetEmployeesWithOpenScheduleEndpoint>()
-                .MapEndpoints<GetAvailableHoursByEmployeeIdEndpoint>();
-            
-            
+                .MapEndpoints<GetAvailableHoursByEmployeeIdEndpoint>()
+                .MapEndpoints<GetAppointmentByEmployeeEndpoint>();
+
+            endpoint.MapGroup("v1/schedules")
+                .WithTags("Schedules")
+                .MapEndpoints<GetAppointmentByEmployeeCodeEndpoint>();
         }
 
         private static IEndpointRouteBuilder MapEndpoints<TEndpoint> (this IEndpointRouteBuilder app) where TEndpoint : IEndpoint

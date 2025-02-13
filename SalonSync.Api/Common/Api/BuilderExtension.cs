@@ -67,6 +67,7 @@ namespace SalonSync.Api.Common.Api
             builder.Services.AddTransient<ITransactionHandler, TransactionHandler>();
             builder.Services.AddTransient<IClientHandler, ClientHandler>();
             builder.Services.AddTransient<IEmployeeHandler, EmployeeHandler>();
+            builder.Services.AddTransient<ICompanyHandler, CompanyHandler>();
             builder.Services.AddTransient<IServiceHandler, ServiceHandler>();
             builder.Services.AddTransient<IPackageHandler, PackageHandler>();
             builder.Services.AddTransient<IPackageServiceHandler, PackageServiceHandler>();

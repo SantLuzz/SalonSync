@@ -427,6 +427,44 @@ namespace SalonSync.Api.Migrations
                     b.ToTable("Clients", (string)null);
                 });
 
+            modelBuilder.Entity("SalonSync.Core.Models.Entities.Company", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<Guid>("Code")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Document")
+                        .HasMaxLength(20)
+                        .HasColumnType("NVARCHAR")
+                        .HasColumnName("Document");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("NVARCHAR")
+                        .HasColumnName("Name");
+
+                    b.Property<string>("Phone")
+                        .HasMaxLength(20)
+                        .HasColumnType("NVARCHAR")
+                        .HasColumnName("Phone");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("NVARCHAR")
+                        .HasColumnName("UserId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Companies", (string)null);
+                });
+
             modelBuilder.Entity("SalonSync.Core.Models.Entities.Employee", b =>
                 {
                     b.Property<long>("Id")
@@ -487,6 +525,9 @@ namespace SalonSync.Api.Migrations
                     b.Property<TimeOnly?>("StartTime")
                         .HasColumnType("TIME")
                         .HasColumnName("StartTime");
+
+                    b.Property<Guid?>("UniqueCode")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("DATETIME2")

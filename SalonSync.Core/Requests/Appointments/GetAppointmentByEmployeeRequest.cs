@@ -8,6 +8,4 @@ public class GetAppointmentByEmployeeRequest : Request
     public long EmployeeId { get; set; }
     
     public DateTime Date { get; set; } = DateTime.Today;
-    
-    public int Range { get; set; } = 1;
 }

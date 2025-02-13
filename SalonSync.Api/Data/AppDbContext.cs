@@ -27,6 +27,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     public DbSet<SystemConfig> SystemConfigs { get; set; } = null!;
     public DbSet<Client> Clients { get; set; } = null!;
     public DbSet<Employee> Employees { get; set; } = null!;
+    public DbSet<Company> Companies { get; set; } = null!;
     public DbSet<Service> Services { get; set; } = null!;
     public DbSet<Package> Packages { get; set; } = null!;
     public DbSet<PackageService> PackageServices { get; set; } = null!;

@@ -156,6 +156,30 @@ public class EmployeeHandler(AppDbContext context) : IEmployeeHandler
         }
     }
 
+    public async Task<Response<Employee?>> GenerateUniqueCodeAsync(GenerateUniqueEmployeeCodeRequest request)
+    {
+        try
+        {
+            var employee = await context
+                .Employees
+                .FirstOrDefaultAsync(x => x.UserId == request.UserId
+                                          && x.Id == request.EmployeeId);
+            if (employee is null)
+                return new Response<Employee?>(null, 404, "Funcionário não encontrado!");
+
+            employee.UniqueCode = Guid.NewGuid();
+            
+            context.Employees.Update(employee);
+            await context.SaveChangesAsync();
+
+            return new Response<Employee?>(employee, message: "Código gerado com sucesso!");
+        }
+        catch (Exception)
+        {
+            return new Response<Employee?>(null, 500, "(SSE008) Não foi possível gerar o código de visualização do funcionário!");
+        }
+    }
+
     public async Task<Response<Employee?>> GetByIdAsync(GetEmployeeByIdRequest request)
     {
         DateTime startOfWeek;
