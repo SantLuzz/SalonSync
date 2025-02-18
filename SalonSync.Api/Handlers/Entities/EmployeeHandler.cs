@@ -16,7 +16,8 @@ public class EmployeeHandler(AppDbContext context) : IEmployeeHandler
         try
         {
             if(await MethodsExtensions.CheckFieldInUse(context.Employees, 
-                   x => x.Email.Equals(request.Email, StringComparison.OrdinalIgnoreCase)))
+                   x => x.Email.Equals(request.Email, StringComparison.OrdinalIgnoreCase)
+                   && x.UserId == request.UserId))
                 return new Response<Employee?>(null, 400, "O e-Mail informado já está vinculado a outro funcionário!");
             
             var employee = new Employee
@@ -29,6 +30,10 @@ public class EmployeeHandler(AppDbContext context) : IEmployeeHandler
                 Admission = request.Admission,
                 Commission = request.Commission,
                 UserId = request.UserId,
+                StartTime = request.StartTime,
+                EndTime = request.EndTime,
+                LunchStart = request.LunchStart ?? ApiConfiguration.DefaultStartLunchTime,
+                LunchEnd = request.LunchEnd ?? ApiConfiguration.DefaultEndLunchTime,
             };
             
             await context.Employees.AddAsync(employee);
@@ -57,7 +62,8 @@ public class EmployeeHandler(AppDbContext context) : IEmployeeHandler
             if (!employee.Email.Equals(request.Email, StringComparison.OrdinalIgnoreCase))
             {
                 if(await MethodsExtensions.CheckFieldInUse(context.Employees, 
-                       x => x.Email.Equals(request.Email, StringComparison.OrdinalIgnoreCase)))
+                       x => x.Email.Equals(request.Email, StringComparison.OrdinalIgnoreCase)
+                            && x.UserId == request.UserId))
                     return new Response<Employee?>(null, 400, "O e-Mail informado já está vinculado a outro Funcionário!");
             }
 
@@ -69,6 +75,10 @@ public class EmployeeHandler(AppDbContext context) : IEmployeeHandler
             employee.Commission = request.Commission;
             employee.UserId = request.UserId;
             employee.UpdatedAt = DateTime.Now;
+            employee.StartTime = request.StartTime;
+            employee.EndTime = request.EndTime;
+            employee.LunchStart = request.LunchStart ?? ApiConfiguration.DefaultStartLunchTime;
+            employee.LunchEnd = request.LunchEnd ?? ApiConfiguration.DefaultEndLunchTime;
 
             context.Employees.Update(employee);
             await context.SaveChangesAsync();
@@ -146,8 +156,46 @@ public class EmployeeHandler(AppDbContext context) : IEmployeeHandler
         }
     }
 
+    public async Task<Response<Employee?>> GenerateUniqueCodeAsync(GenerateUniqueEmployeeCodeRequest request)
+    {
+        try
+        {
+            var employee = await context
+                .Employees
+                .FirstOrDefaultAsync(x => x.UserId == request.UserId
+                                          && x.Id == request.EmployeeId);
+            if (employee is null)
+                return new Response<Employee?>(null, 404, "Funcionário não encontrado!");
+
+            employee.UniqueCode = Guid.NewGuid();
+            
+            context.Employees.Update(employee);
+            await context.SaveChangesAsync();
+
+            return new Response<Employee?>(employee, message: "Código gerado com sucesso!");
+        }
+        catch (Exception)
+        {
+            return new Response<Employee?>(null, 500, "(SSE008) Não foi possível gerar o código de visualização do funcionário!");
+        }
+    }
+
     public async Task<Response<Employee?>> GetByIdAsync(GetEmployeeByIdRequest request)
     {
+        DateTime startOfWeek;
+        DateTime endOfWeek;
+        try
+        {
+            var today = DateTime.UtcNow.Date;
+            startOfWeek = today.AddDays(-(int)today.DayOfWeek + (int)DayOfWeek.Monday);
+            endOfWeek = startOfWeek.AddDays(6);
+        }
+        catch 
+        {
+           startOfWeek = DateTime.Today;
+           endOfWeek = DateTime.Today.AddDays(6);
+        }
+        
         try
         {
             var employee = await context
@@ -155,10 +203,20 @@ public class EmployeeHandler(AppDbContext context) : IEmployeeHandler
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.UserId == request.UserId
                                           && x.Id == request.Id);
+
+            if (employee is null)
+                return new Response<Employee?>(null, 404, "Funcionário não encontrado!");
             
-            return employee is null
-                ? new Response<Employee?>(null, 404, "Funcionário não encontrado!")
-                : new Response<Employee?>(employee, message:"Funcionário encontrado com sucesso!");
+            employee.Appointments = await context
+                .Appointments
+                .AsNoTracking()
+                .Where(a => a.EmployeeId == employee.Id
+                    && a.UserId == request.UserId
+                    && a.Date.Date >= startOfWeek && a.Date.Date <= endOfWeek)
+                .ToListAsync();
+            
+            
+            return new Response<Employee?>(employee, message:"Funcionário encontrado com sucesso!");
         }
         catch (Exception)
         {

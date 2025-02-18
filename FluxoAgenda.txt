@@ -1,0 +1,7 @@
+Pego a data desejada
+Mostro os profissionais disponíveis na data
+Mostro os serviços disponíveis
+Mostro os horários disponíveis para o dia
+- Caso não tenha:
+	No front permito selecionar outras datas ou outro profissional
+	Ou no back sugiro o próximo dia com horários livres

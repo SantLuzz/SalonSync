@@ -27,4 +27,6 @@ public class CreateClientRequest : Request
     [Required(ErrorMessage = "O tipo do cliente é obrigatório!")]
     public EClientType Type { get; set; } = EClientType.Common;
     
+    public DateTime? Birthdate { get; set; }
+    
 }

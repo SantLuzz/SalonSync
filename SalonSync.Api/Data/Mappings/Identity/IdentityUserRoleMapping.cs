@@ -2,14 +2,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace SalonSync.Api.Data.Mappings.Identity
+namespace SalonSync.Api.Data.Mappings.Identity;
+
+public class IdentityUserRoleMapping : IEntityTypeConfiguration<IdentityUserRole<long>>
 {
-    public class IdentityUserRoleMapping : IEntityTypeConfiguration<IdentityUserRole<long>>
+    public void Configure(EntityTypeBuilder<IdentityUserRole<long>> builder)
     {
-        public void Configure(EntityTypeBuilder<IdentityUserRole<long>> builder)
-        {
-            builder.ToTable("IdentityUserRole");
-            builder.HasKey(x => new { x.UserId, x.RoleId });
-        }
+        builder.ToTable("IdentityUserRole");
+        builder.HasKey(x => new { x.UserId, x.RoleId });
     }
 }

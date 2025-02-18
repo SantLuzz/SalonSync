@@ -19,7 +19,11 @@ public class CreateEmployeeRequest : Request
     
     [MaxLength(20, ErrorMessage = "A função deve conter no máximo 50 caracteres!")]
     public string? Position { get; set; }
+    public TimeOnly StartTime { get; set; }
+    public TimeOnly EndTime { get; set; }
     
+    public TimeOnly? LunchStart { get; set; }
+    public TimeOnly? LunchEnd { get; set; }
     public DateTime? Admission { get; set; }
     public decimal? Commission { get; set; }
 }

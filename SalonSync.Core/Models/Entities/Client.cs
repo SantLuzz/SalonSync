@@ -1,4 +1,6 @@
 using SalonSync.Core.Enums;
+using SalonSync.Core.Models.Appointments;
+using SalonSync.Core.Models.Packages;
 
 namespace SalonSync.Core.Models.Entities;
 
@@ -11,9 +13,12 @@ public class Client
     public string? PreferredService { get; set; }
     public string? Observations { get; set; }
     public EClientType Type { get; set; } = EClientType.Common;
+    public DateTime? Birthdate { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.Now;
     public DateTime? UpdatedAt { get; set; }
     public DateTime? LastProcedure { get; set; }
     public string? Image { get; set; }
     public string UserId { get; set; } = string.Empty;
+    public List<ClientPackage> ClientPackages { get; set; } = [];
+    public List<ClientPackageAppointment>? Historic { get; set; } = [];
 }

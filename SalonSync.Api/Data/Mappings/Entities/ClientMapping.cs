@@ -54,6 +54,11 @@ public class ClientMapping : IEntityTypeConfiguration<Client>
             .HasColumnName("UpdatedAt")
             .HasColumnType("DATETIME2");
 
+        builder.Property(x => x.Birthdate)
+            .IsRequired(false)
+            .HasColumnName("BirthDate")
+            .HasColumnType("DATETIME2");
+
         builder.Property(x => x.LastProcedure)
             .IsRequired(false)
             .HasColumnName("LastProcedure")

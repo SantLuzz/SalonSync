@@ -2,6 +2,10 @@ using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 using SalonSync.Api.Common.Api;
 using SalonSync.Api.Data;
+using SalonSync.Api.Handlers.Appointments;
+using SalonSync.Api.Services;
+using SalonSync.Core.DTOs;
+using SalonSync.Core.Enums;
 using SalonSync.Core.Handlers.Entities;
 using SalonSync.Core.Models.Entities;
 using SalonSync.Core.Requests.Entities.Clients;
@@ -11,6 +15,7 @@ namespace SalonSync.Api.Handlers.Entities;
 
 public class ClientHandler(AppDbContext context) : IClientHandler
 {
+    private readonly ClientPackageAppointmentHandler _clientAppointmentHandler = new ClientPackageAppointmentHandler(context);
     public async Task<Response<Client?>> CreateAsync(CreateClientRequest request)
     {
         try
@@ -29,6 +34,7 @@ public class ClientHandler(AppDbContext context) : IClientHandler
                 Type = request.Type,
                 CreatedAt = DateTime.Now,
                 UserId = request.UserId,
+                
             };
             
             await context.Clients.AddAsync(client);
@@ -179,13 +185,68 @@ public class ClientHandler(AppDbContext context) : IClientHandler
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.UserId == request.UserId
                                           && x.Id == request.Id);
-                return  client is null 
-                    ? new Response<Client?>(null, 404, "Cliente não encontrado!")
-                    : new Response<Client?>(client, message: "Cliente encontrado com sucesso!");
+
+            if (client is null)
+                return new Response<Client?>(null, 404, "Cliente não encontrado!");
+
+            if (client is { Type: EClientType.Monthly })
+            {
+                client.ClientPackages = await context
+                    .ClientPackages
+                    .AsNoTracking()
+                    .Include(x => x.Package)
+                    .Where(x => x.ClientId == client.Id
+                        && x.UserId == request.UserId
+                        && x.Status == EPackageStatus.Active)
+                    .ToListAsync();
+
+                client.Historic = await _clientAppointmentHandler
+                    .GetHistoricClient(client.Id, request.UserId);
+            }
+            
+            return new Response<Client?>(client, message: "Cliente encontrado com sucesso!");
         }
         catch (Exception)
         {
             return new Response<Client?>(null, 500, "(SSCL007) Não foi possível buscar o cliente!");
+        }
+    }
+
+    public async Task<PagedResponse<List<ClientBirthdaysDTO>?>> GetBirthdaysOfWeek(GetBirthdaysOfWeekRequest request)
+    {
+        DateService dateService;
+        try
+        {
+            dateService = new DateService();
+            dateService.GetCurrentWeekRange();
+        }
+        catch (Exception)
+        {
+            return new PagedResponse<List<ClientBirthdaysDTO>?>(null, 500, "(SSCL011) Não foi possível converter as datas!");
+        }
+        
+        
+        try
+        {
+            var clients = await context
+                .Clients
+                .AsNoTracking()
+                .Where(x => x.UserId == request.UserId
+                && x.Birthdate >= dateService.StartOfWeek && x.Birthdate <= dateService.EndOfWeek)
+                .ToListAsync();
+
+            return new PagedResponse<List<ClientBirthdaysDTO>?>(clients
+                    .Select(x => new ClientBirthdaysDTO
+                {
+                    Id = x.Id,
+                    Birthday = x.Birthdate,
+                    Name = x.Name ?? string.Empty,
+                }).ToList(), 
+                message:"Aniversáriantes encontrados com sucesso!");
+        }
+        catch (Exception)
+        {
+            return new PagedResponse<List<ClientBirthdaysDTO>?>(null, 500, "(SSCL010) Não foi possível buscar os aniversáriantes da semana!");
         }
     }
 

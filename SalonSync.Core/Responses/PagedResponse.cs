@@ -1,28 +1,27 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace SalonSync.Core.Responses
+namespace SalonSync.Core.Responses;
+
+public class PagedResponse<TData> : Response<TData>
 {
-    public class PagedResponse<TData> : Response<TData>
+    public int CurrentPage { get; set; } = Configuration.DefaultPageNumber;
+    public int TotalPages => (int)Math.Ceiling(TotalCount / (double)PageSize);
+    public int PageSize { get; set; } = Configuration.DefaultPageSize;
+    public int TotalCount { get; set; }
+
+    [JsonConstructor]
+    public PagedResponse(TData? data, int totalCount, 
+        int currentPage = Configuration.DefaultPageNumber, int pageSize = Configuration.DefaultPageSize) : base(data)
     {
-        public int CurrentPage { get; set; } = Configuration.DefaultPageNumber;
-        public int TotalPages => (int)Math.Ceiling(TotalCount / (double)PageSize);
-        public int PageSize { get; set; } = Configuration.DefaultPageSize;
-        public int TotalCount { get; set; }
+        Data = data;
+        TotalCount = totalCount;
+        CurrentPage = currentPage;
+        PageSize = pageSize;
+    }
 
-        [JsonConstructor]
-        public PagedResponse(TData? data, int totalCount, 
-            int currentPage = Configuration.DefaultPageNumber, int pageSize = Configuration.DefaultPageSize) : base(data)
-        {
-            Data = data;
-            TotalCount = totalCount;
-            CurrentPage = currentPage;
-            PageSize = pageSize;
-        }
-
-        public PagedResponse(TData? data, 
-            int code = Configuration.DefaultStatusCode, 
-            string? message = null) : base(data, code, message)
-        { 
-        }
+    public PagedResponse(TData? data, 
+        int code = Configuration.DefaultStatusCode, 
+        string? message = null) : base(data, code, message)
+    { 
     }
 }
