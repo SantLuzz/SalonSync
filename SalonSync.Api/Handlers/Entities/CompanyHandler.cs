@@ -131,4 +131,21 @@ public class CompanyHandler(AppDbContext context) : ICompanyHandler
             return new Response<Company?>(null, 500, "(SSCP004) Não foi possível gerar o código a empresa!");
         }
     }
+
+    public async Task<Company?> GetByCodeAsync(Guid code)
+    {
+        try
+        {
+            var company = await context
+                .Companies
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Code == code);
+
+            return company;
+        }
+        catch
+        {
+            return null;
+        }
+    }
 }

@@ -3,7 +3,7 @@ using SalonSync.Core.Models.Appointments;
 
 namespace SalonSync.Core.DTOs;
 
-public class SchedulingClosedDTO
+public class SchedullingClosedDTO
 {
     public string UserId { get; set; } = String.Empty;
     public TimeOnly StartTime { get; set; }
@@ -11,5 +11,5 @@ public class SchedulingClosedDTO
     public int ServiceDuration { get; set; }
     public decimal ServiceValue { get; set; }
     public EAppointmentStatus Status { get; set; }
-    public List<Appointment> Appointments { get; set; } = [];
+    public List<AppointmentDto> Appointments { get; set; } = [];
 }

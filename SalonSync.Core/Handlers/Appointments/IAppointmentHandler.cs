@@ -9,11 +9,12 @@ public interface IAppointmentHandler
 {
     Task<Response<AppointmentCreatedDto?>> CreateAsync(GenerateScheduleWithEmployeeRequest request);
     Task<Response<List<AvailableDateDto>?>> GetAvailableDatesAsync(GetAvailableDateRequest request);
+    Task<Response<List<AvailableDateDto>?>> GetAvailableDatesByCompanyCodeAsync(GetAvailableDateByCompanyRequest request);
     Task<Response<EmployeeAvailabilitySlotsDTO?>> GetAvailablesHoursByEmployeeIdAsync(GetAvailableHoursByServicesAndEmployeeRequest request);
     Task<Response<EmployeeAvailabilityScheduleDTO?>> OpenByEmployeeIdAsync(OpenAppointmentByEmployeeRequest request);
-    Task<Response<SchedulingClosedDTO?>> FinishAsync(FinishSchedulingRequest request);
-    Task<Response<SchedulingClosedDTO?>> CancelAsync(FinishSchedulingRequest request);
+    Task<Response<SchedullingClosedDTO?>> FinishAsync(FinishSchedulingRequest request);
+    Task<Response<SchedullingClosedDTO?>> CancelAsync(FinishSchedulingRequest request);
     Task<PagedResponse<List<EmployeeAvailabilitySlotsDTO>?>> GetEmployeesWithOpenScheduleAsync(GetEmployeesWithOpenScheduleRequest request);
-    Task<PagedResponse<List<Appointment>?>> GetByEmployeeAsync(GetAppointmentByEmployeeRequest request);
-    Task<PagedResponse<List<Appointment>?>> GetByEmployeeCodeAsync(GetAppointmentByEmployeeCodeRequest request);
+    Task<PagedResponse<List<AppointmentDto>?>> GetByEmployeeAsync(GetAppointmentByEmployeeRequest request);
+    Task<PagedResponse<List<AppointmentDto>?>> GetByEmployeeCodeAsync(GetAppointmentByEmployeeCodeRequest request);
 }

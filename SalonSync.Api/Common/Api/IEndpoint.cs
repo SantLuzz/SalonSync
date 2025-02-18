@@ -1,7 +1,6 @@
-﻿namespace SalonSync.Api.Common.Api
+﻿namespace SalonSync.Api.Common.Api;
+
+public interface IEndpoint
 {
-    public interface IEndpoint
-    {
-        static abstract void Map(IEndpointRouteBuilder app);
-    }
+    static abstract void Map(IEndpointRouteBuilder app);
 }

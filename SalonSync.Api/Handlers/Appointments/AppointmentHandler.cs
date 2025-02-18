@@ -5,7 +5,6 @@ using SalonSync.Core.DTOs;
 using SalonSync.Core.Enums;
 using SalonSync.Core.Handlers.Appointments;
 using SalonSync.Core.Models.Appointments;
-using SalonSync.Core.Models.Entities;
 using SalonSync.Core.Requests.Appointments;
 using SalonSync.Core.Responses;
 
@@ -133,14 +132,196 @@ public class AppointmentHandler(AppDbContext context) : IAppointmentHandler
         }
     }
 
-    public async Task<Response<SchedulingClosedDTO?>> FinishAsync(FinishSchedulingRequest request)
+    public async Task<Response<SchedullingClosedDTO?>> FinishAsync(FinishSchedulingRequest request)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var employee = await context
+                .Employees
+                .FirstOrDefaultAsync(x => x.UserId == request.UserId
+                                          && x.Id == request.EmployeeId);
+
+            if (employee is null)
+                return new Response<SchedullingClosedDTO?>(null, 404, "Profissíonal não encontrado!");
+            
+            var service = await context
+                .Services
+                .FirstOrDefaultAsync(x => x.UserId == request.UserId
+                                          && x.Id == request.ServiceId);
+
+            if (service is null)
+                return new Response<SchedullingClosedDTO?>(null, 404, "Serviço não encontrado!");
+
+            List<Appointment> appointments = [];
+
+            if (request.AppointmentGroupId == 0)
+            {
+                var appointment = await context
+                    .Appointments
+                    .Where(x => x.UserId == request.UserId
+                                && x.EmployeeId == request.EmployeeId
+                                && x.Date == request.Date.Date
+                                && x.StartTime >= request.StartTime
+                                && x.EndTime <= request.EndTime
+                    )
+                    .OrderBy(x => x.StartTime)
+                    .FirstOrDefaultAsync();
+
+                if (appointment is null)
+                    return new Response<SchedullingClosedDTO?>(null, 404, "Agendamento não encontrado!");
+                
+                appointments.Add(appointment);
+            }
+            else
+            {
+                appointments = await context
+                    .Appointments
+                    .Where(x => x.UserId == request.UserId
+                                && x.EmployeeId == request.EmployeeId
+                                && x.Date == request.Date
+                                && x.AppointmentGroupId == request.AppointmentGroupId)
+                    .ToListAsync();
+            }
+
+            foreach (var appointment in appointments)
+                appointment.Status = EAppointmentStatus.Completed;
+            
+            context.Appointments.UpdateRange(appointments);
+            await context.SaveChangesAsync();
+            
+            return new Response<SchedullingClosedDTO?>(new SchedullingClosedDTO
+            {
+                UserId = request.UserId,
+                StartTime = request.StartTime,
+                EndTime = request.EndTime,
+                ServiceDuration = service.Duration,
+                ServiceValue = service.Price,
+                Status = EAppointmentStatus.Completed,
+                Appointments = appointments
+                    .Select(x => new AppointmentDto
+                    {
+                        Id = x.Id,
+                        UserId = x.UserId,
+                        Date = x.Date,
+                        StartTime = x.StartTime,
+                        EndTime = x.EndTime,
+                        Status = x.Status,
+                        ClientId = x.ClientId,
+                        EmployeeId = x.EmployeeId,
+                        ServiceId = x.ServiceId,
+                        AppointmentGroupId = x.AppointmentGroupId,
+                    }).ToList()
+            }, message:"Agendamento finalizado com sucesso!");
+        }
+        catch (Exception)
+        {
+            return new Response<SchedullingClosedDTO?>(null, 500, "(SSA009) Não foi possível encerrar o agendamento!");
+        }
     }
     
-    public async Task<Response<SchedulingClosedDTO?>> CancelAsync(FinishSchedulingRequest request)
+    public async Task<Response<SchedullingClosedDTO?>> CancelAsync(FinishSchedulingRequest request)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var employee = await context
+                .Employees
+                .FirstOrDefaultAsync(x => x.UserId == request.UserId
+                                          && x.Id == request.EmployeeId);
+
+            if (employee is null)
+                return new Response<SchedullingClosedDTO?>(null, 404, "Profissíonal não encontrado!");
+            
+            var service = await context
+                .Services
+                .FirstOrDefaultAsync(x => x.UserId == request.UserId
+                                          && x.Id == request.ServiceId);
+
+            if (service is null)
+                return new Response<SchedullingClosedDTO?>(null, 404, "Serviço não encontrado!");
+
+            List<Appointment> appointments = [];
+
+            if (request.AppointmentGroupId == 0)
+            {
+                var appointment = await context
+                    .Appointments
+                    .Where(x => x.UserId == request.UserId
+                                && x.EmployeeId == request.EmployeeId
+                                && x.Date == request.Date.Date
+                                && x.StartTime >= request.StartTime
+                                && x.EndTime <= request.EndTime
+                    )
+                    .OrderBy(x => x.StartTime)
+                    .FirstOrDefaultAsync();
+
+                if (appointment is null)
+                    return new Response<SchedullingClosedDTO?>(null, 404, "Agendamento não encontrado!");
+                
+                appointments.Add(appointment);
+            }
+            else
+            {
+                appointments = await context
+                    .Appointments
+                    .Where(x => x.UserId == request.UserId
+                                && x.EmployeeId == request.EmployeeId
+                                && x.Date == request.Date
+                                && x.AppointmentGroupId == request.AppointmentGroupId)
+                    .ToListAsync();
+            }
+
+            var cancellationHistories = appointments
+                .Select(x => new AppointmentCancellationHistory
+                {
+                    UserId = x.UserId,
+                    AppointmentId = x.Id,
+                    AppointmentGroupId = x.AppointmentGroupId,
+                    CanceledAt = DateTime.Now,
+                    CanceledBy = request.UserId,
+                    CancellationReason = request.CancellationReason,
+                    StartTime = x.StartTime,
+                    EndTime = x.EndTime,
+                    ClientId = x.ClientId,
+                    Date = x.Date,
+                    ServiceId = x.ServiceId,
+                    EmployeeId = x.EmployeeId,
+                    Status = x.Status
+                }).ToList();
+
+            appointments.ForEach(x => x.Status = EAppointmentStatus.Cancelled);
+            
+            context.Appointments.UpdateRange(appointments);
+            await context.CancellationHistories.AddRangeAsync(cancellationHistories);
+            await context.SaveChangesAsync();
+            
+            return new Response<SchedullingClosedDTO?>(new SchedullingClosedDTO
+            {
+                UserId = request.UserId,
+                StartTime = request.StartTime,
+                EndTime = request.EndTime,
+                ServiceDuration = service.Duration,
+                ServiceValue = service.Price,
+                Status = EAppointmentStatus.Completed,
+                Appointments = appointments
+                    .Select(x => new AppointmentDto
+                    {
+                        Id = x.Id,
+                        UserId = x.UserId,
+                        Date = x.Date,
+                        StartTime = x.StartTime,
+                        EndTime = x.EndTime,
+                        Status = x.Status,
+                        ClientId = x.ClientId,
+                        EmployeeId = x.EmployeeId,
+                        ServiceId = x.ServiceId,
+                        AppointmentGroupId = x.AppointmentGroupId,
+                    }).ToList()
+            }, message:"Agendamento finalizado com sucesso!");
+        }
+        catch (Exception)
+        {
+            return new Response<SchedullingClosedDTO?>(null, 500, "(SSA010) Não foi possível cancelar o agendamento!");
+        }
     }
     
     public async Task<Response<EmployeeAvailabilityScheduleDTO?>> OpenByEmployeeIdAsync(OpenAppointmentByEmployeeRequest request)
@@ -157,6 +338,9 @@ public class AppointmentHandler(AppDbContext context) : IAppointmentHandler
                 return new Response<EmployeeAvailabilityScheduleDTO?>(null, 404,
                     "Não foi possível encontrar o profissional!");
 
+            if(request.StartDate.Date < DateTime.Today) return new Response<EmployeeAvailabilityScheduleDTO?>(null, 404, 
+                "A data inicial da abertura de agenda não pode ser menor que o dia atual!");
+            
             request.StartDate = request.StartDate.Date;
             request.EndDate = request.EndDate.Date;
             
@@ -214,7 +398,7 @@ public class AppointmentHandler(AppDbContext context) : IAppointmentHandler
             return new Response<EmployeeAvailabilityScheduleDTO?>(null, 500, "(SSA001) Não foi abrir a agenda do profissional!");
         }
     }
-
+    
     public async Task<Response<EmployeeAvailabilitySlotsDTO?>> GetAvailablesHoursByEmployeeIdAsync(GetAvailableHoursByServicesAndEmployeeRequest request)
     {
         try
@@ -367,9 +551,39 @@ public class AppointmentHandler(AppDbContext context) : IAppointmentHandler
                 .Appointments
                 .AsNoTracking()
                 .Where(x => x.UserId == request.UserId
-                    && x.Status == EAppointmentStatus.Free)
+                    && x.Status == EAppointmentStatus.Free
+                    && x.Date >= DateTime.Today)
                 .GroupBy(x => x.Date)
                 .ToListAsync();
+
+            if (!appointments.Any() && request.EmployeeId is not null)
+            {
+                if ((await _systemConfigHandler.GetConfigAsync(request.UserId))?.OpenScheduleAutomatically
+                    ?? false)
+                {
+                    var result = await OpenByEmployeeIdAsync(new OpenAppointmentByEmployeeRequest
+                    {
+                        UserId = request.UserId,
+                        EmployeeId = request?.EmployeeId ?? 0,
+                        StartDate = DateTime.Today,
+                        EndDate = DateTime.Today.AddDays(7)
+                    });
+
+                    if (!result.IsSuccess)
+                        return new Response<List<AvailableDateDto>?>(null, 404,
+                            "Não existem agendas abertas e não foi possível abrir agenda para o profissíonal informado!");
+                    
+                    appointments = await context
+                        .Appointments
+                        .AsNoTracking()
+                        .Where(x => x.UserId == request.UserId
+                                    && x.Status == EAppointmentStatus.Free
+                                    && x.Date >= DateTime.Today)
+                        .GroupBy(x => x.Date)
+                        .ToListAsync();
+                }
+            }
+            
 
             return appointments.Any()
                 ? new Response<List<AvailableDateDto>?>(appointments.Select(x => new AvailableDateDto
@@ -383,7 +597,43 @@ public class AppointmentHandler(AppDbContext context) : IAppointmentHandler
             return new Response<List<AvailableDateDto>?>(null, 500, "(SSA004) Não foi possível buscar os dias disponíveis!");
         }
     }
-    public async Task<PagedResponse<List<Appointment>?>> GetByEmployeeAsync(GetAppointmentByEmployeeRequest request)
+    
+    public async Task<Response<List<AvailableDateDto>?>> GetAvailableDatesByCompanyCodeAsync(GetAvailableDateByCompanyRequest request)
+    {
+        try
+        {
+            var company = await context
+                .Companies
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Code == request.Code);
+
+            if (company is null)
+                return new Response<List<AvailableDateDto>?>(null, 404, "Empresa dona da agenda não encontrada!");
+            
+            var appointments = await context
+                .Appointments
+                .AsNoTracking()
+                .Where(x => x.UserId == company.UserId
+                            && x.Status == EAppointmentStatus.Free
+                            && x.Date >= DateTime.Today)
+                .GroupBy(x => x.Date)
+                .ToListAsync();
+            
+            //TODO: se caso tiver fechado informar no email da empresa responsável
+            
+            return appointments.Any()
+                ? new Response<List<AvailableDateDto>?>(appointments.Select(x => new AvailableDateDto
+                {
+                    Date = x.Key,
+                }).ToList(), message: "Dias recuperados com sucesso!")
+                : new Response<List<AvailableDateDto>?>(null,404, "Não existem agendas abertas no momento, tente novamente mais tarde!");
+        }
+        catch (Exception)
+        {
+            return new Response<List<AvailableDateDto>?>(null, 500, "(SSA011) Não foi possível buscar os dias disponíveis!");
+        }
+    }
+    public async Task<PagedResponse<List<AppointmentDto>?>> GetByEmployeeAsync(GetAppointmentByEmployeeRequest request)
     {
         try
         {
@@ -393,7 +643,7 @@ public class AppointmentHandler(AppDbContext context) : IAppointmentHandler
                 .FirstOrDefaultAsync(x => x.UserId == request.UserId
                 && x.Id == request.EmployeeId);
             
-            if(employee is null) return new PagedResponse<List<Appointment>?>(null, 404, "Profissional não encontrado!");
+            if(employee is null) return new PagedResponse<List<AppointmentDto>?>(null, 404, "Profissional não encontrado!");
 
             var query = context
                 .Appointments
@@ -407,15 +657,61 @@ public class AppointmentHandler(AppDbContext context) : IAppointmentHandler
             var appointments = await query
                 .ToListAsync();
             
-            return new PagedResponse<List<Appointment>?>(appointments, message: $"Agenda do profissional para o dia {request.Date:dd/MM/yyyy}!");
+            List<AppointmentDto> appointmentDtos = [];
+            AppointmentDto? currentGroup = null;
+
+            foreach (var appointment in appointments)
+            {
+                if (currentGroup == null || 
+                    currentGroup.AppointmentGroupId != appointment.AppointmentGroupId || 
+                    appointment.Status == EAppointmentStatus.Free || 
+                    currentGroup.EndTime < appointment.StartTime) 
+                {
+                    // Inicia um novo grupo
+                    currentGroup = new AppointmentDto
+                    {
+                        Id = appointment.Id,
+                        UserId = appointment.UserId,
+                        Date = appointment.Date,
+                        StartTime = appointment.StartTime,
+                        EndTime = appointment.EndTime,
+                        Status = appointment.Status,
+                        ClientId = appointment.ClientId,
+                        EmployeeId = appointment.EmployeeId,
+                        ServiceId = appointment.ServiceId,
+                        AppointmentGroupId = appointment.AppointmentGroupId,
+                        Client = appointment.Client is null ? null : new()
+                        {
+                            Id = appointment.Client.Id,
+                            Name = appointment.Client.Name,
+                            UserId = appointment.Client.UserId,
+                        },
+                        Employee = new()
+                        {
+                            Id = employee.Id,
+                            Name = employee.Name,
+                            UserId = employee.UserId
+                        }
+                    };
+                    appointmentDtos.Add(currentGroup);
+                }
+                else
+                {
+                    // Atualiza o horário final do grupo atual
+                    currentGroup.EndTime = appointment.EndTime;
+                }
+            }
+            
+            
+            return new PagedResponse<List<AppointmentDto>?>(appointmentDtos, message: $"Agenda do profissional para o dia {request.Date:dd/MM/yyyy}!");
         }
         catch (Exception)
         {
-            return new PagedResponse<List<Appointment>?>(null, 500, "(SSA007) Não foi possível recuperar a agenda do profissional!");
+            return new PagedResponse<List<AppointmentDto>?>(null, 500, "(SSA007) Não foi possível recuperar a agenda do profissional!");
         }
     }
 
-    public async Task<PagedResponse<List<Appointment>?>> GetByEmployeeCodeAsync(GetAppointmentByEmployeeCodeRequest request)
+    public async Task<PagedResponse<List<AppointmentDto>?>> GetByEmployeeCodeAsync(GetAppointmentByEmployeeCodeRequest request)
     {
         try
         {
@@ -425,7 +721,7 @@ public class AppointmentHandler(AppDbContext context) : IAppointmentHandler
                 .FirstOrDefaultAsync(x => x.UniqueCode == request.Code);
             
             if(employee is null) 
-                return new PagedResponse<List<Appointment>?>(null, 404, "Profissional não encontrado!");
+                return new PagedResponse<List<AppointmentDto>?>(null, 404, "Profissional não encontrado!");
 
             var query = context
                 .Appointments
@@ -439,11 +735,57 @@ public class AppointmentHandler(AppDbContext context) : IAppointmentHandler
             var appointments = await query
                 .ToListAsync();
             
-            return new PagedResponse<List<Appointment>?>(appointments, message: $"Agenda do profissional para o dia {request.Date:dd/MM/yyyy}!");
+            List<AppointmentDto> appointmentDtos = [];
+            AppointmentDto? currentGroup = null;
+
+            foreach (var appointment in appointments)
+            {
+                if (currentGroup == null || 
+                    currentGroup.AppointmentGroupId != appointment.AppointmentGroupId || 
+                    appointment.Status == EAppointmentStatus.Free || 
+                    currentGroup.EndTime < appointment.StartTime) 
+                {
+                    // Inicia um novo grupo
+                    currentGroup = new AppointmentDto
+                    {
+                        Id = appointment.Id,
+                        UserId = appointment.UserId,
+                        Date = appointment.Date,
+                        StartTime = appointment.StartTime,
+                        EndTime = appointment.EndTime,
+                        Status = appointment.Status,
+                        ClientId = appointment.ClientId,
+                        EmployeeId = appointment.EmployeeId,
+                        ServiceId = appointment.ServiceId,
+                        AppointmentGroupId = appointment.AppointmentGroupId,
+                        Client = appointment.Client is null ? null : new()
+                        {
+                            Id = appointment.Client.Id,
+                            Name = appointment.Client.Name,
+                            UserId = appointment.Client.UserId,
+                        },
+                        Employee = new()
+                        {
+                            Id = employee.Id,
+                            Name = employee.Name,
+                            UserId = employee.UserId
+                        }
+                    };
+                    appointmentDtos.Add(currentGroup);
+                }
+                else
+                {
+                    // Atualiza o horário final do grupo atual
+                    currentGroup.EndTime = appointment.EndTime;
+                }
+            }
+            
+            
+            return new PagedResponse<List<AppointmentDto>?>(appointmentDtos, message: $"Agenda do profissional para o dia {request.Date:dd/MM/yyyy}!");
         }
         catch (Exception)
         {
-            return new PagedResponse<List<Appointment>?>(null, 500, "(SSA008) Não foi possível recuperar a agenda do profissional!");
+            return new PagedResponse<List<AppointmentDto>?>(null, 500, "(SSA008) Não foi possível recuperar a agenda do profissional!");
         }
     }
 
@@ -518,7 +860,7 @@ public class AppointmentHandler(AppDbContext context) : IAppointmentHandler
         }
         catch
         {
-            return new List<DateTime>();
+            return [];
         }
     }
     

@@ -17,6 +17,7 @@ if (app.Environment.IsDevelopment())
     app.ConfigureDevEnvironment();
 
 app.UseFiles();
+app.LoadConfiguration();
 app.UseCors(ApiConfiguration.CorsPolicyName);
 app.UseSecurity();
 app.MapEndpoints();

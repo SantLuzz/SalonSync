@@ -297,6 +297,75 @@ namespace SalonSync.Api.Migrations
                     b.ToTable("Appointments", (string)null);
                 });
 
+            modelBuilder.Entity("SalonSync.Core.Models.Appointments.AppointmentCancellationHistory", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("AppointmentGroupId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("AppointmentGroupId");
+
+                    b.Property<long>("AppointmentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CanceledAt")
+                        .HasColumnType("DATETIME2");
+
+                    b.Property<string>("CanceledBy")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("NVARCHAR");
+
+                    b.Property<string>("CancellationReason")
+                        .HasMaxLength(-1)
+                        .HasColumnType("NVARCHAR")
+                        .HasColumnName("CancellationReason");
+
+                    b.Property<long?>("ClientId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("ClientId");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("DATETIME2")
+                        .HasColumnName("Date");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("EmployeeId");
+
+                    b.Property<TimeOnly>("EndTime")
+                        .HasColumnType("TIME")
+                        .HasColumnName("EndTime");
+
+                    b.Property<long?>("ServiceId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("ServiceId");
+
+                    b.Property<TimeOnly>("StartTime")
+                        .HasColumnType("TIME")
+                        .HasColumnName("StartTime");
+
+                    b.Property<short>("Status")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("SMALLINT")
+                        .HasDefaultValue((short)3)
+                        .HasColumnName("Status");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("NVARCHAR")
+                        .HasColumnName("UserId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AppointmentsCancellationsHistories", (string)null);
+                });
+
             modelBuilder.Entity("SalonSync.Core.Models.Appointments.AppointmentGroup", b =>
                 {
                     b.Property<long>("Id")
@@ -461,6 +530,9 @@ namespace SalonSync.Api.Migrations
                         .HasColumnName("UserId");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("Companies", (string)null);
                 });
@@ -783,6 +855,9 @@ namespace SalonSync.Api.Migrations
                         .HasColumnType("bit");
 
                     b.Property<bool>("Monday")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("OpenScheduleAutomatically")
                         .HasColumnType("bit");
 
                     b.Property<bool>("Saturday")

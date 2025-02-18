@@ -14,4 +14,6 @@ public class AppointmentDto
     public long EmployeeId { get; set; }
     public long? ServiceId { get; set; }
     public long? AppointmentGroupId { get; set; }
+    public EntityDto? Client { get; set; }
+    public EntityDto? Employee { get; set; }
 }

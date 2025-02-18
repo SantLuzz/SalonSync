@@ -30,6 +30,7 @@ public class SystemConfigHandler(AppDbContext context) : ISystemConfigHandler
             config.Friday = request.Friday;
             config.Saturday = request.Saturday;
             config.Sunday = request.Sunday;
+            config.OpenScheduleAutomatically = request.OpenScheduleAutomatically;
             
             if(config.Id == 0)
                 await context.SystemConfigs.AddAsync(config);
@@ -76,7 +77,7 @@ public class SystemConfigHandler(AppDbContext context) : ISystemConfigHandler
 
             List<DayOfWeek> days = config is not null
                 ? typeof(SystemConfig).GetProperties()
-                    .Where(p => p.PropertyType == typeof(bool) && (bool)p.GetValue(config)!)
+                    .Where(p => p.PropertyType == typeof(bool) && p.Name != "OpenScheduleAutomatically" && (bool)p.GetValue(config)!)
                     .Select(p => Enum.Parse<DayOfWeek>(p.Name))
                     .ToList()
                 : [];
@@ -86,6 +87,23 @@ public class SystemConfigHandler(AppDbContext context) : ISystemConfigHandler
         catch (Exception ex)
         {
             return [];
+        }
+    }
+
+    public async Task<SystemConfig?> GetConfigAsync(string userId)
+    {
+        try
+        {
+            var config = await context
+                .SystemConfigs
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.UserId == userId);
+            
+            return config;
+        }
+        catch
+        {
+            return null;
         }
     }
 }

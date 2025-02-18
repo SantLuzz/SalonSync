@@ -11,4 +11,5 @@ public interface ICompanyHandler
     Task<Response<Company?>> DeleteAsync(DeleteCompanyRequest request);
     Task<Response<Company?>> GetAsync(GetCompanyRequest request);
     Task<Response<Company?>> GenerateCodeAsync(GenerateCodeByCompanyRequest request);
+    Task<Company?> GetByCodeAsync(Guid code);
 }

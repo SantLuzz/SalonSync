@@ -1,25 +1,24 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using SalonSync.Api.Common.Api;
+using SalonSync.Core.DTOs;
 using SalonSync.Core.Handlers.Appointments;
-using SalonSync.Core.Models.Appointments;
 using SalonSync.Core.Requests.Appointments;
 using SalonSync.Core.Responses;
 
-namespace SalonSync.Api.Endpoints.Appointments;
+namespace SalonSync.Api.Endpoints.Schedules;
 
 public class GetAppointmentByEmployeeCodeEndpoint : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app)
-        => app.MapGet("/appointments/{id:guid}", HandlerAsync)
-            .WithName("Appointments: Get Appointments by code employee")
-            .WithDescription("Get Appointments by employee.")
+        => app.MapGet("/employees-appointments/", HandlerAsync)
+            .WithName("Schedules: Get Appointments by code employee")
+            .WithDescription("Get Schedules by employee.")
             .WithOrder(1)
-            .Produces<PagedResponse<List<Appointment>?>>();
+            .Produces<PagedResponse<List<AppointmentDto>?>>();
 
     private static async Task<IResult> HandlerAsync(
         IAppointmentHandler handler,
-        Guid id,
+        [FromQuery]Guid id,
         [FromQuery] DateTime date)
     {
         var request = new GetAppointmentByEmployeeCodeRequest()

@@ -11,7 +11,7 @@ namespace SalonSync.Api.Endpoints.Appointments;
 public class GetEmployeesWithOpenScheduleEndpoint : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app)
-        => app.MapGet("/employees-open-schedule/{date:datetime}", HandlerAsync)
+        => app.MapGet("/employees-open-schedule/", HandlerAsync)
             .WithName("Appointments: Get employees with open schedule")
             .WithDescription("Get employees with open schedule.")
             .WithOrder(4)
@@ -20,7 +20,7 @@ public class GetEmployeesWithOpenScheduleEndpoint : IEndpoint
     private static async Task<IResult> HandlerAsync(
         ClaimsPrincipal user,
         IAppointmentHandler handler,
-        DateTime date)
+        [FromQuery]DateTime date)
     {
         var request = new GetEmployeesWithOpenScheduleRequest()
         {

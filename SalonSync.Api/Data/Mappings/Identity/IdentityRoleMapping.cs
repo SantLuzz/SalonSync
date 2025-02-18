@@ -2,18 +2,17 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace SalonSync.Api.Data.Mappings.Identity
+namespace SalonSync.Api.Data.Mappings.Identity;
+
+public class IdentityRoleMapping : IEntityTypeConfiguration<IdentityRole<long>>
 {
-    public class IdentityRoleMapping : IEntityTypeConfiguration<IdentityRole<long>>
+    public void Configure(EntityTypeBuilder<IdentityRole<long>> builder)
     {
-        public void Configure(EntityTypeBuilder<IdentityRole<long>> builder)
-        {
-            builder.ToTable("IdentityRole");
-            builder.HasKey(x => x.Id);
-            builder.HasIndex(x => x.NormalizedName).IsUnique();
-            builder.Property(x => x.ConcurrencyStamp).IsConcurrencyToken();
-            builder.Property(x => x.Name).HasMaxLength(256);
-            builder.Property(x => x.NormalizedName).HasMaxLength(256);
-        }
+        builder.ToTable("IdentityRole");
+        builder.HasKey(x => x.Id);
+        builder.HasIndex(x => x.NormalizedName).IsUnique();
+        builder.Property(x => x.ConcurrencyStamp).IsConcurrencyToken();
+        builder.Property(x => x.Name).HasMaxLength(256);
+        builder.Property(x => x.NormalizedName).HasMaxLength(256);
     }
 }

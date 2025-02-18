@@ -1,8 +1,8 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using SalonSync.Api.Common.Api;
+using SalonSync.Core.DTOs;
 using SalonSync.Core.Handlers.Appointments;
-using SalonSync.Core.Models.Appointments;
 using SalonSync.Core.Requests.Appointments;
 using SalonSync.Core.Responses;
 
@@ -15,7 +15,7 @@ public class GetAppointmentByEmployeeEndpoint : IEndpoint
             .WithName("Appointments: Get Appointments by employee")
             .WithDescription("Get Appointments by employee.")
             .WithOrder(6)
-            .Produces<PagedResponse<List<Appointment>?>>();
+            .Produces<PagedResponse<List<AppointmentDto>?>>();
 
         private static async Task<IResult> HandlerAsync(
             ClaimsPrincipal user,

@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc;
 using SalonSync.Api.Common.Api;
 using SalonSync.Core.DTOs;
 using SalonSync.Core.Handlers.Appointments;
@@ -18,10 +19,12 @@ public class GetAvailableDateEndpoint : IEndpoint
 
     private static async Task<IResult> HandlerAsync(
         ClaimsPrincipal user,
-        IAppointmentHandler handler)
+        IAppointmentHandler handler,
+        [FromQuery]long? employeeId)
     {
         var request = new GetAvailableDateRequest
         {
+            EmployeeId = employeeId,
             UserId = user.Identity?.Name ?? string.Empty,
         };
 
