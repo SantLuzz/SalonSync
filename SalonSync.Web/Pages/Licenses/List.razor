@@ -1,0 +1,45 @@
+@page "/licenses"
+
+<MudText Typo="Typo.h3">Licenças</MudText>
+
+@if (IsBusy)
+{
+    <Skeleton />
+}
+else
+{
+    <MudDataGrid
+        Class="mt-4"
+        Items="@Licenses"
+        Filterable="true"
+        QuickFilter="Filter"
+        Hideable="true">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Licenças</MudText>
+            <MudSpacer />
+            <MudTextField @bind-Value="SearchTerm" Placeholder="Filtrar..."
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search"
+                          Immediate="true"
+                          IconSize="Size.Medium"
+                          Class="mt-0"/>
+        </ToolBarContent>
+        <Columns>
+            <PropertyColumn Property="x => x.Id" Title="#" />
+            <PropertyColumn Property="x => x.Name" Title="Nome" />
+            <PropertyColumn Property="x => x.CreatedAt" Title="Data de Criação" />
+            <PropertyColumn Property="x => x.LicenseEndDate" Title="Expiração" />
+        
+            <TemplateColumn Class="d-flex justify-end">
+                <CellTemplate>
+                    <MudStack Row>
+                        <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                       OnClick="() => OnEditLicenseClickedAsync(context.Item.UserId)"
+                                       Color="Color.Primary"
+                                       aria-label="Editar" />
+                    </MudStack>
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+    </MudDataGrid>
+}

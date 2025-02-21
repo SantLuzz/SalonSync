@@ -27,7 +27,7 @@ public class GetCompanyEndpoint : IEndpoint
         
         var result = await handler.GetAsync(request);
         return result.IsSuccess
-            ? TypedResults.Ok(result.Data)
+            ? TypedResults.Ok(result)
             : TypedResults.NotFound(result);
     }
 }

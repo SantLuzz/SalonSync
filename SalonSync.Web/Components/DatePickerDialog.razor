@@ -1,0 +1,48 @@
+<MudDialog OnKeyDown="OnKeyDownAsync">
+    <DialogContent>
+        <MudText>@Description</MudText>
+        <MudDatePicker @bind-Date="_selectedDate" Label="@Label" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public string Label { get; set; } = "Selecione a Data";
+    [Parameter] public string Description { get; set; } = "Selecione a data desejada.";
+    
+    [Inject]
+    private IDialogService DialogService { get; set; } // for MessageBox
+
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; }
+
+    private DateTime? _selectedDate;
+
+    private void Submit() => MudDialog.Close(DialogResult.Ok(_selectedDate));
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private async Task OnKeyDownAsync(KeyboardEventArgs args)
+    {
+        switch(args.Key) {
+        case "Enter":
+        case "NumpadEnter":
+        if (!_selectedDate.HasValue) {
+            await DialogService.ShowMessageBox(
+                "Desculpe",
+                @"Você deve selecionar uma data e fechar com Enter ou cancelar com Escape!",
+                yesText:"Entendi",
+                options: new DialogOptions() { CloseOnEscapeKey = true });
+                return;
+                }
+            Submit();
+                break;
+            case "Escape":
+                Cancel();
+            break;
+        }
+    }
+}

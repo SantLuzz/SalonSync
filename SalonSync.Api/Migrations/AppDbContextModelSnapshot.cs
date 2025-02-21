@@ -507,10 +507,21 @@ namespace SalonSync.Api.Migrations
                     b.Property<Guid>("Code")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("DATETIME2")
+                        .HasDefaultValueSql("GETDATE()");
+
                     b.Property<string>("Document")
                         .HasMaxLength(20)
                         .HasColumnType("NVARCHAR")
                         .HasColumnName("Document");
+
+                    b.Property<string>("LicenseEndDate")
+                        .IsRequired()
+                        .HasMaxLength(-1)
+                        .HasColumnType("NVARCHAR")
+                        .HasColumnName("LicenseEndDate");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -522,6 +533,9 @@ namespace SalonSync.Api.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("NVARCHAR")
                         .HasColumnName("Phone");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("DATETIME2");
 
                     b.Property<string>("UserId")
                         .IsRequired()

@@ -1,0 +1,69 @@
+@using System.Linq.Expressions
+@using SalonSync.Web.Common
+
+<MudTextField T="string"
+              Label="@Label"
+              HelperText="@($"Telefone: {GetHelperText(Value)}")"
+              Variant="Variant.Outlined"
+              Immediate="true"
+              @bind-Value="Value"
+              For="@(For is not null ? For : null)"
+              MaxLength="15"
+              OnBlur="FormatPhone">
+</MudTextField>
+
+@code {
+    [Parameter] public string Value { get; set; } = string.Empty;
+    [Parameter] public EventCallback<string> ValueChanged { get; set; }
+    [Parameter] public string Label { get; set; } = "Telefone";
+    [Parameter] public Expression<Func<string>>? For { get; set; }
+
+    private string GetHelperText(string value)
+    {
+        var unmaskedValue = value?.ForNumbersOnly() ?? string.Empty;
+
+        if (string.IsNullOrWhiteSpace(unmaskedValue))
+            return "(XX) XXXXX-XXXX"; // Placeholder inicial
+
+        return ApplyMask(unmaskedValue, unmaskedValue.Length <= 10 ? "(XX) XXXX-XXXX" : "(XX) XXXXX-XXXX");
+    }
+
+    private async Task FormatPhone(FocusEventArgs args)
+    {
+        string unmaskedValue = Value.ForNumbersOnly();
+
+        if (!string.IsNullOrEmpty(unmaskedValue))
+        {
+            Value = ApplyMask(unmaskedValue, unmaskedValue.Length <= 10 ? "(XX) XXXX-XXXX" : "(XX) XXXXX-XXXX");
+            await ValueChanged.InvokeAsync(Value);
+        }
+    }
+
+    private string ApplyMask(string value, string mask)
+    {
+        var formatted = "";
+        int valueIndex = 0;
+
+        foreach (char c in mask)
+        {
+            if (c == 'X')
+            {
+                if (valueIndex < value.Length)
+                {
+                    formatted += value[valueIndex]; // Preenche com número digitado
+                    valueIndex++;
+                }
+                else
+                {
+                    formatted += "X"; // Mantém X nos espaços vazios
+                }
+            }
+            else
+            {
+                formatted += c;
+            }
+        }
+
+        return formatted;
+    }
+}

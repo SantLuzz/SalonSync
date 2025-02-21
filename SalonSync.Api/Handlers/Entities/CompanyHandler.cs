@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SalonSync.Api.Data;
+using SalonSync.Core.DTOs;
 using SalonSync.Core.Handlers.Entities;
 using SalonSync.Core.Models.Entities;
 using SalonSync.Core.Requests.Entities.Companies;
@@ -28,6 +29,8 @@ public class CompanyHandler(AppDbContext context) : ICompanyHandler
                 Phone = request.Phone,
                 UserId = request.UserId,
                 Code = Guid.NewGuid(),
+                CreatedAt = DateTime.Now,
+                LicenseEndDate =  Encription.CryptoService.Encrypt(DateTime.Today.AddDays(15).ToString("dd/MM/yyyy")),
             };
             
             await context.Companies.AddAsync(company);
@@ -55,6 +58,7 @@ public class CompanyHandler(AppDbContext context) : ICompanyHandler
             company.Name = request.Name;
             company.Document = request.Document;
             company.Phone = request.Phone;
+            company.UpdatedAt = DateTime.Now;
             
             context.Companies.Update(company);
             await context.SaveChangesAsync();
@@ -97,10 +101,13 @@ public class CompanyHandler(AppDbContext context) : ICompanyHandler
                 .Companies
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.UserId == request.UserId);
+
+            if (company is null)
+                return new Response<Company?>(null, 404, "Empresa não encontrada!");
             
-            return company is null
-                ? new Response<Company?>(null, 404, "Empresa não encontrada!")
-                : new Response<Company?>(company, message: "Empresa encontrada com sucesso!");
+            company.LicenseEndDate = Encription.CryptoService.Decrypt(company.LicenseEndDate);
+            
+            return new Response<Company?>(company, message: "Empresa encontrada com sucesso!");
         }
         catch (Exception)
         {
@@ -120,6 +127,7 @@ public class CompanyHandler(AppDbContext context) : ICompanyHandler
                 return new Response<Company?>(null, 404, "Empresa não encontrada!");
             
             company.Code = Guid.NewGuid();
+            company.UpdatedAt = DateTime.Now;
             
             context.Companies.Update(company);
             await context.SaveChangesAsync();

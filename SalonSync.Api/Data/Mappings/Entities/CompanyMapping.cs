@@ -34,6 +34,21 @@ public class CompanyMapping : IEntityTypeConfiguration<Company>
             .HasColumnName("Phone")
             .HasColumnType("NVARCHAR")
             .HasMaxLength(20);
+
+        builder.Property(x => x.CreatedAt)
+            .IsRequired()
+            .HasColumnType("DATETIME2")
+            .HasDefaultValueSql("GETDATE()");
+        
+        builder.Property(x => x.UpdatedAt)
+            .IsRequired(false)
+            .HasColumnType("DATETIME2");
+        
+        builder.Property(x => x.LicenseEndDate)
+            .IsRequired()
+            .HasColumnName("LicenseEndDate")
+            .HasColumnType("NVARCHAR")
+            .HasMaxLength(-1);
         
         builder.Property(x => x.Code)
             .IsRequired();

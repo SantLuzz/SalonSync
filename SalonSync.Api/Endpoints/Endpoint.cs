@@ -1,4 +1,5 @@
-﻿using SalonSync.Api.Common.Api;
+﻿using Microsoft.AspNetCore.Identity;
+using SalonSync.Api.Common.Api;
 using SalonSync.Api.Endpoints.Appointments;
 using SalonSync.Api.Endpoints.ClientsPackages;
 using SalonSync.Api.Endpoints.Configs;
@@ -7,6 +8,7 @@ using SalonSync.Api.Endpoints.Entities.Companies;
 using SalonSync.Api.Endpoints.Entities.Employees;
 using SalonSync.Api.Endpoints.Financial.CostCenters;
 using SalonSync.Api.Endpoints.Identity;
+using SalonSync.Api.Endpoints.Licenses;
 using SalonSync.Api.Endpoints.Packages;
 using SalonSync.Api.Endpoints.PackagesServices;
 using SalonSync.Api.Endpoints.Schedules;
@@ -41,7 +43,7 @@ public static class Endpoint
                 : Results.Problem("Falha ao enviar o e-mail.");
         });
 
-            
+        
         //mapeando os endpoints do identity
         endpoint.MapGroup("v1/identity")
             .WithTags("Identity")
@@ -49,8 +51,11 @@ public static class Endpoint
 
         endpoint.MapGroup("v1/identity")
             .WithTags("Identity")
+            .MapEndpoints<RegisterUserEndpoint>()
             .MapEndpoints<LogoutEndpoint>()
-            .MapEndpoints<GetRolesEndpoint>();
+            .MapEndpoints<GetRolesEndpoint>()
+            .MapEndpoints<LoginUserEndpoint>()
+            .MapEndpoints<GetUserInfoEndpoint>();
 
         endpoint.MapGroup("v1/configs")
             .WithTags("Configs")
@@ -155,6 +160,18 @@ public static class Endpoint
             .MapEndpoints<GenerateScheduleWithEmployeeByCompanyCodeEndpoint>()
             .MapEndpoints<GetAvailableHoursByEmployeeIdAndCompanyCodeEndpoint>()
             .MapEndpoints<GetEmployeesWithOpenScheduleByCompanyCodeEndpoint>();
+
+        endpoint.MapGroup("v1/licenses")
+            .WithTags("Licenses")
+            .RequireAuthorization()
+            .MapEndpoints<CheckCompanyLicenseEndpoint>();
+
+        endpoint.MapGroup("v1/licenses")
+            .WithTags("Licenses")
+            .RequireAuthorization()
+            .MapEndpoints<GetUserLicensesEndpoint>()
+            .MapEndpoints<UpdateUserLicenseEndpoint>();
+
     }
 
     private static IEndpointRouteBuilder MapEndpoints<TEndpoint> (this IEndpointRouteBuilder app) where TEndpoint : IEndpoint

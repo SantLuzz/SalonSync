@@ -2,7 +2,7 @@
 
 namespace SalonSync.Core.Requests.Account;
 
-public class RegisterRequest : Request
+public class RegisterRequest
 {
     [Required(ErrorMessage = "E-mail")]
     [EmailAddress(ErrorMessage = "E-mail inválido")]

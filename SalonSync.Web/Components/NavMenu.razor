@@ -1,0 +1,17 @@
+<div class="d-flex justify-center pb-8 pt-8">
+    <img src="uploads/LogoRedondaSemFundo.png"
+         alt="Salon Sync - Gestão Financeira"
+         width="200" />
+</div>
+
+<MudNavMenu>
+    <MudNavLink Href="/" Match="NavLinkMatch.All">Dashboard</MudNavLink>
+    <AuthorizeView>
+        @if (context.User.IsInRole("SuperAdmin"))
+        {
+            <MudNavLink Href="/licenses">Licenças</MudNavLink>        
+        }
+    </AuthorizeView>
+    
+    <MudNavLink Href="/logout">Sair</MudNavLink>
+</MudNavMenu>

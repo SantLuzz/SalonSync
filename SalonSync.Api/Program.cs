@@ -21,6 +21,7 @@ app.LoadConfiguration();
 app.UseCors(ApiConfiguration.CorsPolicyName);
 app.UseSecurity();
 app.MapEndpoints();
-
+//app.CreateSuperAdminAndRoles();
 
 app.Run();
+
