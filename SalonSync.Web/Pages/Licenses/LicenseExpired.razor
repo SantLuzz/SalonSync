@@ -1,0 +1,61 @@
+@page "/license-expired"
+@using SalonSync.Web.Services
+@layout HeadlessLayout
+
+<PageTitle>Salon Sync - Licença Expirada</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="d-flex flex-column align-center text-center mt-10">
+    <MudText Typo="Typo.h3" Class="text-primary">Sessão Finalizada!</MudText>
+
+    <MudPaper Class="pa-6 mt-6 text-center">
+        <div class="d-flex justify-center pb-6 pt-4">
+            <img src="Uploads/LogoRedondaSemFundo.png"
+                 alt="Salon Sync - Gestão de Salão"
+                 width="200" />
+        </div>
+
+        <MudAlert Severity="Severity.Warning" Variant="Variant.Filled" Class="mb-4">
+            Sua licença expirou. Para continuar usando o sistema, entre em contato com o administrador.
+        </MudAlert>
+
+        <MudButton Variant="Variant.Outlined" Href="/login" Color="Color.Primary" Class="mb-4 d-flex align-center">
+            <MudIcon Icon="mdi-login" Class="mr-2" />
+            Ir para Tela de Login
+        </MudButton>
+
+        <MudDivider Class="mb-4" />
+
+        <MudContainer Class="d-flex align-center text-center mt-2">
+            <MudText Typo="Typo.subtitle1" Class="d-flex align-center">
+                <strong>Entre em contato:</strong>
+            </MudText>
+
+            <div class="d-flex align-center gap-2">
+                <MudButton Variant="Variant.Text"
+                           Color="Color.Primary"
+                           Href="mailto:contato@salonsyncapp.com?subject=Licença%20expirada">
+                    <MudIcon Icon="@Icons.Material.Filled.Email" />
+                </MudButton>
+
+                <MudButton Variant="Variant.Text"
+                           Color="Color.Success"
+                           Href="https://wa.me/5567981275336?text=Ol%C3%A1,%20minha%20licen%C3%A7a%20de%20uso%20do%20aplicativo%20Salon%20Sync%20expirou.">
+                    <MudIcon Icon="@Icons.Custom.Brands.WhatsApp" />
+                </MudButton>
+            </div>
+        </MudContainer>
+        
+
+    </MudPaper>
+</MudContainer>
+
+
+@code {
+    [Inject] public LogoutService LogoutService { get; set; } = null!;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await LogoutService.Logout();
+        await base.OnInitializedAsync();
+    }
+}

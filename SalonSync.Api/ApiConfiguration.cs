@@ -22,6 +22,7 @@ public static class ApiConfiguration
     ];
 
     public static SmtpConfiguration Smtp { get; set; } = new();
+    public static string SuperAdminPass { get; set; } = string.Empty;
     
     public class SmtpConfiguration
     {

@@ -1,0 +1,71 @@
+@page "/company"
+
+<PageTitle>Salon Sync - Empresa Usuária</PageTitle>
+<MudText Typo="Typo.h3">Empresa Usuária</MudText>
+
+@if (IsBusy)
+{
+    <Skeleton/>
+}
+else
+{
+    <MudPaper Class="pa-8 mt-4">
+        <EditForm Model="@InputModel" OnValidSubmit="OnValidSubmitAsync">
+            <DataAnnotationsValidator />
+            <MudTextField Label="Nome"
+                          HelperText="Campo Obrigatório"
+                          Variant="Variant.Outlined"
+                          @bind-Value="InputModel.UpdateRequest.Name"
+                          For="@(() => InputModel.UpdateRequest.Name)" />
+            
+            <DocumentMudTextField
+                @bind-Value="InputModel.UpdateRequest.Document"/>
+
+            <PhoneMudTextField
+                @bind-Value="InputModel.UpdateRequest.Phone" />
+
+            @* Colocar o button no campo para copiar e voltar da forma inicial *@
+            <div class="d-flex align-items-center mt-2" style="width: 100%;">
+                <MudTextField T="string" 
+                              Label="Link da Empresa"
+                              ReadOnly="true"
+                              Variant="Variant.Outlined"
+                              @bind-Value="InputModel.Url"
+                              Adornment="Adornment.End"
+                              AdornmentIcon="@Icons.Material.Filled.ContentCopy"
+                              AdornmentAriaLabel="Copiar link da empresa"
+                              OnAdornmentClick="CopyToClipboardAsync"/>
+
+                @if (IsSubmitCode)
+                {
+                    <MudProgressCircular Color="Color.Info" Indeterminate="true"/>
+                }
+                else
+                {
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Warning"
+                               OnClick="GenerateCodeAsync"
+                               Class="ml-2">
+                        Gerar URL
+                    </MudButton>
+                }
+            </div>
+            
+            <div class="d-flex mt-8">
+                @if (IsSubmit)
+                {
+                     <MudProgressCircular Color="Color.Info" Indeterminate="true" />
+                }
+                else
+                {
+                <MudButton ButtonType="ButtonType.Submit"
+                           Variant="Variant.Filled"
+                           Color="Color.Primary">
+                    Salvar Alterações
+                </MudButton>
+                }
+            </div>
+        </EditForm>
+    </MudPaper>
+}
+

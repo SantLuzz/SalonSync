@@ -1,11 +1,13 @@
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using SalonSync.Web;
+using SalonSync.Web.Common.Web;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
-builder.RootComponents.Add<App>("#app");
-builder.RootComponents.Add<HeadOutlet>("head::after");
 
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+builder.AddConfiguration();
+builder.AddRoots();
+builder.AddSecurity();
+builder.AddExternalComponets();
+builder.AddServices();
+builder.AddLocalization();
 
 await builder.Build().RunAsync();

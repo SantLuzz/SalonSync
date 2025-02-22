@@ -19,6 +19,12 @@
     <Folder Include="wwwroot\uploads\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="Encription">
+      <HintPath>..\..\Encription\Encription\bin\Debug\net8.0\Encription.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>

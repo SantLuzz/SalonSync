@@ -1,0 +1,69 @@
+@using System.Linq.Expressions
+@using SalonSync.Web.Common
+
+<MudTextField T="string"
+              Label="@Label"
+              HelperText="@($"Telefone: {GetHelperText()}")"
+              Variant="Variant.Outlined"
+              Immediate="true"
+              Value="@RawValue"
+              ValueChanged="OnValueChanged"
+              MaxLength="15">
+</MudTextField>
+
+@code {
+    [Parameter] public string Value { get; set; } = string.Empty;
+    [Parameter] public EventCallback<string> ValueChanged { get; set; }
+    [Parameter] public string Label { get; set; } = "Telefone";
+
+    private string RawValue { get; set; } = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        RawValue = ApplyMask(Value);
+    }
+
+    private async Task OnValueChanged(string newValue)
+    {
+        // Remove caracteres não numéricos
+        string onlyNumbers = new string(newValue.Where(char.IsDigit).ToArray());
+
+        // Limita ao tamanho máximo de um telefone brasileiro
+        if (onlyNumbers.Length > 11)
+            onlyNumbers = onlyNumbers[..11];
+
+        // Aplica a máscara
+        RawValue = ApplyMask(onlyNumbers);
+
+        // Atualiza o valor do parâmetro e notifica mudanças
+        await ValueChanged.InvokeAsync(onlyNumbers);
+    }
+
+    private string GetHelperText()
+    {
+        return string.IsNullOrEmpty(RawValue) ? "(XX) XXXXX-XXXX" : RawValue;
+    }
+
+    private string ApplyMask(string value)
+    {
+        if (string.IsNullOrEmpty(value)) return value;
+
+        if (value.Length <= 10) // Formato (XX) XXXX-XXXX
+            return value.Length switch
+            {
+                > 6 => $"({value[..2]}) {value[2..6]}-{value[6..]}",
+                > 2 => $"({value[..2]}) {value[2..]}",
+                _ => value
+            };  
+
+        // Formato (XX) XXXXX-XXXX
+        return value.Length switch
+        {
+            > 7 => $"({value[..2]}) {value[2..7]}-{value[7..]}",
+            > 2 => $"({value[..2]}) {value[2..]}",
+            _ => value
+        };
+    }
+}
+
+

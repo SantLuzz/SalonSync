@@ -2,7 +2,7 @@
 
 namespace SalonSync.Core.Requests.Account;
 
-public class LoginRequest : Request
+public class LoginRequest
 {
     [Required(ErrorMessage = "E-mail")]
     [EmailAddress(ErrorMessage = "E-mail inválido")]

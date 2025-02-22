@@ -1,0 +1,24 @@
+@using SalonSync.Core
+<div class="d-flex justify-center pb-8 pt-8">
+    <img src="uploads/LogoRedondaSemFundo.png"
+         alt="Salon Sync - Gestão Financeira"
+         width="200" />
+</div>
+
+<AuthorizeView>
+    <MudNavMenu>
+        <MudNavLink Href="/" Match="NavLinkMatch.All">Dashboard</MudNavLink>
+        @if (context.User.IsInRole(Configuration.CompanyUserRole) 
+             || context.User.IsInRole(Configuration.SuperAdminRole))
+        {
+            <MudNavLink Href="/company" Match="NavLinkMatch.All">Empresa Usuária</MudNavLink>
+            <MudNavLink Href="/list-employees" >Funcionários</MudNavLink>
+        }
+
+        @if (context.User.IsInRole(Configuration.SuperAdminRole))
+        {
+            <MudNavLink Href="/licenses">Licenças</MudNavLink>
+        }
+        <MudNavLink Href="/logout">Sair</MudNavLink>
+    </MudNavMenu>
+</AuthorizeView>
