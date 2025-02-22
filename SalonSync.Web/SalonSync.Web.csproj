@@ -38,8 +38,6 @@
 
   <ItemGroup>
     <Folder Include="Pages\Entities\Clients\" />
-    <Folder Include="Pages\Entities\Companies\" />
-    <Folder Include="Pages\Entities\Employees\" />
   </ItemGroup>
 
 </Project>

@@ -16,7 +16,15 @@
     [Parameter] public string Label { get; set; } = "CPF ou CNPJ";
     [Parameter] public Expression<Func<string>>? For { get; set; } 
 
+    private string _rawValue = string.Empty;
+
     private string RawValue { get; set; } = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        RawValue = FormatCpfCnpj(Value);
+    }
+    
     private int MaxDigits => RawValue.Length <= 11 ? 11 : 14;
 
     private string FormattedHelperText => $"Documento: {GetHelperText(RawValue)}";

@@ -27,7 +27,7 @@ public class GenerateCodeByCompanyEndpoint : IEndpoint
         
         var result = await handler.GenerateCodeAsync(request);
         return result.IsSuccess
-            ? TypedResults.Ok(result.Data)
+            ? TypedResults.Ok(result)
             : TypedResults.NotFound(result);
     }
 }

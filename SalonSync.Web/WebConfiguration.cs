@@ -7,6 +7,7 @@ namespace SalonSync.Web
         public const string HttpClientName = "salonsyncapi";
 
         public static string BackendUrl { get; set; } = string.Empty;
+        public static string FrontendUrl { get; set; } = string.Empty;
 
         public static readonly MudTheme Theme = new()
         {

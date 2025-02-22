@@ -25,7 +25,7 @@ public class UpdateCompanyEndpoint : IEndpoint
         
         var result = await handler.UpdateAsync(request);
         return result.IsSuccess
-            ? TypedResults.Ok(result.Data)
+            ? TypedResults.Ok(result)
             : TypedResults.NotFound(result);
     }
 }

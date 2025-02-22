@@ -43,6 +43,7 @@ public class LoginUserEndpoint : IEndpoint
         foreach (var role in roles)
             claims.Add(new Claim(ClaimTypes.Role, role));
         
+        claims.Add(new Claim(ClaimTypes.Name, request.Email));
         claims.Add(new Claim("CompanyId", company.Data.Id.ToString()));
         claims.Add(new Claim("CompanyName", company.Data.Name));
         claims.Add(new Claim("CompanyEmail", company.Data.UserId));

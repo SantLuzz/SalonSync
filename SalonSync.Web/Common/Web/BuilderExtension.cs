@@ -20,6 +20,8 @@ public static class BuilderExtension
     {
         WebConfiguration.BackendUrl = builder.Configuration.GetValue<string>("BackendUrl") 
                                    ?? string.Empty;
+        WebConfiguration.FrontendUrl = builder.Configuration.GetValue<string>("FrontendUrl") 
+                                       ?? string.Empty;
     }
 
     public static void AddRoots(this WebAssemblyHostBuilder builder)

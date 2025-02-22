@@ -18,11 +18,11 @@
                                OnClick="ToggleDrawer" />
                 Salon Sync 
                 <MudSpacer />
-                <MudText Typo="Typo.caption">
+                <MudText Typo="Typo.caption" Class="d-flex aling-center">
                     @{
-                    string? companyLicense = context.User.FindFirst("ComapanyLicense") is not null
-                    ? context.User.FindFirst("ComapanyLicense")?.Value
-                    : "Não expira.";
+                        string? companyLicense = context.User.FindFirst("CompanyLicense") is not null
+                        ? context.User.FindFirst("CompanyLicense")?.Value
+                        : "Não expira.";
                     }
                     Expira em: @companyLicense
                 </MudText>
