@@ -12,7 +12,7 @@
              || context.User.IsInRole(Configuration.SuperAdminRole))
         {
             <MudNavLink Href="/company" Match="NavLinkMatch.All">Empresa Usuária</MudNavLink>
-            <MudNavLink Href="/list-employees" >Funcionários</MudNavLink>
+            <MudNavLink Href="/employees/list" >Funcionários</MudNavLink>
         }
 
         @if (context.User.IsInRole(Configuration.SuperAdminRole))

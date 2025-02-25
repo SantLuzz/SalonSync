@@ -20,7 +20,7 @@
 
     protected override void OnInitialized()
     {
-        RawValue = ApplyMask(Value);
+        RawValue = Masks.ApplyPhoneMask(Value);
     }
 
     private async Task OnValueChanged(string newValue)
@@ -33,7 +33,7 @@
             onlyNumbers = onlyNumbers[..11];
 
         // Aplica a máscara
-        RawValue = ApplyMask(onlyNumbers);
+        RawValue = Masks.ApplyPhoneMask(onlyNumbers);
 
         // Atualiza o valor do parâmetro e notifica mudanças
         await ValueChanged.InvokeAsync(onlyNumbers);
@@ -42,27 +42,6 @@
     private string GetHelperText()
     {
         return string.IsNullOrEmpty(RawValue) ? "(XX) XXXXX-XXXX" : RawValue;
-    }
-
-    private string ApplyMask(string value)
-    {
-        if (string.IsNullOrEmpty(value)) return value;
-
-        if (value.Length <= 10) // Formato (XX) XXXX-XXXX
-            return value.Length switch
-            {
-                > 6 => $"({value[..2]}) {value[2..6]}-{value[6..]}",
-                > 2 => $"({value[..2]}) {value[2..]}",
-                _ => value
-            };  
-
-        // Formato (XX) XXXXX-XXXX
-        return value.Length switch
-        {
-            > 7 => $"({value[..2]}) {value[2..7]}-{value[7..]}",
-            > 2 => $"({value[..2]}) {value[2..]}",
-            _ => value
-        };
     }
 }
 

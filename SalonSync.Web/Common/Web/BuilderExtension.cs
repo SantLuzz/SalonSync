@@ -55,6 +55,8 @@ public static class BuilderExtension
         builder.Services.AddTransient<IAccountHandler, AccountHandler>();
         builder.Services.AddTransient<ICompanyHandler, CompanyHandler>();
         builder.Services.AddTransient<ILicenseHandler, LicenseHandler>();
+        builder.Services.AddTransient<IEmployeeHandler, EmployeeHandler>();
+        builder.Services.AddTransient<IClientHandler, ClientHandler>();
     }
 
     public static void AddLocalization(this WebAssemblyHostBuilder builder)

@@ -1,0 +1,36 @@
+<div class="d-flex justify-center align-center">
+    <MudPaper Class="d-flex justify-center align-center" Style="height: 150px; width: 150px; border-radius: 50%; border: 1px solid #ccc; position: relative; overflow: hidden;">
+        @if (string.IsNullOrEmpty(UploadedImage))
+        {
+            <MudIconButton Icon="@Icons.Material.Filled.AddPhotoAlternate" Color="Color.Primary" OnClick="OpenFileDialog" />
+        }
+        else
+        {
+            <MudImage Src="@UploadedImage" Alt="Imagem de Perfil" Width="100%" Height="100%" Style="object-fit: cover;" />
+        }
+    </MudPaper>
+
+    <MudFileUpload OnChange="OnFileUpload" AcceptedFileTypes="@(new string[] { "image/jpeg", "image/png" })" Style="display: none;" Ref="fileInput" />
+
+</div>
+
+@code {
+    private string UploadedImage;
+    private ElementReference fileInput;
+
+    // Abre a caixa de seleção de arquivos ao clicar no ícone
+    private void OpenFileDialog()
+    {
+        fileInput?.InvokeAsync(() => fileInput.Click());
+    }
+
+    // Lida com o arquivo carregado
+    private async Task OnFileUpload(IBrowserFile file)
+    {
+        var buffer = new byte[file.Size];
+        await file.OpenReadStream().ReadAsync(buffer);
+
+        // Convertendo a imagem para Base64 para exibição imediata
+        UploadedImage = $"data:{file.ContentType};base64,{Convert.ToBase64String(buffer)}";
+    }
+}

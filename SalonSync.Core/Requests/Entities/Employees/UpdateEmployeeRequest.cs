@@ -21,10 +21,14 @@ public class UpdateEmployeeRequest : Request
     
     [MaxLength(20, ErrorMessage = "A função deve conter no máximo 50 caracteres!")]
     public string? Position { get; set; }
-    public DateTime? Admission { get; set; }
-    public decimal? Commission { get; set; }
-    public TimeOnly? LunchStart { get; set; }
-    public TimeOnly? LunchEnd { get; set; }
-    public TimeOnly StartTime { get; set; }
-    public TimeOnly EndTime { get; set; }
+    public DateTime Admission { get; set; }
+    public decimal Commission { get; set; }
+    
+    [Required(ErrorMessage = "Informe o horário de início do expediente")]
+    public TimeSpan? StartTime { get; set; }
+    
+    [Required(ErrorMessage = "Informe o horário do final do expediente")]
+    public TimeSpan? EndTime { get; set; }
+    public TimeSpan? LunchStart { get; set; }
+    public TimeSpan? LunchEnd { get; set; }
 }
