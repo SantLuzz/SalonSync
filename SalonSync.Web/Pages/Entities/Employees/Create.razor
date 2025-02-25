@@ -1,6 +1,90 @@
-@page "/Create"
-<h3>Create</h3>
+@page "/employees/create"
 
-@code {
-    
-}
+<PageTitle>Salon Sync - Funcionários</PageTitle>
+<MudText Typo="Typo.h3">Novo Funcionário</MudText>
+
+<MudPaper Class="pa-8 mt-4">
+    <EditForm Model="@InputModel" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator />
+        <MudTextField Label="Nome*"
+                      HelperText="Campo Obrigatório"
+                      Variant="Variant.Outlined"
+                      @bind-Value="InputModel.Name"
+                      For="@(() => InputModel.Name)"
+                      MaxLength="255"/>
+
+        <MudTextField Label="E-mail*"
+                      HelperText="Campo Obrigatório"
+                      Variant="Variant.Outlined"
+                      @bind-Value="InputModel.Email"
+                      For="@(() => InputModel.Email)" 
+                      MaxLength="160"/>
+        
+        <PhoneMudTextField
+            @bind-Value="InputModel.Phone" />
+        
+        <div class="d-flex align-items-center mt-2" style="width: 100%;">
+            <MudTextField Label="Função"
+                          HelperText="Função execida pelo profissional"
+                          Variant="Variant.Outlined"
+                          @bind-Value="InputModel.Position"
+                          For="@(() => InputModel.Position)"
+                          MaxLength="20"/>
+
+            <MudTextField T="DateTime"
+                          Label="Data de Admissão"
+                          Class="ml-2"
+                          Variant="Variant.Outlined"
+                          @bind-Value="InputModel.Admission"/>
+
+            <MudTextField T="Decimal"
+                          Label="Comissão (%)"
+                          Class="ml-2"
+                          Variant="Variant.Outlined"
+                          @bind-Value="InputModel.Commission"/>
+        </div>
+        
+        
+        <div class="d-flex align-items-center mt-2" style="width: 100%;">
+            <MudTimePicker Label="Entrada*"
+                           HelperText="Horário de Início das atividades"
+                           Variant="Variant.Outlined"
+                           @bind-Time="InputModel.StartTime"/>
+
+            <MudTimePicker Label="Saída Almoço"
+                           HelperText="Horário de saída para almoço"
+                           Class="ml-2"
+                           Variant="Variant.Outlined"
+                           @bind-Time="InputModel.LunchStart"/>
+
+            <MudTimePicker Label="Retorno Almoço"
+                           HelperText="Horário de retorno do almoço"
+                           Class="ml-2"
+                           Variant="Variant.Outlined"
+                           @bind-Time="InputModel.LunchEnd"/>
+
+            <MudTimePicker Label="Saída*"
+                           HelperText="Horário do fim das atividades"
+                           Class="ml-2"
+                           Variant="Variant.Outlined"
+                           @bind-Time="InputModel.EndTime"/>
+            
+        </div>
+        
+        
+        <div class="d-flex mt-8">
+            @if (IsSubmit)
+            {
+                 <MudProgressCircular Color="Color.Info" Indeterminate="true" />
+            }
+            else
+            {
+            <MudButton ButtonType="ButtonType.Submit"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary">
+                Salvar
+            </MudButton>
+            }
+        </div>
+    </EditForm>
+</MudPaper>

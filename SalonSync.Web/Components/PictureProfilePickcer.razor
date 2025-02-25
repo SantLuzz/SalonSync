@@ -1,0 +1,88 @@
+<MudContainer Class="d-flex align-center flex-column justify-center">
+    @if (string.IsNullOrWhiteSpace(Value))
+    {
+        <MudIcon Class="profile-image  mt-4 icon-border" Icon="@Icons.Material.Filled.Person" />
+    }
+    else
+    {
+        <MudImage Class="profile-image mt-4" src="@Value" />
+    }
+
+    <div class="d-flex align-center ml-2">
+        <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles" Accept=".png, .jpg">
+            <ActivatorContent>
+                <MudIconButton Color="Color.Info" Icon="@Icons.Material.Filled.PhotoCamera" />
+            </ActivatorContent>
+        </MudFileUpload>
+
+        @if (!string.IsNullOrWhiteSpace(Value))
+        {
+            <MudIconButton Color="Color.Error" Icon="@Icons.Material.Filled.Delete" OnClick="RemoveImage" />
+        }
+    </div>
+</MudContainer>
+
+<style>
+    .profile-image {
+        width: 200px;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 50%;
+        display: block;
+        margin: 0 auto;
+    }
+
+    .icon-border {
+        width: 200px;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 50%;
+        display: block;
+        margin: 0 auto;
+        border: 3px solid #cccccc;
+        padding: 20px;
+    }
+</style>
+
+@code {
+    [Parameter] public string? Value { get; set; } = String.Empty;
+    [Parameter] public EventCallback<string> ValueChanged { get; set; }
+    [Parameter] public string? Base64 { get; set; }
+    [Parameter] public EventCallback<string> OnUpload { get; set; }
+
+    [Inject] public ISnackbar Snackbar { get; set; } = null!;
+    
+    public async Task UploadFiles(IBrowserFile file)
+    {
+        try
+        {
+            var buffer = new byte[file.Size];
+            await file.OpenReadStream().ReadAsync(buffer);
+
+            // Converte o buffer em uma string Base64
+            string base64Image = Convert.ToBase64String(buffer);
+
+            // Atualiza a propriedade com a URL Base64
+            Value = Base64 = $"data:image/png;base64,{base64Image}";
+            
+            if (OnUpload.HasDelegate)
+                await OnUpload.InvokeAsync(Base64);
+
+            await ValueChanged.InvokeAsync(Value);
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Não foi possível carregar a imagem!", Severity.Error);
+        }
+    }
+    
+    public async Task RemoveImage()
+    {
+        Value = Base64 = null; 
+        
+        if (OnUpload.HasDelegate)
+            await OnUpload.InvokeAsync(Base64);
+        
+        await ValueChanged.InvokeAsync(Value);
+    }
+}

@@ -1,6 +1,68 @@
-@page "/list-employees"
+@page "/employees/list"
+
+<PageTitle>Salon Sync - Funcionários</PageTitle> 
 <MudText Typo="Typo.h3">Funcionários</MudText>
 
-@code {
-    
+@if (IsStarted)
+{
+    <Skeleton/>
+}
+else
+{
+    <div Class="d-flex justify-end">
+        <MudButton
+            Variant="Variant.Filled"
+            Color="Color.Primary"
+            StartIcon="@Icons.Material.Filled.Add"
+            Href="/employees/create">
+            NOVO FUNCIONÁRIO
+        </MudButton>
+    </div>
+
+    <MudDataGrid
+        Class="mt-4"
+        Style="min-width: 800px; width: 100%;"
+        Items="@Employees"
+        Filterable="true"
+        QuickFilter="Filter"
+        Hideable="true">
+        
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Funcionários</MudText>
+            <MudSpacer/>
+            <MudTextField @bind-Value="SearchTerm" Placeholder="Filtrar..."
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search"
+                          Immediate="true"
+                          IconSize="Size.Medium"
+                          Class="mt-0"/>
+        </ToolBarContent>
+        <Columns>
+            <PropertyColumn Property="x => x.Id" Title="#" />
+            <PropertyColumn Property="x => x.Name" Title="Nome" />
+            <PropertyColumn Property="x => x.Email" Title="E-mail" />
+            <PropertyColumn Property="x => x.PhoneFormatted" Title="Telefone" />
+            <PropertyColumn Property="x => x.Position" Title="Função" />
+            <PropertyColumn Property="x => x.Commission" Title="Comissão(%)"/>
+
+            <TemplateColumn Class="d-flex justify-end">
+                <HeaderTemplate>
+                    Ações
+                </HeaderTemplate>
+                <CellTemplate>
+                    <MudStack Row>
+                        <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                       Href="@($"/employees/edit/{context.Item.Id}")"
+                                       Color="Color.Primary"
+                                       aria-label="Editar"/>
+
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                       Color="Color.Error"
+                                       aria-label="Excluir"
+                                       OnClick="() => OnDeleteButtonClickedAsync(context.Item.Id, context.Item.Name)"/>
+                    </MudStack>
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+    </MudDataGrid>
 }

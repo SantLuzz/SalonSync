@@ -1,5 +1,134 @@
-<h3>Edit</h3>
+@page "/employees/edit/{id}"
 
-@code {
-    
+<PageTitle>Salon Sync - Funcionários</PageTitle>
+<MudText Typo="Typo.h3">Editar Funcionário</MudText>
+
+@if (IsBusy)
+{
+    <Skeleton/>
 }
+else
+{
+    <MudPaper Class="pa-8 mt-4">
+    <EditForm Model="@InputModel" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator />
+        
+        <PictureProfilePickcer
+            @bind-Value="InputModel.ImageRequest.UrlImage"
+            Base64="@InputModel.ImageRequest.Base64Image"
+            OnUpload="OnFileUploadAsync"/>
+
+        <MudTextField Label="Nome*"
+                      Class="mt-4"
+                      HelperText="Campo Obrigatório"
+                      Variant="Variant.Outlined"
+                      @bind-Value="InputModel.UpdateRequest.Name"
+                      For="@(() => InputModel.UpdateRequest.Name)"
+                      MaxLength="255"/>
+
+        <MudTextField Label="E-mail*"
+                      HelperText="Campo Obrigatório"
+                      Variant="Variant.Outlined"
+                      @bind-Value="InputModel.UpdateRequest.Email"
+                      For="@(() => InputModel.UpdateRequest.Email)"
+                      MaxLength="160"/>
+
+        <PhoneMudTextField
+            @bind-Value="InputModel.UpdateRequest.Phone" />
+
+        <div class="d-flex align-items-center mt-2" style="width: 100%;">
+            <MudTextField Label="Função"
+                          HelperText="Função execida pelo profissional"
+                          Variant="Variant.Outlined"
+                          @bind-Value="InputModel.UpdateRequest.Position"
+                          For="@(() => InputModel.UpdateRequest.Position)"
+                          MaxLength="20"/>
+
+            <MudTextField T="DateTime"
+                          Label="Data de Admissão"
+                          Class="ml-2"
+                          Variant="Variant.Outlined"
+                          @bind-Value="InputModel.UpdateRequest.Admission"/>
+
+            <MudTextField T="Decimal"
+                          Label="Comissão (%)"
+                          Class="ml-2"
+                          Variant="Variant.Outlined"
+                          @bind-Value="InputModel.UpdateRequest.Commission"/>
+        </div>
+
+
+        <div class="d-flex align-items-center mt-2" style="width: 100%;">
+            <MudTimePicker Label="Entrada*"
+                           HelperText="Horário de Início das atividades"
+                           Variant="Variant.Outlined"
+                           @bind-Time="InputModel.UpdateRequest.StartTime"/>
+
+            <MudTimePicker Label="Saída Almoço"
+                           HelperText="Horário de saída para almoço"
+                           Class="ml-2"
+                           Variant="Variant.Outlined"
+                           @bind-Time="InputModel.UpdateRequest.LunchStart"/>
+
+            <MudTimePicker Label="Retorno Almoço"
+                           HelperText="Horário de retorno do almoço"
+                           Class="ml-2"
+                           Variant="Variant.Outlined"
+                           @bind-Time="InputModel.UpdateRequest.LunchEnd"/>
+
+            <MudTimePicker Label="Saída*"
+                           HelperText="Horário do fim das atividades"
+                           Class="ml-2"
+                           Variant="Variant.Outlined"
+                           @bind-Time="InputModel.UpdateRequest.EndTime"/>
+        </div>
+
+        <div class="d-flex align-items-center mt-2" style="width: 100%;">
+            <MudTextField T="string"
+                          Label="Link do profissional"
+                          ReadOnly="true"
+                          Variant="Variant.Outlined"
+                          @bind-Value="InputModel.Url"
+                          Adornment="Adornment.End"
+                          AdornmentIcon="@Icons.Material.Filled.ContentCopy"
+                          AdornmentAriaLabel="Copiar link do Profissional"
+                          OnAdornmentClick="CopyToClipboardAsync"/>
+
+            @if (IsSubmitCode)
+            {
+                <MudProgressCircular Color="Color.Info" Indeterminate="true"/>
+            }
+            else
+            {
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Warning"
+                           OnClick="GenerateCodeAsync"
+                           Class="ml-2">
+                    Gerar URL
+                </MudButton>
+            }
+        </div>
+        
+
+        <div class="d-flex mt-8">
+            @if (IsSubmit)
+            {
+                <MudProgressCircular Color="Color.Info" Indeterminate="true" />
+            }
+            else
+            {
+                <MudButton ButtonType="ButtonType.Submit"
+                           Variant="Variant.Filled"
+                           Color="Color.Primary">
+                    Salvar Alterações
+                </MudButton>
+            }
+        </div>
+    </EditForm>
+</MudPaper>
+}
+
+
+
+
+

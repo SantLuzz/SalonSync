@@ -7,5 +7,6 @@ public class UpdateImageEmployeeRequest : Request
     public long Id { get; set; }
     
     [Required(ErrorMessage = "Informe a imagem do funcionário!")]
-    public string Base64Image { get; set; } = string.Empty;
+    public string? Base64Image { get; set; } 
+    public string? UrlImage { get; set; }
 }

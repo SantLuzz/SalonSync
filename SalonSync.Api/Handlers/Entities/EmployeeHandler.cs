@@ -30,10 +30,14 @@ public class EmployeeHandler(AppDbContext context) : IEmployeeHandler
                 Admission = request.Admission,
                 Commission = request.Commission,
                 UserId = request.UserId,
-                StartTime = request.StartTime,
-                EndTime = request.EndTime,
-                LunchStart = request.LunchStart ?? ApiConfiguration.DefaultStartLunchTime,
-                LunchEnd = request.LunchEnd ?? ApiConfiguration.DefaultEndLunchTime,
+                StartTime = TimeOnly.FromTimeSpan(request.StartTime ?? new TimeSpan(8,0,0)),
+                EndTime = TimeOnly.FromTimeSpan(request.EndTime ?? new TimeSpan(18,0,0)),
+                LunchStart = request.LunchStart is null 
+                    ? TimeOnly.FromTimeSpan(request.LunchStart.Value) 
+                    : ApiConfiguration.DefaultStartLunchTime,
+                LunchEnd = request.LunchEnd is null
+                        ? TimeOnly.FromTimeSpan(request.LunchEnd.Value) 
+                        : ApiConfiguration.DefaultEndLunchTime
             };
             
             await context.Employees.AddAsync(employee);
@@ -75,10 +79,14 @@ public class EmployeeHandler(AppDbContext context) : IEmployeeHandler
             employee.Commission = request.Commission;
             employee.UserId = request.UserId;
             employee.UpdatedAt = DateTime.Now;
-            employee.StartTime = request.StartTime;
-            employee.EndTime = request.EndTime;
-            employee.LunchStart = request.LunchStart ?? ApiConfiguration.DefaultStartLunchTime;
-            employee.LunchEnd = request.LunchEnd ?? ApiConfiguration.DefaultEndLunchTime;
+            employee.StartTime = TimeOnly.FromTimeSpan(request.StartTime ?? new TimeSpan(8, 0, 0));
+            employee.EndTime = TimeOnly.FromTimeSpan(request.EndTime ?? new TimeSpan(18, 0, 0));
+            employee.LunchStart = request.LunchStart is null
+                ? TimeOnly.FromTimeSpan(request.LunchStart.Value)
+                : ApiConfiguration.DefaultStartLunchTime;
+            employee.LunchEnd = request.LunchEnd is null
+                ? TimeOnly.FromTimeSpan(request.LunchEnd.Value)
+                : ApiConfiguration.DefaultEndLunchTime;
 
             context.Employees.Update(employee);
             await context.SaveChangesAsync();
@@ -103,23 +111,45 @@ public class EmployeeHandler(AppDbContext context) : IEmployeeHandler
             if (employee is null)
                 return new Response<Employee?>(null, 404, "Funcionário não encontrado!");
             
-            var fileName = $"{Guid.NewGuid().ToString()}.jpg";
-            
-            var data = new Regex(@"^data:image/[a-z]+;base64,")
-                .Replace(request.Base64Image, string.Empty);
-            
-            var bytes = Convert.FromBase64String(data);
-
-            try
+            if (request.Base64Image is not null)
             {
-                await System.IO.File.WriteAllBytesAsync($"{ApiConfiguration.FileFolder}{fileName}", bytes);
-            }
-            catch (Exception)
-            {
-                return new Response<Employee?>(null, 500, "(SSE004) Não foi possível gravar a imagem do funcionário!");
-            }
+                var fileName = $"{Guid.NewGuid().ToString()}.jpg";
+                
+                var data = new Regex(@"^data:image/[a-z]+;base64,")
+                    .Replace(request.Base64Image, string.Empty);
+            
+                var bytes = Convert.FromBase64String(data);
 
-            employee.Image = ApiConfiguration.UrlFiles + fileName;
+                try
+                {
+                    await System.IO.File.WriteAllBytesAsync($"{ApiConfiguration.FileFolder}{fileName}", bytes);
+                }
+                catch (Exception)
+                {
+                    return new Response<Employee?>(null, 500, "(SSE004) Não foi possível gravar a imagem do funcionário!");
+                }
+
+                employee.Image = ApiConfiguration.UrlFiles + fileName;
+            }
+            else
+            {
+                try
+                {
+                    string fileName = employee.Image.Replace(ApiConfiguration.UrlFiles, "");
+
+                    if (File.Exists(ApiConfiguration.FileFolder + fileName))
+                    {
+                        File.Delete(ApiConfiguration.FileFolder + fileName);
+                    }
+                }
+                catch
+                {
+                    // ignored
+                }
+
+                employee.Image = null;
+            }
+            
             employee.UpdatedAt = DateTime.Now;
             
             context.Employees.Update(employee);
