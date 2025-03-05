@@ -1,13 +1,12 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using SalonSync.Core.Handlers.Entities;
-using SalonSync.Core.Models.Entities;
 using SalonSync.Core.Requests.Entities.Employees;
 using SalonSync.Web.ViewModels;
 
 namespace SalonSync.Web.Pages.Entities.Employees;
 
-public partial class List : ComponentBase
+public partial class ListPage : ComponentBase
 {
     #region Dependencies
 

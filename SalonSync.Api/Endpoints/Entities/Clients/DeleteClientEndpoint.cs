@@ -29,7 +29,7 @@ public class DeleteClientEndpoint : IEndpoint
         
         var result = await handler.DeleteAsync(request);
         return result.IsSuccess
-            ? TypedResults.Ok(result.Data)
-            : TypedResults.NotFound(result.Data);
+            ? TypedResults.Ok(result)
+            : TypedResults.NotFound(result);
     }
 }

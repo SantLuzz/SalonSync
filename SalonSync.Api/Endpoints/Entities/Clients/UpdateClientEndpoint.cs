@@ -27,8 +27,8 @@ public class UpdateClientEndpoint : IEndpoint
         
         var result = await handler.UpdateAsync(request);
         return result.IsSuccess
-            ? TypedResults.Ok(result.Data)
-            : TypedResults.NotFound(result.Data);
+            ? TypedResults.Ok(result)
+            : TypedResults.NotFound(result);
     }
 
     

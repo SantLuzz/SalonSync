@@ -29,6 +29,7 @@ namespace SalonSync.Web
                 TextPrimary = Colors.Shades.Black,
                 DrawerText = Colors.Shades.White,
                 DrawerBackground = "#0B5A8D",
+                DrawerIcon = Colors.Shades.White,
             },
             PaletteDark = new PaletteDark()
             {

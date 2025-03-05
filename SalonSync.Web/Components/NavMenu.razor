@@ -7,18 +7,21 @@
 
 <AuthorizeView>
     <MudNavMenu>
-        <MudNavLink Href="/" Match="NavLinkMatch.All">Dashboard</MudNavLink>
+        <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Dashboard</MudNavLink>
         @if (context.User.IsInRole(Configuration.CompanyUserRole) 
              || context.User.IsInRole(Configuration.SuperAdminRole))
         {
-            <MudNavLink Href="/company" Match="NavLinkMatch.All">Empresa Usuária</MudNavLink>
-            <MudNavLink Href="/employees/list" >Funcionários</MudNavLink>
+            <MudNavLink Href="/clients" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Person">Clientes</MudNavLink>
+            <MudNavLink Href="/company" Match="NavLinkMatch.All" Icon="@Icons.Material.Rounded.Business">Empresa Usuária</MudNavLink>
+            <MudNavLink Href="/employees" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Person" >Funcionários</MudNavLink>
+            <MudNavLink Href="/packages" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.ShoppingBag" >Pacotes</MudNavLink>
+            <MudNavLink Href="/services" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.ShoppingBag" >Serviços</MudNavLink>
         }
 
         @if (context.User.IsInRole(Configuration.SuperAdminRole))
         {
-            <MudNavLink Href="/licenses">Licenças</MudNavLink>
+            <MudNavLink Href="/licenses" Icon="@Icons.Material.Filled.AttachMoney">Licenças</MudNavLink>
         }
-        <MudNavLink Href="/logout">Sair</MudNavLink>
+        <MudNavLink Href="/logout" Icon="@Icons.Material.Filled.Logout">Sair</MudNavLink>
     </MudNavMenu>
 </AuthorizeView>

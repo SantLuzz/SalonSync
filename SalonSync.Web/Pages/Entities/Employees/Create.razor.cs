@@ -26,6 +26,7 @@ public partial class Create : ComponentBase
 
     public async Task OnValidSubmit()
     {
+        IsSubmit = true;
         try
         {
             var result = await Handler.CreateAsync(InputModel);
@@ -33,7 +34,7 @@ public partial class Create : ComponentBase
             if (result.IsSuccess)
             {
                 Snackbar.Add("Funcionário criado com sucesso!", Severity.Success);
-                NavigationManager.NavigateTo("/employees/list");
+                NavigationManager.NavigateTo("/employees");
             }
             else
                 Snackbar.Add(result.Message, Severity.Error);
@@ -41,6 +42,10 @@ public partial class Create : ComponentBase
         catch (Exception e)
         {
             Snackbar.Add("Não foi possível salvar o funcionário!", Severity.Error);
+        }
+        finally
+        {
+            IsSubmit = false;
         }
     }
     

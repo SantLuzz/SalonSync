@@ -1,0 +1,94 @@
+@page "/clients"
+@using SalonSync.Core.Enums
+@inherits ListPage
+
+<PageTitle>Salon Sync - Clientes</PageTitle> 
+<MudText Typo="Typo.h3">Clientes</MudText>
+
+@if (IsStarted)
+{
+    <Skeleton/>
+}
+else
+{
+    <div Class="d-flex justify-end">
+        <MudButton
+            Variant="Variant.Filled"
+            Color="Color.Primary"
+            StartIcon="@Icons.Material.Filled.Add"
+            Href="/clients/create">
+            NOVO CLIENTE
+        </MudButton>
+    </div>
+
+    <MudDataGrid
+        Class="mt-4"
+        Style="min-width: 800px; width: 100%;"
+        Items="@Clients"
+        Filterable="true"
+        QuickFilter="Filter"
+        Hideable="true">
+        
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Clientes</MudText>
+            <MudSpacer/>
+            <MudTextField @bind-Value="SearchTerm" Placeholder="Filtrar..."
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search"
+                          Immediate="true"
+                          IconSize="Size.Medium"
+                          Class="mt-0"/>
+        </ToolBarContent>
+        <Columns>
+            <PropertyColumn Property="x => x.Id" Title="#" />
+            <PropertyColumn Property="x => x.Name" Title="Nome" />
+            <PropertyColumn Property="x => x.Email" Title="E-mail" />
+            <PropertyColumn Property="x => x.Phone" Title="Telefone" />
+            <TemplateColumn>
+                <HeaderTemplate>Nascimento</HeaderTemplate>
+                <CellTemplate>
+                    @(context.Item.Birthdate?.ToString("dd/MM/yyyy"))
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn>
+                <HeaderTemplate>Tipo</HeaderTemplate>
+                <CellTemplate>
+                    @if (context.Item.Type == EClientType.Common)
+                    {
+                        <MudChip Color="Color.Info" Size="Size.Small" Variant="Variant.Filled">
+                            @context.Item.Type.GetDescription()
+                        </MudChip>
+                    }
+                    else
+                    {
+                        <MudChip Color="Color.Success" Size="Size.Small" Variant="Variant.Filled">
+                            @context.Item.Type.GetDescription()
+                        </MudChip>    
+                    }
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn Class="d-flex justify-end">
+                <HeaderTemplate>
+                    Ações
+                </HeaderTemplate>
+                <CellTemplate>
+                    <MudStack Row>
+                        <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                       Href="@($"/clients/edit/{context.Item.Id}")"
+                                       Color="Color.Primary"
+                                       aria-label="Editar"/>
+
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                       Color="Color.Error"
+                                       aria-label="Excluir"
+                                       OnClick="() => OnDeleteButtonClickedAsync(context.Item.Id, context.Item.Name)"/>
+                        
+                        <MudIconButton Icon="@Icons.Material.Filled.History" 
+                                       Color="Color.Info"
+                                       Href="@($"/clients/history/{context.Item.Id}")"/>
+                    </MudStack>
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+    </MudDataGrid>
+}

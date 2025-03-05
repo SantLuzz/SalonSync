@@ -122,7 +122,8 @@ public static class Endpoint
             .MapEndpoints<UpdatePackageEndpoint>()
             .MapEndpoints<DeletePackageEndpoint>()
             .MapEndpoints<GetPackageByIdEndpoint>()
-            .MapEndpoints<GetAllPackagesEndpoint>();
+            .MapEndpoints<GetAllPackagesEndpoint>()
+            .MapEndpoints<GetPackageServiceDtoByIdEndpoint>();
             
         endpoint.MapGroup("v1/packages-services")
             .WithTags("Packages-Services")

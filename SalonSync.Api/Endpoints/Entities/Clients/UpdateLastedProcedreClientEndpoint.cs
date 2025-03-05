@@ -27,7 +27,7 @@ public class UpdateLastedProcedreClientEndpoint : IEndpoint
         
         var result = await handler.UpdateLastedProcedureAsync(request);
         return result.IsSuccess
-            ? TypedResults.Ok(result.Data)
-            : TypedResults.NotFound(result.Data);
+            ? TypedResults.Ok(result)
+            : TypedResults.NotFound(result);
     }
 }

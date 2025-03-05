@@ -36,8 +36,4 @@
     <ReferencePathWithRefAssemblies Update="C:\Users\Luiz\.nuget\packages\microsoft.extensions.http\8.0.0\lib\net8.0\Microsoft.Extensions.Http.dll" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Pages\Entities\Clients\" />
-  </ItemGroup>
-
 </Project>
