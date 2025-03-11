@@ -6,7 +6,7 @@ using SalonSync.Core.Requests.Services;
 
 namespace SalonSync.Web.Pages.Services;
 
-public partial class List : ComponentBase
+public partial class ListService : ComponentBase
 {
     #region Dependencies
 

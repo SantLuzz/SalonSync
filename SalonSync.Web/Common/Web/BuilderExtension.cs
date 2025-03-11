@@ -64,6 +64,7 @@ public static class BuilderExtension
         builder.Services.AddTransient<IServiceHandler, ServiceHandler>();
         builder.Services.AddTransient<IPackageHandler, PackageHandler>();
         builder.Services.AddTransient<IPackageServiceHandler, PackageServiceHandler>();
+        builder.Services.AddTransient<IClientPackageHandler, ClientPackageHandler>();
     }
 
     public static void AddLocalization(this WebAssemblyHostBuilder builder)

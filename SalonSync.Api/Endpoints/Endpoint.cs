@@ -15,6 +15,7 @@ using SalonSync.Api.Endpoints.Schedules;
 using SalonSync.Api.Endpoints.Services;
 using SalonSync.Api.Models;
 using SalonSync.Api.Services;
+using SalonSync.Core.Requests.ClientsPackages;
 
 namespace SalonSync.Api.Endpoints;
 
@@ -124,7 +125,7 @@ public static class Endpoint
             .MapEndpoints<GetPackageByIdEndpoint>()
             .MapEndpoints<GetAllPackagesEndpoint>()
             .MapEndpoints<GetPackageServiceDtoByIdEndpoint>();
-            
+
         endpoint.MapGroup("v1/packages-services")
             .WithTags("Packages-Services")
             .RequireAuthorization()
@@ -140,7 +141,9 @@ public static class Endpoint
             .MapEndpoints<DeleteClientPackageEndpoint>()
             .MapEndpoints<InactiveClientPackageEndpoint>()
             .MapEndpoints<GetClientPackagesByIdEndpoint>()
-            .MapEndpoints<GetAllPackagesByClientIdEndpoint>();
+            .MapEndpoints<GetActiveClientPackageEndpoint>()
+            .MapEndpoints<GetAllPackagesByClientIdEndpoint>()
+            .MapEndpoints<InactiveClientIsActivePackageEndpoint>();
 
         endpoint.MapGroup("v1/appointments")
             .WithTags("Appointments")
