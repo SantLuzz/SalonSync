@@ -9,7 +9,7 @@ namespace SalonSync.Web.Pages.Entities.Clients;
 
 public partial class ListPage : ComponentBase
 {
-  #region Dependencies
+    #region Dependencies
 
     [Inject] public ISnackbar Snackbar { get; set; } = null!;
     [Inject] public NavigationManager NavigationManager { get; set; } = null!;

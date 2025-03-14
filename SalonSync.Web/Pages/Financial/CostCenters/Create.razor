@@ -1,0 +1,51 @@
+@page "/cost-centers/create"
+@inherits CreateCenterCostPage
+
+<PageTitle>Salon Sync - Centro de Custo</PageTitle>
+<MudText Typo="Typo.h3">Cadastrar Centro de Custo</MudText>
+
+<MudPaper Class="pa-8 mt-4">
+    <EditForm Model="@InputModel" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator />
+        <MudTextField Label="Nome*"
+                      HelperText="Campo Obrigatório"
+                      Variant="Variant.Outlined"
+                      @bind-Value="InputModel.Title"
+                      For="@(() => InputModel.Title)"
+                      MaxLength="100"/>
+
+        <MudTextField Label="Descrição "
+                      Variant="Variant.Outlined"
+                      @bind-Value="InputModel.Description"
+                      For="@(() => InputModel.Description)"
+                      MaxLength="255"/>
+        
+        <div class="d-flex align-items-center mt-2" style="width: 100%;">
+            <MudSelect T="ECostCenterType"
+                       Variant="Variant.Outlined"
+                       Label="Tipo"
+                       AnchorOrigin="Origin.BottomLeft"
+                       @bind-Value="InputModel.Type"
+                       ReadOnly="true">
+
+                <MudSelectItem T="ECostCenterType" Value="ECostCenterType.Income">Receita</MudSelectItem>
+                <MudSelectItem T="ECostCenterType" Value="ECostCenterType.Expense">Despesa</MudSelectItem>
+            </MudSelect>
+        </div>
+        
+        <div class="d-flex mt-8">
+            @if (IsSubmit)
+            {
+                 <MudProgressCircular Color="Color.Info" Indeterminate="true" />
+            }
+            else
+            {
+            <MudButton ButtonType="ButtonType.Submit"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary">
+                Salvar
+            </MudButton>
+            }
+        </div>
+    </EditForm>
+</MudPaper>

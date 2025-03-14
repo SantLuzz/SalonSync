@@ -1,0 +1,84 @@
+@page "/transactions"
+@inherits ListTransactionPage
+
+<PageTitle>Salon Sync - Caixa</PageTitle>
+<MudText Typo="Typo.h3">Caixa</MudText>
+
+@if (IsStarted)
+{
+<Skeleton/>
+}
+else
+{
+<div Class="d-flex justify-end">
+    <MudButton
+        Variant="Variant.Filled"
+        Color="Color.Primary"
+        StartIcon="@Icons.Material.Filled.Add"
+        Href="/transactions/create">
+        NOVO LANÇAMENTO
+    </MudButton>
+</div>
+
+<MudDataGrid
+    Class="mt-4"
+    Style="min-width: 800px; width: 100%;"
+    Items="@Transactions"
+    Filterable="true"
+    QuickFilter="Filter"
+    Hideable="true">
+
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Caixa</MudText>
+        <MudSpacer/>
+        <MudTextField @bind-Value="SearchTerm" Placeholder="Filtrar..."
+                      Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search"
+                      Immediate="true"
+                      IconSize="Size.Medium"
+                      Class="mt-0"/>
+    </ToolBarContent>
+    <Columns>
+        <PropertyColumn Property="x => x.Id" Title="#" />
+        <PropertyColumn Property="x => x.Description" Title="Descrição" />
+        <PropertyColumn Property="x => x.Amount"  Title="Valor"/>
+        
+        @* <TemplateColumn> *@
+        @*     <HeaderTemplate>Tipo</HeaderTemplate> *@
+        @*     <CellTemplate> *@
+        @*         @if (@context.Item.Type == ECostCenterType.Income) *@
+        @*         { *@
+        @*             <MudChip Color="Color.Success" Size="Size.Small" Variant="Variant.Filled"> *@
+        @*                 @context.Item.Type.GetDescription() *@
+        @*             </MudChip> *@
+        @*         } *@
+        @*         else *@
+        @*         { *@
+        @*             <MudChip Color="Color.Error" Size="Size.Small" Variant="Variant.Filled"> *@
+        @*                 @context.Item.Type.GetDescription() *@
+        @*             </MudChip> *@
+        @*         } *@
+        @*     </CellTemplate> *@
+        @* </TemplateColumn> *@
+
+        <TemplateColumn Class="d-flex justify-end">
+            <HeaderTemplate>
+                Ações
+            </HeaderTemplate>
+            <CellTemplate>
+                <MudStack Row>
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                   Href="@($"/transactions/edit/{context.Item.Id}")"
+                                   Color="Color.Primary"
+                                   aria-label="Editar"/>
+
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                   Color="Color.Error"
+                                   aria-label="Excluir"
+                                   OnClick="() => OnDeleteButtonClickedAsync(context.Item.Id, context.Item.Description)"/>
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+</MudDataGrid>
+}

@@ -11,10 +11,15 @@
         @if (context.User.IsInRole(Configuration.CompanyUserRole) 
              || context.User.IsInRole(Configuration.SuperAdminRole))
         {
+            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Schedule" >Agenda</MudNavLink>
+            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Schedule" >Agenda de Senhas</MudNavLink>
+            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.RequestPage" >Caixa</MudNavLink>
+            <MudNavLink Href="/cost-centers" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.BusinessCenter" >Centro de Custo</MudNavLink>
             <MudNavLink Href="/clients" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Person">Clientes</MudNavLink>
             <MudNavLink Href="/company" Match="NavLinkMatch.All" Icon="@Icons.Material.Rounded.Business">Empresa Usuária</MudNavLink>
             <MudNavLink Href="/employees" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Person" >Funcionários</MudNavLink>
             <MudNavLink Href="/packages" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.ShoppingBag" >Pacotes</MudNavLink>
+            <MudNavLink Href="/clients-packages" Icon="@Icons.Material.Filled.ShoppingBag">Pacotes dos Clientes</MudNavLink>
             <MudNavLink Href="/services" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.ShoppingBag" >Serviços</MudNavLink>
         }
 

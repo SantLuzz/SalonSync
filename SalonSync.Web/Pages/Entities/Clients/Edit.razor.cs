@@ -64,9 +64,9 @@ public partial class Edit : ComponentBase
                 NavigationManager.NavigateTo("/clients");
             }
 
-            if (InputModel.UpdateRequest.Type == EClientType.Common 
-                && InputModel.ClientPackage is not null)
-                await OnInactivePackageAsync();
+            // if (InputModel.UpdateRequest.Type == EClientType.Common 
+            //     && InputModel.ClientPackage is not null)
+            //     await OnInactivePackageAsync();
             
             
             Snackbar.Add(result.Message, Severity.Error);
@@ -98,77 +98,8 @@ public partial class Edit : ComponentBase
             Snackbar.Add($"Erro ao processar a imagem: {ex.Message}", Severity.Error);
         }
     }
-
-    public async Task OnClientTypeChanged()
-    {
-        try
-        {
-            if (InputModel.ClientPackage is null && InputModel.UpdateRequest.Type == EClientType.Common)
-                return;
-            
-            var result = await DialogService
-                .ShowMessageBox("Atenção", $"Ao prosseguir o pacote ativo do cliente será Encerrado. " +
-                                           $"Esta é uma ação irreversível, deseja prosseguir?", "Excluir", cancelText: "Cancelar");
-
-            if (result is true)
-                await OnInactivePackageAsync();
-            
-            StateHasChanged();
-        }
-        catch (Exception ex)
-        {
-            Snackbar.Add($"Erro ao alterar o tipo do cliente: {ex.Message}", Severity.Error);
-        }
-    }
     
-    public async Task OnSubmitPackage()
-    {
-        try
-        {
-            var result = await ClientPackageHandler.CreateAsync(InputModel.CreateClientPackageRequest);
-            if (!result.IsSuccess)
-            {
-                Snackbar.Add("Não foi possível adicionar o pacote!", Severity.Error);
-                return;                
-            }
-            
-            Snackbar.Add("Pacote vinculado com sucesso ao cliente!", Severity.Success);
-            StateHasChanged();
-        }
-        catch (Exception ex)
-        {
-            Snackbar.Add($"Erro ao definir o pacote para o cliente: {ex.Message}", Severity.Error);
-        }
-    }
-
-    private async Task<bool> OnInactivePackageAsync()
-    {
-        try
-        {
-            var result = await ClientPackageHandler
-                .InactiveActivePackageAsync(
-                new InactiveClientIsActivePackageRequest
-            {
-                ClientId = ClientId
-            });
-
-            if (!result.IsSuccess)
-            {
-                Snackbar.Add(result.Message, Severity.Error);
-                return false;                
-            }
-
-            InputModel.ClientPackage = null;
-            
-            Snackbar.Add("Pacote inativado com sucesso!", Severity.Success);
-            return true;
-        }
-        catch (Exception e)
-        {
-            Snackbar.Add("Não foi possível inativar o pacote do cliente!", Severity.Error);
-            return false;
-        }
-    }
+    
 
     private async Task GetClientAsync()
     {

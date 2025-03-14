@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using SalonSync.Core.Enums;
 
 namespace SalonSync.Core.Requests.Financial.Transactions;
 
@@ -16,4 +17,6 @@ public class CreateTransactionRequest : Request
     [Required(ErrorMessage = "A data de pagamento é obrigatório!")]
     public DateTime? PaidOrReceivedAt { get; set; }
     
+    public long EntityId { get; set; }
+    public EEntityType EntityType { get; set; } = EEntityType.DirectTransaction;
 }

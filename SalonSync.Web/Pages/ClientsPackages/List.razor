@@ -1,0 +1,116 @@
+@page "/clients-packages"
+@inherits ListClientPackagePage
+<PageTitle>Salon Sync - Pacotes</PageTitle> 
+<MudText Typo="Typo.h3">Pacotes dos Clientes</MudText>
+
+
+@if (IsStarted)
+{
+    <Skeleton/>
+}
+else
+{
+    <MudPaper Class="pa-8 mt-4">
+        <MudStack Row Class="mb-10">
+            <div class="d-flex align-items-center mt-2" style="width: 100%;">
+                <PackageSelect
+                    Label="Pacotes cadastrados"
+                    SelectedValue="SelectedPackage"
+                    ValueChanged="OnPackageValueChanged" 
+                    Items="Packages"/>
+                
+                <div Class="d-flex justify-end ml-4">
+                    <MudButton
+                        Variant="Variant.Filled"
+                        Color="Color.Primary"
+                        StartIcon="@Icons.Material.Filled.Add"
+                        Href="@($"clients-packages/create/{SelectedPackage.Id}")">
+                        ADICIONAR CLIENTE
+                    </MudButton>
+                </div>
+            </div>
+        </MudStack>
+
+        @if (IsSearching)
+        {
+            <Skeleton/>
+        }
+        else
+        {
+            <MudDataGrid
+            Class="mt-4"
+            Style="min-width: 800px; width: 100%;"
+            Items="@ClientPackageDtos"
+            Filterable="true"
+            QuickFilter="Filter"
+            Hideable="true">
+
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">Clientes</MudText>
+                <MudSpacer/>
+                <MudTextField @bind-Value="SearchTerm" Placeholder="Filtrar..."
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Filled.Search"
+                              Immediate="true"
+                              IconSize="Size.Medium"
+                              Class="mt-0"/>
+            </ToolBarContent>
+            <Columns>
+                <PropertyColumn Property="x => x.Id" Title="#"/>
+                <PropertyColumn Property="x => x.ClientName" Title="Cliente"/>
+                <TemplateColumn>
+                    <HeaderTemplate>Data Inicial</HeaderTemplate>
+                    <CellTemplate>
+                        @(context.Item.StartDate.ToString("dd/MM/yyyy"))
+                    </CellTemplate>
+                </TemplateColumn>
+                <TemplateColumn>
+                    <HeaderTemplate>Data Final</HeaderTemplate>
+                    <CellTemplate>
+                        @(context.Item.EndDate.ToString("dd/MM/yyyy"))
+                    </CellTemplate>
+                </TemplateColumn>
+                <PropertyColumn Property="x => x.RemainingSessions" Title="Sessões Restantes"/>
+                <TemplateColumn>
+                    <HeaderTemplate>Status</HeaderTemplate>
+                    <CellTemplate>
+                        @if (context.Item.EndDate.Date >= DateTime.Today)
+                        {
+                            <MudChip Color="Color.Success" Size="Size.Small" Variant="Variant.Filled">
+                                @context.Item.Status.GetDescription()
+                            </MudChip>
+                        }
+                        else
+                        {
+                            <MudChip Color="Color.Error" Size="Size.Small" Variant="Variant.Filled">
+                                Vencido
+                            </MudChip>
+                        }
+                    </CellTemplate>
+                </TemplateColumn>
+                <TemplateColumn Class="d-flex justify-end">
+                    <HeaderTemplate>
+                        Ações
+                    </HeaderTemplate>
+                    <CellTemplate>
+                        <MudStack Row>
+                            <MudButton StartIcon="@Icons.Material.Filled.Autorenew"
+                                       Href="@($"/clients-packages/renew/{context.Item.Id}")"
+                                       Color="Color.Primary"
+                                       aria-label="Renovar">
+                                Renovar
+                            </MudButton>
+
+                            <MudIconButton Icon="@Icons.Material.Filled.Close"
+                                           Color="Color.Error"
+                                           aria-label="Excluir"
+                                           OnClick="() => OnDeleteButtonClickedAsync(context.Item.Id, context.Item.ClientName)"/>
+                        </MudStack>
+                    </CellTemplate>
+                </TemplateColumn>
+            </Columns>
+        </MudDataGrid>
+        }
+        
+    </MudPaper>
+}

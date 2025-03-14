@@ -1,0 +1,19 @@
+@using SalonSync.Core.DTOs
+<MudSelect T="PackageDto" Label=@Label
+           Variant="Variant.Outlined"
+           Value="@SelectedValue"
+           ValueChanged="@ValueChanged">
+    
+    @foreach (var item in Items)
+    {
+        <MudSelectItem T="PackageDto" Value="item">@item.Name</MudSelectItem>
+    }
+    
+</MudSelect>
+
+@code {
+[Parameter] public List<PackageDto> Items { get; set; } = [];
+[Parameter] public PackageDto SelectedValue { get; set; }
+[Parameter] public string Label { get; set; } = "Selecione um pacote";
+[Parameter] public EventCallback<PackageDto> ValueChanged { get; set; }
+}

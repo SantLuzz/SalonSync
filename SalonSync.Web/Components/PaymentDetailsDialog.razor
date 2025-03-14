@@ -1,0 +1,139 @@
+@using SalonSync.Core.Handlers.Financial
+@using SalonSync.Core.Models.Financial
+@using SalonSync.Core.Requests.Financial.CostCenters
+@using SalonSync.Web.ViewModels
+<MudDialog OnKeyDown="OnKeyDownAsync">
+    <DialogContent>
+        <!-- Centro de Custo -->
+        <MudSelect T="CostCenter" Label="Centros de Custo" 
+                   Value="@SelectedCostCenter"
+                   Class="mt-4"
+                   ValueChanged="OnCostCenterChanged">
+            
+            @foreach (var costCenter in CostCenters)
+            {
+                <MudSelectItem T="CostCenter" Value="costCenter">@costCenter.Title</MudSelectItem>
+            }
+        </MudSelect>
+
+        <MudTextField Label="Descrição do pagamento"
+                      @bind-Value="Details.Description"
+                      Adornment="Adornment.Start"
+                      Lines="3"
+                      Class="mt-4"
+                      MaxLength="255"
+                      AdornmentIcon="@Icons.Material.Filled.TextSnippet" />
+
+        <div class="d-flex align-items-center mt-4" style="width: 100%;">
+            <!-- Valor -->
+            <MudTextField T="decimal" Label="Valor" 
+                          @bind-Value="Details.Amount" 
+                          Format="C"
+                          Adornment="Adornment.Start" 
+                          AdornmentIcon="@Icons.Material.Filled.Money" />
+
+            
+            <!-- Data de Pagamento -->
+            <MudDatePicker Label="Data de Pagamento" 
+                           Class="ml-4"
+                           @bind-Date="Details.PaidOrReceivedAt" />
+        </div>
+    </DialogContent>
+
+    <DialogActions>
+        <MudButton StartIcon="@Icons.Material.Filled.Check" Color="Color.Primary" Variant="Variant.Outlined" OnClick="Submit">Confirmar</MudButton>
+        <MudButton StartIcon="@Icons.Material.Filled.Close" Color="Color.Error" Variant="Variant.Outlined" OnClick="Cancel">Cancelar</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public string Label { get; set; } = "Informe os detalhes do pagamento";
+    [Parameter] public PaymentDetailsViewModel Details { get; set; } = new();
+    [Parameter] public EventCallback<PaymentDetailsViewModel> OnSubmit { get; set; }
+    
+    [Inject] public ICostCenterHandler CostCenterHandler { get; set; } = null!;
+    [Inject] public ISnackbar Snackbar { get; set; } = null!;
+    
+    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; }
+
+    private CostCenter SelectedCostCenter { get; set; }
+    private List<CostCenter> CostCenters { get; set; } = [];
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var result = await CostCenterHandler.GetAllByTypeAsync(new GetAllCostCentersByTypeRequest
+            {
+                Type = Details.CenterType
+            });
+
+            if (!result.IsSuccess)
+            {
+                Snackbar.Add("Não foi possível carregar os centros de custos, Operação cancelada!", Severity.Warning);
+                Cancel();
+                return;
+            }
+
+            CostCenters = result?.Data ?? [];
+            SelectedCostCenter = CostCenters.FirstOrDefault() ?? new();
+        }
+        catch (Exception e)
+        {
+            Snackbar.Add($"Não foi possível carregar os centros de custo! Erro: {e.Message}", Severity.Error);
+        }
+    }
+
+    private void OnCostCenterChanged(CostCenter costCenter)
+    {
+        SelectedCostCenter = costCenter;
+    }
+
+    private async Task OnKeyDownAsync(KeyboardEventArgs args)
+    {
+        switch (args.Key)
+        {
+            case "Enter":
+            case "NumpadEnter":
+                Submit();
+                break;
+            case "Escape":
+                Cancel();
+                break;
+        }
+    }
+
+    private async void Submit()
+    {
+        if (SelectedCostCenter.Id == 0)
+        {
+            Snackbar.Add("Informe o centro de custo do lançamento!", Severity.Warning);
+            return;
+        }
+        
+        if (string.IsNullOrWhiteSpace(Details.Description))
+        {
+            Snackbar.Add("Informe a descrição do lançamento!", Severity.Warning);
+            return;
+        }
+        
+        if (Details.Amount == 0)
+        {
+            Snackbar.Add("Informe o valor do lançamento!", Severity.Warning);
+            return;
+        }
+        
+        if (!Details.PaidOrReceivedAt.HasValue)
+        {
+            Snackbar.Add("Informe a data de pagamento do lançamento!", Severity.Warning);
+            return;
+        }
+
+        Details.CostCenterId = SelectedCostCenter.Id;
+        
+        MudDialog.Close(DialogResult.Ok(Details));
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}

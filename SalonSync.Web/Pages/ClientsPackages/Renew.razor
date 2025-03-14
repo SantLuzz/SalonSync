@@ -1,0 +1,50 @@
+@page "/clients-packages/renew/{id}"
+
+<PageTitle>Salon Sync - Pacotes</PageTitle>
+<MudText Typo="Typo.h4">Renovar Pacote: @(Package.Name ?? "Sem Nome")</MudText>
+
+<MudPaper Class="pa-8 mt-4">
+    <EditForm Model="@InputModel" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator />
+        
+        <MudSelect T="long" Label="Selecione o Cliente"
+                   @bind-Value="InputModel.ClientId"
+                   Variant="Variant.Outlined"
+                   AnchorOrigin="Origin.BottomLeft"
+                   ReadOnly="true">
+            @foreach (var client in Clients)
+            {
+                <MudSelectItem T="long" Value="@client.Id">@client.Name</MudSelectItem>
+            }
+        </MudSelect>
+        <div class="d-flex align-items-center mt-2" style="width: 100%;">
+            <MudDatePicker
+                Label="Data de Inicio"
+                Variant="Variant.Outlined"
+                @bind-Date="InputModel.StartDate"
+                ReadOnly="true"/>
+
+            <MudDatePicker
+                Label="Data de Encerramento"
+                Class="ml-4"
+                Variant="Variant.Outlined"
+                @bind-Date="InputModel.EndDate"
+                ReadOnly="true"/>
+        </div>
+        
+        <div class="d-flex mt-8">
+            @if (IsSubmit)
+            {
+                <MudProgressCircular Color="Color.Info" Indeterminate="true" />
+            }
+            else
+            {
+                <MudButton ButtonType="ButtonType.Submit"
+                           Variant="Variant.Filled"
+                           Color="Color.Primary">
+                    Renovar
+                </MudButton>
+            }
+        </div>
+    </EditForm>
+</MudPaper>

@@ -1,3 +1,5 @@
+using SalonSync.Core.Enums;
+
 namespace SalonSync.Core.Models.Financial;
 
 public class Transaction
@@ -8,6 +10,8 @@ public class Transaction
     public DateTime CreatedAt { get; set; }
     public DateTime? PaidOrReceivedAt { get; set; }
     public decimal Amount { get; set; }
+    public long EntityId { get; set; }
+    public EEntityType EntityType { get; set; } = EEntityType.DirectTransaction;
     public long CostCenterId { get; set; }
     public CostCenter CostCenter { get; set; } = null!;
 }

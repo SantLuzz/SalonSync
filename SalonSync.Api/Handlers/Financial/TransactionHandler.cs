@@ -22,7 +22,9 @@ public class TransactionHandler(AppDbContext context) : ITransactionHandler
                 CreatedAt = DateTime.Now,
                 PaidOrReceivedAt = request.PaidOrReceivedAt,
                 Amount = request.Amount,
-                CostCenterId = request.CostId
+                CostCenterId = request.CostId,
+                EntityId = request.EntityId,
+                EntityType = request.EntityType
             };
             
             await context.Transactions.AddAsync(transaction);

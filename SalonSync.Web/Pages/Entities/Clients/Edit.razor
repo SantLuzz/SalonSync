@@ -68,7 +68,8 @@ else
                        Variant="Variant.Outlined"
                        Label="Tipo de Cliente"
                        AnchorOrigin="Origin.BottomLeft"
-                       @bind-Value="InputModel.UpdateRequest.Type">
+                       @bind-Value="InputModel.UpdateRequest.Type"
+                       ReadOnly="true">
 
                 <MudSelectItem T="EClientType" Value="EClientType.Common">Comum</MudSelectItem>
                 <MudSelectItem T="EClientType" Value="EClientType.Monthly">Mensal</MudSelectItem>
@@ -81,8 +82,8 @@ else
                                Label="Pacote do Cliente"
                                AnchorOrigin="Origin.BottomLeft"
                                @bind-Value="InputModel.CreateClientPackageRequest.PackageId"
-                               @bind-Value:event="OnClientTypeChanged"
-                               Disabled="@(InputModel.UpdateRequest?.Type == EClientType.Common)">
+                               ReadOnly="true">
+                               @* Disabled="@(InputModel.UpdateRequest?.Type == EClientType.Common)"> *@
                         @foreach (var package in PackageDtos)
                         {
                             <MudSelectItem T="long" Value="@package.Id">@package.Name</MudSelectItem>
@@ -93,28 +94,30 @@ else
                         Label="Data de Inicio"
                         Class="ml-4"
                         Variant="Variant.Outlined"
-                        @bind-Date="InputModel.CreateClientPackageRequest.StartDate"/>
+                        @bind-Date="InputModel.CreateClientPackageRequest.StartDate"
+                        ReadOnly="true"/>
 
                     <MudDatePicker
                         Label="Data de Final"
                         Class="ml-4"
                         Variant="Variant.Outlined"
-                        @bind-Date="InputModel.CreateClientPackageRequest.EndDate"/>
+                        @bind-Date="InputModel.CreateClientPackageRequest.EndDate"
+                        ReadOnly="true"/>
                 </div>
-                <div class="d-flex align-items-center mt-8">
-                    @if (IsSubmit)
-                    {
-                        <MudProgressCircular Color="Color.Info" Indeterminate="true" />
-                    }
-                    else
-                    {
-                        <MudButton Variant="Variant.Filled"
-                                   Color="Color.Primary"
-                                   OnClick="OnSubmitPackage">
-                            Definir Pacote
-                        </MudButton>
-                    }
-                </div>
+                @* <div class="d-flex align-items-center mt-8"> *@
+                @*     @if (IsSubmit) *@
+                @*     { *@
+                @*         <MudProgressCircular Color="Color.Info" Indeterminate="true" /> *@
+                @*     } *@
+                @*     else *@
+                @*     { *@
+                @*         <MudButton Variant="Variant.Filled" *@
+                @*                    Color="Color.Primary" *@
+                @*                    OnClick="OnSubmitPackage"> *@
+                @*             Definir Pacote *@
+                @*         </MudButton> *@
+                @*     } *@
+                @* </div> *@
                 
             </MudCollapse>
             

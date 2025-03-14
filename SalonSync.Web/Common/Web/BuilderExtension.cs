@@ -5,11 +5,13 @@ using Microsoft.AspNetCore.Http;
 using MudBlazor.Services;
 using SalonSync.Core.Handlers;
 using SalonSync.Core.Handlers.Entities;
+using SalonSync.Core.Handlers.Financial;
 using SalonSync.Core.Handlers.Licences;
 using SalonSync.Core.Handlers.Packages;
 using SalonSync.Core.Handlers.Services;
 using SalonSync.Web.Handlers;
 using SalonSync.Web.Handlers.Entities;
+using SalonSync.Web.Handlers.Financial;
 using SalonSync.Web.Handlers.Licenses;
 using SalonSync.Web.Handlers.Packages;
 using SalonSync.Web.Handlers.Services;
@@ -56,6 +58,7 @@ public static class BuilderExtension
     {
         builder.Services.AddScoped<LogoutService>();
         builder.Services.AddScoped<LicenseService>();
+        builder.Services.AddTransient<PaymentService>();
         builder.Services.AddTransient<IAccountHandler, AccountHandler>();
         builder.Services.AddTransient<ICompanyHandler, CompanyHandler>();
         builder.Services.AddTransient<ILicenseHandler, LicenseHandler>();
@@ -65,6 +68,8 @@ public static class BuilderExtension
         builder.Services.AddTransient<IPackageHandler, PackageHandler>();
         builder.Services.AddTransient<IPackageServiceHandler, PackageServiceHandler>();
         builder.Services.AddTransient<IClientPackageHandler, ClientPackageHandler>();
+        builder.Services.AddTransient<ICostCenterHandler, CostCenterHandler>();
+        builder.Services.AddTransient<ITransactionHandler, TransactionHandler>();
     }
 
     public static void AddLocalization(this WebAssemblyHostBuilder builder)

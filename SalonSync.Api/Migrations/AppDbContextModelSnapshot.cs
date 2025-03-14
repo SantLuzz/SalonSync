@@ -690,6 +690,18 @@ namespace SalonSync.Api.Migrations
                         .HasColumnType("NVARCHAR(255)")
                         .HasColumnName("Description");
 
+                    b.Property<long>("EntityId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("BIGINT")
+                        .HasDefaultValue(0L)
+                        .HasColumnName("EntityId");
+
+                    b.Property<short>("EntityType")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("SMALLINT")
+                        .HasDefaultValue((short)0)
+                        .HasColumnName("EntityType");
+
                     b.Property<DateTime?>("PaidOrReceivedAt")
                         .HasColumnType("DATETIME2")
                         .HasColumnName("PaidOrReceivedAt");
@@ -816,6 +828,8 @@ namespace SalonSync.Api.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("PackageId");
+
+                    b.HasIndex("ServiceId");
 
                     b.ToTable("PackageServices", (string)null);
                 });
@@ -1006,7 +1020,7 @@ namespace SalonSync.Api.Migrations
 
             modelBuilder.Entity("SalonSync.Core.Models.Packages.ClientPackage", b =>
                 {
-                    b.HasOne("SalonSync.Core.Models.Entities.Client", "Client")
+                    b.HasOne("SalonSync.Core.Models.Entities.Client", null)
                         .WithMany("ClientPackages")
                         .HasForeignKey("ClientId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1017,8 +1031,6 @@ namespace SalonSync.Api.Migrations
                         .HasForeignKey("PackageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Client");
 
                     b.Navigation("Package");
                 });
@@ -1031,7 +1043,15 @@ namespace SalonSync.Api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("SalonSync.Core.Models.Services.Service", "Service")
+                        .WithMany()
+                        .HasForeignKey("ServiceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Package");
+
+                    b.Navigation("Service");
                 });
 
             modelBuilder.Entity("SalonSync.Api.Models.User", b =>

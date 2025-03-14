@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using SalonSync.Core.Enums;
 using SalonSync.Core.Models.Financial;
 
 namespace SalonSync.Api.Data.Mappings.Financial;
@@ -39,6 +40,18 @@ public class TransactionMapping : IEntityTypeConfiguration<Transaction>
             .IsRequired()
             .HasColumnName("CostCenterId")
             .HasColumnType("BIGINT"); // Melhor usar BIGINT para IDs longos
+        
+        builder.Property(x => x.EntityId)
+            .IsRequired()
+            .HasColumnName("EntityId")
+            .HasColumnType("BIGINT")
+            .HasDefaultValue(0);
+        
+        builder.Property(x => x.EntityType)
+            .IsRequired()
+            .HasColumnName("EntityType")
+            .HasColumnType("SMALLINT")
+            .HasDefaultValue(EEntityType.DirectTransaction);
         
         builder.HasOne(x => x.CostCenter)
             .WithMany()

@@ -7,6 +7,7 @@ using SalonSync.Api.Endpoints.Entities.Clients;
 using SalonSync.Api.Endpoints.Entities.Companies;
 using SalonSync.Api.Endpoints.Entities.Employees;
 using SalonSync.Api.Endpoints.Financial.CostCenters;
+using SalonSync.Api.Endpoints.Financial.Transactions;
 using SalonSync.Api.Endpoints.Identity;
 using SalonSync.Api.Endpoints.Licenses;
 using SalonSync.Api.Endpoints.Packages;
@@ -107,6 +108,16 @@ public static class Endpoint
             .MapEndpoints<GetAllCostCentersByTypeEndpoint>()
             .MapEndpoints<GetCostCenterByIdEndpoint>();
 
+        endpoint.MapGroup("v1/transactions")
+            .WithTags("Transactions")
+            .RequireAuthorization()
+            .MapEndpoints<CreateTransactionEndpoint>()
+            .MapEndpoints<UpdateTransactionEndpoint>()
+            .MapEndpoints<DeleteTransactionEndpoint>()
+            .MapEndpoints<GetTransactionByIdEndpoint>()
+            .MapEndpoints<GetTransactionsByCostCenterEndpoint>()
+            .MapEndpoints<GetTransactionsByPeriodEndpoint>();
+
         endpoint.MapGroup("v1/services")
             .WithTags("Services")
             .RequireAuthorization()
@@ -143,7 +154,8 @@ public static class Endpoint
             .MapEndpoints<GetClientPackagesByIdEndpoint>()
             .MapEndpoints<GetActiveClientPackageEndpoint>()
             .MapEndpoints<GetAllPackagesByClientIdEndpoint>()
-            .MapEndpoints<InactiveClientIsActivePackageEndpoint>();
+            .MapEndpoints<InactiveClientIsActivePackageEndpoint>()
+            .MapEndpoints<GetClientsPackagesByPackageIdEndpoint>();
 
         endpoint.MapGroup("v1/appointments")
             .WithTags("Appointments")

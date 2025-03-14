@@ -1,4 +1,57 @@
 @page "/clients/history/{id}"
+@using SalonSync.Core.Enums
 
 <PageTitle>Salon Sync - Clientes</PageTitle> 
 <MudText Typo="Typo.h3">Pacotes do Cliente</MudText>
+
+@if (IsBusy)
+{
+    <Skeleton/>
+}
+else
+{
+    <MudText Typo="Typo.h4" Class="mt-10">
+        Pacote Ativo: @(ActivePackage?.Package?.Name ?? "Nenhum pacote ativo")
+    </MudText>
+
+    <MudDataGrid
+        Class="mt-4"
+        Style="min-width: 800px; width: 100%;"
+        Items="@Packages"
+        Hideable="true">
+        
+        <Columns>
+            <PropertyColumn Property="x => x.Id" Title="#" />
+            <PropertyColumn Property="x => x.Package.Name" Title="Descrição" />
+            <TemplateColumn>
+                <HeaderTemplate>Data Inicial</HeaderTemplate>
+                <CellTemplate>
+                    @(context.Item.StartDate.ToString("dd/MM/yyyy"))
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn>
+                <HeaderTemplate>Data Final</HeaderTemplate>
+                <CellTemplate>
+                    @(context.Item.EndDate.ToString("dd/MM/yyyy"))
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn>
+                <HeaderTemplate>Status</HeaderTemplate>
+                <CellTemplate>
+                    @if (context.Item.Status == EPackageStatus.Active)
+                    {
+                        <MudChip Color="Color.Success" Size="Size.Small" Variant="Variant.Filled">
+                            @context.Item.Status.GetDescription()
+                        </MudChip>
+                    }
+                    else
+                    {
+                        <MudChip Color="Color.Error" Size="Size.Small" Variant="Variant.Filled">
+                            @context.Item.Status.GetDescription()
+                        </MudChip>    
+                    }
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+    </MudDataGrid>
+}

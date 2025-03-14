@@ -6,7 +6,7 @@ using SalonSync.Web.ViewModels;
 
 namespace SalonSync.Web.Pages.Entities.Employees;
 
-public partial class ListPage : ComponentBase
+public partial class ListEmployeePage : ComponentBase
 {
     #region Dependencies
 

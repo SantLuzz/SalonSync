@@ -41,8 +41,9 @@
             <MudSelect T="EClientType"
                        Variant="Variant.Outlined"
                        Label="Tipo de Cliente"
-                       AnchorOrigin="Origin.BottomCenter"
-                       @bind-Value="InputModel.Type">
+                       AnchorOrigin="Origin.BottomLeft"
+                       @bind-Value="InputModel.Type"
+                       ReadOnly="true">
 
                 <MudSelectItem T="EClientType" Value="EClientType.Common">Comum</MudSelectItem>
                 <MudSelectItem T="EClientType" Value="EClientType.Monthly">Mensal</MudSelectItem>
