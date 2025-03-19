@@ -24,7 +24,8 @@ public class TransactionHandler(AppDbContext context) : ITransactionHandler
                 Amount = request.Amount,
                 CostCenterId = request.CostId,
                 EntityId = request.EntityId,
-                EntityType = request.EntityType
+                EntityType = request.EntityType,
+                PaymentType = request.PaymentType
             };
             
             await context.Transactions.AddAsync(transaction);
@@ -53,6 +54,7 @@ public class TransactionHandler(AppDbContext context) : ITransactionHandler
             transaction.CostCenterId = request.CostId;
             transaction.PaidOrReceivedAt = request.PaidOrReceivedAt;
             transaction.Amount = request.Amount;
+            transaction.PaymentType = request.PaymentType;
             
             context.Transactions.Update(transaction);
             await context.SaveChangesAsync();
@@ -94,6 +96,7 @@ public class TransactionHandler(AppDbContext context) : ITransactionHandler
             var transaction = await context
                 .Transactions
                 .AsNoTracking()
+                .Include(x => x.CostCenter)
                 .FirstOrDefaultAsync(x => x.Id == request.Id && x.UserId == request.UserId);
 
             return transaction is null
@@ -113,6 +116,7 @@ public class TransactionHandler(AppDbContext context) : ITransactionHandler
             var query = context
                 .Transactions
                 .AsNoTracking()
+                .Include(x => x.CostCenter)
                 .Where(x => x.UserId == request.UserId && x.CostCenterId == request.CostCenterId);
             
             var transactions =  await query
@@ -130,6 +134,33 @@ public class TransactionHandler(AppDbContext context) : ITransactionHandler
         }
     }
 
+    public async Task<PagedResponse<List<Transaction>?>> GetByDayAsync(GetTransactionsByPeriodRequest request)
+    {
+        try
+        {
+            var query = context
+                .Transactions
+                .AsNoTracking()
+                .Include(x => x.CostCenter)
+                .Where(x => x.UserId == request.UserId
+                            && x.PaidOrReceivedAt.Value.Date == request.StartDate.Value.Date)
+                .OrderBy(x => x.PaidOrReceivedAt);
+            
+            var transactions =  await query
+                // .Skip((request.PageNumber - 1) * request.PageSize)
+                // .Take(request.PageSize)
+                .ToListAsync();
+            
+            var count = await query.CountAsync();
+            
+            return new PagedResponse<List<Transaction>?>(transactions, count, request.PageNumber, request.PageSize);
+        }
+        catch (Exception)
+        {
+            return new PagedResponse<List<Transaction>?>(null, 500, "(SST008) Não foi possível recuperar as transações do dia!");
+        }
+    }
+
     public async Task<PagedResponse<List<Transaction>?>> GetByPeriodAsync(GetTransactionsByPeriodRequest request)
     {
         try
@@ -139,7 +170,7 @@ public class TransactionHandler(AppDbContext context) : ITransactionHandler
         }
         catch (Exception)
         {
-            return new PagedResponse<List<Transaction>?> (null, 500, "(SST007) Não foi possível determinar a data de ínicio e fim da requisição!");
+            return new PagedResponse<List<Transaction>?> (null, 500, "(SST008) Não foi possível determinar a data de ínicio e fim da requisição!");
         }
         
         try
@@ -147,6 +178,7 @@ public class TransactionHandler(AppDbContext context) : ITransactionHandler
             var query = context
                 .Transactions
                 .AsNoTracking()
+                .Include(x => x.CostCenter)
                 .Where(x => x.UserId == request.UserId
                     && x.PaidOrReceivedAt >= request.StartDate
                     && x.PaidOrReceivedAt <= request.EndDate)

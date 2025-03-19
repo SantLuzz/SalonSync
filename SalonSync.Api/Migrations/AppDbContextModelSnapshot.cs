@@ -630,6 +630,59 @@ namespace SalonSync.Api.Migrations
                     b.ToTable("Employees", (string)null);
                 });
 
+            modelBuilder.Entity("SalonSync.Core.Models.Financial.AccountPayable", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("MONEY")
+                        .HasColumnName("Amount");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("DATETIME2")
+                        .HasColumnName("CreatedAt")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(255)
+                        .HasColumnType("NVARCHAR")
+                        .HasColumnName("Description");
+
+                    b.Property<DateTime>("DueDate")
+                        .HasColumnType("DATETIME2")
+                        .HasColumnName("DueDate");
+
+                    b.Property<DateTime?>("PaymentDate")
+                        .HasColumnType("DATETIME2")
+                        .HasColumnName("PaymentDate");
+
+                    b.Property<string>("SupplierDocument")
+                        .HasMaxLength(20)
+                        .HasColumnType("NVARCHAR")
+                        .HasColumnName("SupplierDocument");
+
+                    b.Property<string>("SupplierName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("NVARCHAR")
+                        .HasColumnName("SupplierName");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("NVARCHAR")
+                        .HasColumnName("UserId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AccountsPayable", (string)null);
+                });
+
             modelBuilder.Entity("SalonSync.Core.Models.Financial.CostCenter", b =>
                 {
                     b.Property<long>("Id")
@@ -705,6 +758,12 @@ namespace SalonSync.Api.Migrations
                     b.Property<DateTime?>("PaidOrReceivedAt")
                         .HasColumnType("DATETIME2")
                         .HasColumnName("PaidOrReceivedAt");
+
+                    b.Property<short>("PaymentType")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("SMALLINT")
+                        .HasDefaultValue((short)0)
+                        .HasColumnName("PaymentType");
 
                     b.Property<string>("UserId")
                         .IsRequired()

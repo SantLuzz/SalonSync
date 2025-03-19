@@ -6,6 +6,7 @@ using SalonSync.Api.Endpoints.Configs;
 using SalonSync.Api.Endpoints.Entities.Clients;
 using SalonSync.Api.Endpoints.Entities.Companies;
 using SalonSync.Api.Endpoints.Entities.Employees;
+using SalonSync.Api.Endpoints.Financial.AccountsPayable;
 using SalonSync.Api.Endpoints.Financial.CostCenters;
 using SalonSync.Api.Endpoints.Financial.Transactions;
 using SalonSync.Api.Endpoints.Identity;
@@ -17,6 +18,7 @@ using SalonSync.Api.Endpoints.Services;
 using SalonSync.Api.Models;
 using SalonSync.Api.Services;
 using SalonSync.Core.Requests.ClientsPackages;
+using SalonSync.Core.Requests.Financial.AccountsPayable;
 
 namespace SalonSync.Api.Endpoints;
 
@@ -116,7 +118,18 @@ public static class Endpoint
             .MapEndpoints<DeleteTransactionEndpoint>()
             .MapEndpoints<GetTransactionByIdEndpoint>()
             .MapEndpoints<GetTransactionsByCostCenterEndpoint>()
-            .MapEndpoints<GetTransactionsByPeriodEndpoint>();
+            .MapEndpoints<GetTransactionsByPeriodEndpoint>()
+            .MapEndpoints<GetTransactionsByDateEndpoint>();
+
+        endpoint.MapGroup("v1/account-payable")
+            .WithTags("Accounts Payable")
+            .RequireAuthorization()
+            .MapEndpoints<CreateAccountPayableEndpoint>()
+            .MapEndpoints<UpdateAccountPayableEndpoint>()
+            .MapEndpoints<DeleteAccountPayableEndpoint>()
+            .MapEndpoints<CloseAccountPayableEndpoint>()
+            .MapEndpoints<GetAccountPayableByIdEndpoint>()
+            .MapEndpoints<GetAccountPayableByPeriodEndpoint>();
 
         endpoint.MapGroup("v1/services")
             .WithTags("Services")

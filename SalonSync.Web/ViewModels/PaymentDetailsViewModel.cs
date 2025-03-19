@@ -11,4 +11,5 @@ public class PaymentDetailsViewModel
     public EEntityType EntityType { get; set; } = EEntityType.DirectTransaction;
     public ECostCenterType CenterType { get; set; } = ECostCenterType.Income;
     public long CostCenterId { get; set; }
+    public EPaymentType PaymentType { get; set; } = EPaymentType.Cash;
 }

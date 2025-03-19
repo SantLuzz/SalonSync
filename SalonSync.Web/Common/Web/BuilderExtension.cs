@@ -70,6 +70,7 @@ public static class BuilderExtension
         builder.Services.AddTransient<IClientPackageHandler, ClientPackageHandler>();
         builder.Services.AddTransient<ICostCenterHandler, CostCenterHandler>();
         builder.Services.AddTransient<ITransactionHandler, TransactionHandler>();
+        builder.Services.AddTransient<IAccountPayableHandler, AccountPayableHandler>();
     }
 
     public static void AddLocalization(this WebAssemblyHostBuilder builder)

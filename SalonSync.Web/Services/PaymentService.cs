@@ -48,7 +48,8 @@ public class PaymentService(ITransactionHandler handler,
                 CostId = detailsPay.CostCenterId,
                 PaidOrReceivedAt = detailsPay.PaidOrReceivedAt,
                 EntityId = detailsPay.EntityId,
-                EntityType = detailsPay.EntityType
+                EntityType = detailsPay.EntityType,
+                PaymentType = detailsPay.PaymentType,
             };
             
             return await Pay(create);

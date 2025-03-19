@@ -1,0 +1,150 @@
+@page "/accounts-payable"
+@inherits ListAccountPayablePage
+
+<PageTitle>Salon Sync - Contas a Pagar</PageTitle>
+<MudText Typo="Typo.h3">Contas a Pagar</MudText>
+
+@if (IsStarted)
+{
+    <Skeleton/>
+}
+else
+{
+    <div class="d-flex justify-end mt-4 mb-4">
+        <MudDatePicker Label="Data"
+                       Variant="Variant.Outlined"
+                       OpenTo="OpenTo.Month"
+                       FixDay="@Date.Value.Day"
+                       DateFormat="MM/yyyy"
+                       @bind-Date="Date" />
+
+        <MudSelect T="EAccountStatus"
+                   Variant="Variant.Outlined"
+                   Label="Status"
+                   Class="ml-4"
+                   AnchorOrigin="Origin.BottomLeft"
+                   @bind-Value="AccountStatus">
+
+            <MudSelectItem T="EAccountStatus" Value="EAccountStatus.All">Todos</MudSelectItem>
+            <MudSelectItem T="EAccountStatus" Value="EAccountStatus.Open">Abertos</MudSelectItem>
+            <MudSelectItem T="EAccountStatus" Value="EAccountStatus.Close">Fechados</MudSelectItem>
+        </MudSelect>
+    
+        <MudButton StartIcon="@Icons.Material.Filled.Refresh"
+                   Class="ml-2"
+                   Color="Color.Primary"
+                   OnClick="OnSearchAsync"
+                   aria-label="Recarregar Lançamentos"
+                   Variant="Variant.Filled">
+            Buscar
+        </MudButton>
+        <MudSpacer />
+
+        
+        
+        <MudButton
+            Variant="Variant.Filled"
+            Color="Color.Primary"
+            Class="ml-4"
+            StartIcon="@Icons.Material.Filled.Add"
+            Href="/accounts-payable/create">
+            NOVA CONTA
+        </MudButton>
+    </div>
+    
+    <MudDataGrid
+    Class="mt-4"
+    Style="min-width: 800px; width: 100%;"
+    Items="@AccountPayables"
+    Filterable="true"
+    QuickFilter="Filter"
+    Hideable="true">
+
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Contas a Pagar</MudText>
+        <MudSpacer/>
+        <MudTextField @bind-Value="SearchTerm" Placeholder="Filtrar..."
+                      Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search"
+                      Immediate="true"
+                      IconSize="Size.Medium"
+                      Class="mt-0"/>
+    </ToolBarContent>
+    <Columns>
+        <PropertyColumn Property="x => x.Id" Title="#" />
+        <PropertyColumn Property="x => x.Description" Title="Descrição" />
+        <TemplateColumn>
+            <HeaderTemplate>Fornecedor</HeaderTemplate>
+            <CellTemplate>
+                @{
+                    var name = context.Item.SupplierName + (string.IsNullOrWhiteSpace(context.Item.SupplierDocument) 
+                        ? "" : $"({context.Item.SupplierDocument})");
+                }
+                
+                @name
+            </CellTemplate>
+        </TemplateColumn>
+
+        <TemplateColumn>
+            <HeaderTemplate>Vencimento</HeaderTemplate>
+            <CellTemplate>
+                @context.Item.DueDate.ToString("dd/MM/yyyy")
+            </CellTemplate>
+        </TemplateColumn>
+
+        <TemplateColumn>
+            <HeaderTemplate>Status</HeaderTemplate>
+            <CellTemplate>
+                @if (context.Item.PaymentDate.HasValue)
+                {
+                    <MudChip Color="Color.Success" Size="Size.Small" Variant="Variant.Filled">
+                        Pago
+                    </MudChip>
+                }
+                else
+                {
+                    <MudChip Color="Color.Error" Size="Size.Small" Variant="Variant.Filled">
+                        Em Aberto
+                    </MudChip>
+                }
+            </CellTemplate>
+        </TemplateColumn>
+        
+        <PropertyColumn Property="x => x.Amount" Format="C"
+                        Title="Valor" Sortable="true">
+            <FooterTemplate>
+                @context.Items.Sum(x => x.Amount).ToString("C")
+            </FooterTemplate>
+        </PropertyColumn>
+        
+        <TemplateColumn Class="d-flex justify-end align-end">
+            <HeaderTemplate>
+                Ações
+            </HeaderTemplate>
+            <CellTemplate>
+                <MudStack Row>
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                   Href="@($"/accounts-payable/edit/{context.Item.Id}")"
+                                   Color="Color.Primary"
+                                   aria-label="Editar"/>
+                    
+                    <MudButton StartIcon="@Icons.Material.Filled.AttachMoney"
+                               Color="Color.Primary"
+                               Variant="Variant.Filled"
+                               Disabled="context.Item.PaymentDate.HasValue"
+                               aria-label="Pagar"
+                               OnClick="() => PayAccount(context.Item)">
+                        Pagar
+                    </MudButton>
+
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                   Color="Color.Error"
+                                   aria-label="Excluir"
+                                   Disabled="context.Item.PaymentDate.HasValue"
+                                   OnClick="() => OnDeleteButtonClickedAsync(context.Item.Id)"/>
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+</MudDataGrid>
+}

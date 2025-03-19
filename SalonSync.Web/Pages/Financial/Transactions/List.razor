@@ -10,10 +10,26 @@
 }
 else
 {
-<div Class="d-flex justify-end">
+<div class="d-flex justify-end mt-4 mb-4">
+    <MudDatePicker Label="Data do Caixa"
+                   Variant="Variant.Outlined"
+                   @bind-Date="Date" />
+    
+    <MudButton StartIcon="@Icons.Material.Filled.Refresh"
+               Class="ml-2"
+               Color="Color.Primary"
+               OnClick="OnSearchAsync"
+               aria-label="Recarregar Lançamentos"
+               Variant="Variant.Filled">
+        Buscar
+    </MudButton>
+    <MudSpacer />
+    
+
     <MudButton
         Variant="Variant.Filled"
         Color="Color.Primary"
+        Class="ml-4"
         StartIcon="@Icons.Material.Filled.Add"
         Href="/transactions/create">
         NOVO LANÇAMENTO
@@ -41,27 +57,50 @@ else
     <Columns>
         <PropertyColumn Property="x => x.Id" Title="#" />
         <PropertyColumn Property="x => x.Description" Title="Descrição" />
-        <PropertyColumn Property="x => x.Amount"  Title="Valor"/>
+        <PropertyColumn Property="x => x.CostCenter.Description" Title="Centro de Custo" />
+        <TemplateColumn>
+            <HeaderTemplate>Tipo</HeaderTemplate>
+            <CellTemplate>
+                @if (@context.Item.CostCenter.Type == ECostCenterType.Income)
+                {
+                    <MudChip Color="Color.Success" Size="Size.Small" Variant="Variant.Filled">
+                        @context.Item.CostCenter.Type.GetDescription()
+                    </MudChip>
+                }
+                else
+                {
+                    <MudChip Color="Color.Error" Size="Size.Small" Variant="Variant.Filled">
+                        @context.Item.CostCenter.Type.GetDescription()
+                    </MudChip>
+                }
+            </CellTemplate>
+        </TemplateColumn>
+        <TemplateColumn>
+            <HeaderTemplate>Forma de Pagamento</HeaderTemplate>
+            <CellTemplate>
+                <MudChip Color="Color.Info" Size="Size.Small" Variant="Variant.Filled">
+                    @context.Item.PaymentType.GetDescription()
+                </MudChip>
+            </CellTemplate>
+        </TemplateColumn>
         
-        @* <TemplateColumn> *@
-        @*     <HeaderTemplate>Tipo</HeaderTemplate> *@
-        @*     <CellTemplate> *@
-        @*         @if (@context.Item.Type == ECostCenterType.Income) *@
-        @*         { *@
-        @*             <MudChip Color="Color.Success" Size="Size.Small" Variant="Variant.Filled"> *@
-        @*                 @context.Item.Type.GetDescription() *@
-        @*             </MudChip> *@
-        @*         } *@
-        @*         else *@
-        @*         { *@
-        @*             <MudChip Color="Color.Error" Size="Size.Small" Variant="Variant.Filled"> *@
-        @*                 @context.Item.Type.GetDescription() *@
-        @*             </MudChip> *@
-        @*         } *@
-        @*     </CellTemplate> *@
-        @* </TemplateColumn> *@
+        <PropertyColumn Property="x => x.Amount" Format="C"
+                        Title="Valor" Sortable="true">
+            <FooterTemplate>
+                @{
+                    var income = context.Items
+                        .Where(x => x.CostCenter.Type == ECostCenterType.Income)
+                        .Sum(x => x.Amount);
+                    var expense = context.Items
+                        .Where(x => x.CostCenter.Type == ECostCenterType.Expense)
+                        .Sum(x => x.Amount);
 
-        <TemplateColumn Class="d-flex justify-end">
+                    var total = income - expense;
+                }
+                SALDO: @total.ToString("C")
+            </FooterTemplate>
+        </PropertyColumn>
+        <TemplateColumn Class="d-flex justify-end align-end">
             <HeaderTemplate>
                 Ações
             </HeaderTemplate>

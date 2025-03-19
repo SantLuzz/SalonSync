@@ -120,6 +120,7 @@ public static class BuilderExtension
         builder.Services.AddTransient<ISystemConfigHandler, SystemConfigHandler>();
         builder.Services.AddTransient<ICostCenterHandler, CostCenterHandler>();
         builder.Services.AddTransient<ITransactionHandler, TransactionHandler>();
+        builder.Services.AddTransient<IAccountPayableHandler, AccountPayableHandler>();
         builder.Services.AddTransient<IClientHandler, ClientHandler>();
         builder.Services.AddTransient<IEmployeeHandler, EmployeeHandler>();
         builder.Services.AddTransient<ICompanyHandler, CompanyHandler>();

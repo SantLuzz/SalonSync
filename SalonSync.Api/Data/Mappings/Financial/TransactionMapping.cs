@@ -25,7 +25,7 @@ public class TransactionMapping : IEntityTypeConfiguration<Transaction>
             .IsRequired()
             .HasColumnName("CreatedAt")
             .HasColumnType("DATETIME2")
-            .HasDefaultValueSql("GETDATE()"); // Usa o horário do banco
+            .HasDefaultValueSql("GETDATE()");
         
         builder.Property(x => x.PaidOrReceivedAt)
             .HasColumnName("PaidOrReceivedAt")
@@ -52,6 +52,12 @@ public class TransactionMapping : IEntityTypeConfiguration<Transaction>
             .HasColumnName("EntityType")
             .HasColumnType("SMALLINT")
             .HasDefaultValue(EEntityType.DirectTransaction);
+        
+        builder.Property(x => x.PaymentType)
+            .IsRequired()
+            .HasColumnName("PaymentType")
+            .HasColumnType("SMALLINT")
+            .HasDefaultValue(EPaymentType.Cash);
         
         builder.HasOne(x => x.CostCenter)
             .WithMany()

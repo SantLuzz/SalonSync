@@ -1,0 +1,67 @@
+@page "/accounts-payable/edit/{id}"
+@inherits EditAccountPayablePage
+
+<PageTitle>Salon Sync - Contas a Pagar</PageTitle>
+<MudText Typo="Typo.h3">Editar Conta a Pagar</MudText>
+
+@if (IsStart)
+{
+    <Skeleton/>
+}
+else
+{
+<MudPaper Class="pa-8 mt-4">
+    <EditForm Model="@InputModel" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator />
+
+        <div class="d-flex align-items-center mt-2" style="width: 100%;">
+            <MudTextField Label="Fornecedor*"
+                          Variant="Variant.Outlined"
+                          Class="mr-4"
+                          @bind-Value="InputModel.SupplierName"
+                          For="@(() => InputModel.SupplierName)"
+                          MaxLength="255"/>
+
+            <DocumentMudTextField
+                @bind-Value="InputModel.SupplierDocument"/>
+        </div>
+
+        <MudTextField Label="Descrição*"
+                      Variant="Variant.Outlined"
+                      Lines="3"
+                      @bind-Value="InputModel.Description"
+                      For="@(() => InputModel.Description)"
+                      MaxLength="255"/>
+
+        <div class="d-flex align-items-center mt-2" style="width: 100%;">
+            <MudTextField T="decimal"
+                          Label="Valor*"
+                          Format="C"
+                          Variant="Variant.Outlined"
+                          @bind-Value="InputModel.Amount"
+                          For="@(() => InputModel.Amount)"/>
+
+            <MudDatePicker Label="Data do Vencimento*"
+                           Class="ml-4"
+                           Variant="Variant.Outlined"
+                           @bind-Date="InputModel.DueDate"/>
+        </div>
+
+        <div class="d-flex mt-8">
+            @if (IsSubmit)
+            {
+            <MudProgressCircular Color="Color.Info" Indeterminate="true" />
+            }
+            else
+            {
+            <MudButton ButtonType="ButtonType.Submit"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary">
+                Salvar
+            </MudButton>
+            }
+        </div>
+    </EditForm>
+</MudPaper>
+}
+

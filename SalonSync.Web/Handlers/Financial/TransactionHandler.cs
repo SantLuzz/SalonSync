@@ -42,6 +42,20 @@ public class TransactionHandler(IHttpClientFactory httpClientFactory) : ITransac
            ?? new PagedResponse<List<Transaction>?>(null, 404,
                "Não foram encontrados transações para esse centro de custo!");
 
+    public async Task<PagedResponse<List<Transaction>?>> GetByDayAsync(GetTransactionsByPeriodRequest request)
+    {
+        const string format = "yyyy-MM-dd";
+        var startDate =  request.StartDate is not null
+            ? request.StartDate.Value.ToString(format) 
+            : DateTime.Now.GetFirstDay().ToString(format);
+        
+        var url = $"v1/transactions/by-date/{startDate}";
+        
+        return await _httpClient.GetFromJsonAsync<PagedResponse<List<Transaction>?>>(url)
+               ?? new PagedResponse<List<Transaction>?>(null, 404,
+                   "Não foram encontradas transações para o dia informado!");
+    }
+
     public async Task<PagedResponse<List<Transaction>?>> GetByPeriodAsync(GetTransactionsByPeriodRequest request)
     {
         const string format = "yyyy-MM-dd";

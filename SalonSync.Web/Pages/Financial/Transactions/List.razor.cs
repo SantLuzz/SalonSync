@@ -2,13 +2,14 @@ using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using SalonSync.Core.Handlers.Financial;
 using SalonSync.Core.Models.Financial;
+using SalonSync.Core.Requests.Financial.CostCenters;
 using SalonSync.Core.Requests.Financial.Transactions;
 
 namespace SalonSync.Web.Pages.Financial.Transactions;
 
 public partial class ListTransactionPage : ComponentBase
 {
-     #region Dependencies
+    #region Dependencies
 
     [Inject] public ISnackbar Snackbar { get; set; } = null!;
     [Inject] public NavigationManager NavigationManager { get; set; } = null!;
@@ -20,20 +21,32 @@ public partial class ListTransactionPage : ComponentBase
     public string SearchTerm { get; set; } = string.Empty;
     public bool IsStarted { get; set; }
     public List<Transaction> Transactions { get; set; } = [];
+    public DateTime? Date { get; set; }
     #endregion
 
     #region Overrides
 
     protected override async Task OnInitializedAsync()
-        => await GetTransactionsAsync();
+    {
+        Date = DateTime.Today;
+        await GetTransactionsAsync();
+    }
 
     #endregion
 
     #region Methods
+
+    public async void OnSearchAsync()
+    {
+        await GetTransactionsAsync();
+        StateHasChanged();
+    }
+        
+    
     public async void OnDeleteButtonClickedAsync(long id, string name)
     {
         var result = await DialogService
-            .ShowMessageBox("Atenção", $"Ao prosseguir o Centro de custo {name} será excluído. " +
+            .ShowMessageBox("Atenção", $"Ao prosseguir o lançamento {id} será excluído. " +
                 $"Esta é uma ação irreversível, deseja prosseguir?", "Excluir", cancelText: "Cancelar");
 
         if (result is true)
@@ -54,7 +67,7 @@ public partial class ListTransactionPage : ComponentBase
                 if (result.Data is not null)
                 {
                     Transactions.RemoveAll(x => x.Id == id);
-                    Snackbar.Add($"Transação {name} excluída!", Severity.Success);
+                    Snackbar.Add($"Transação {id} excluída!", Severity.Success);
                 }
                 else
                 {
@@ -95,10 +108,9 @@ public partial class ListTransactionPage : ComponentBase
             {
                 PageNumber = 1,
                 PageSize = 1000,
-                StartDate = DateTime.Today.AddDays(-1),
-                EndDate = DateTime.Today,
+                StartDate = Date,
             };
-            var result = await Handler.GetByPeriodAsync(request);
+            var result = await Handler.GetByDayAsync(request);
 
             if (result is { IsSuccess: true })
                 Transactions = result.Data ?? [];

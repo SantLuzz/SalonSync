@@ -12,4 +12,7 @@ public enum EEntityType
 
     [Description("Pacotes")]
     Packages = 2,
+    
+    [Description("Contas a Pagar")]
+    AccountPayable = 3,
 }

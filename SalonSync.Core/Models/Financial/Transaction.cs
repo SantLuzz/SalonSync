@@ -6,12 +6,13 @@ public class Transaction
 {
     public long Id { get; set; }
     public string UserId { get; set; } = string.Empty;
-    public string? Description { get; set; } // Permitir nulo já que não é obrigatório
+    public string? Description { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? PaidOrReceivedAt { get; set; }
     public decimal Amount { get; set; }
     public long EntityId { get; set; }
     public EEntityType EntityType { get; set; } = EEntityType.DirectTransaction;
+    public EPaymentType PaymentType { get; set; } = EPaymentType.Cash;
     public long CostCenterId { get; set; }
     public CostCenter CostCenter { get; set; } = null!;
 }

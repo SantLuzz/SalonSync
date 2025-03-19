@@ -1,0 +1,62 @@
+@page "/transactions/create"
+@inherits CreateTransactionPage
+
+<PageTitle>Salon Sync - Caixa</PageTitle>
+<MudText Typo="Typo.h3">Caixa: Efetuar Lançamento</MudText>
+
+<MudPaper Class="pa-8 mt-4">
+    <EditForm Model="@InputModel" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator/>
+
+        <MudSelect T="long" Label="Centro de Custo"
+                   @bind-Value="@InputModel.CostId"
+                   Class="mt-4"
+                   Variant="Variant.Outlined">
+            @foreach (var costCenter in CostCenters)
+            {
+                <MudSelectItem T="long" Value="costCenter.Id">@costCenter.Title</MudSelectItem>
+            }
+        </MudSelect>
+        
+        
+        <MudTextField Label="Descrição do Pagamento"
+                      Variant="Variant.Outlined"
+                      lines = "3"
+                      Class="mt-4"
+                      @bind-Value="InputModel.Description"
+                      For="@(() => InputModel.Description)"
+                      MaxLength="255"/>
+        
+        <div class="d-flex align-items-center mt-2" style="width: 100%;">
+            <MudTextField T="decimal"
+                          Label="Valor*"
+                          Format="C"
+                          Variant="Variant.Outlined"
+                          @bind-Value="InputModel.Amount"
+                          For="@(() => InputModel.Amount)"/>
+
+            <MudDatePicker Label="Data do Caixa*"
+                           Class="ml-4"
+                           Variant="Variant.Outlined"
+                           @bind-Date="InputModel.PaidOrReceivedAt" />
+        </div>
+
+        <PaymentTypeSelect @bind-Value="InputModel.PaymentType"
+                           Class="mt-4"/>
+
+        <div class="d-flex mt-8">
+            @if (IsSubmit)
+            {
+                <MudProgressCircular Color="Color.Info" Indeterminate="true"/>
+            }
+            else
+            {
+                <MudButton ButtonType="ButtonType.Submit"
+                           Variant="Variant.Filled"
+                           Color="Color.Primary">
+                    Salvar
+                </MudButton>
+            }
+        </div>
+    </EditForm>
+</MudPaper>

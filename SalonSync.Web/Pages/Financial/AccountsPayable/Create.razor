@@ -1,0 +1,100 @@
+@page "/accounts-payable/create"
+@inherits CreateAccountPayablePage
+
+<PageTitle>Salon Sync - Contas a Pagar</PageTitle>
+<MudText Typo="Typo.h3">Cadastrar Contas a Pagar</MudText>
+
+<MudPaper Class="pa-8 mt-4">
+    <EditForm Model="@InputModel" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator />
+        
+        <div class="d-flex align-items-center mt-2" style="width: 100%;">
+            <MudTextField Label="Fornecedor*"
+                          Variant="Variant.Outlined"
+                          Class="mr-4"
+                          @bind-Value="InputModel.SupplierName"
+                          For="@(() => InputModel.SupplierName)"
+                          MaxLength="255"/>
+
+            <DocumentMudTextField
+                @bind-Value="InputModel.SupplierDocument"/>
+        </div>
+
+        <MudTextField Label="Descrição*"
+                      Variant="Variant.Outlined"
+                      Lines="3"
+                      @bind-Value="InputModel.Description"
+                      For="@(() => InputModel.Description)"
+                      MaxLength="255"/>
+
+        <div class="d-flex align-items-center mt-2" style="width: 100%;">
+            <MudTextField T="decimal"
+                          Label="Valor*"
+                          Format="C"
+                          Variant="Variant.Outlined"
+                          Value="InputModel.Amount"
+                          ValueChanged="OnValueAmountChanged"
+                          For="@(() => InputModel.Amount)"/>
+
+            <MudDatePicker Label="Data do Vencimento*"
+                           Class="ml-4"
+                           Variant="Variant.Outlined"
+                           Date="InputModel.DueDate"
+                           DateChanged="OnValueDateChanged"/>
+        </div>
+
+        <MudCheckBox @bind-Value="IsInstallment" Label="Parcelamento?" />
+
+        <MudCollapse Expanded="@IsInstallment">
+            <MudText Typo="Typo.h6">Detalhes do Parcelamento</MudText>
+            <div class="d-flex align-items-center mt-2">
+                <MudTextField T="int"
+                              Label="Quantidade de Parcelas*"
+                              Variant="Variant.Outlined"
+                              @bind-Value="InstallmentCount"
+                              For="@(() => InstallmentCount)"
+                              Immediate="true"/>
+
+                <MudTextField T="int"
+                              Label="Intervalo entre Parcelas (dias)*"
+                              Variant="Variant.Outlined"
+                              Class="ml-4"
+                              @bind-Value="InstallmentInterval"
+                              For="@(() => InstallmentInterval)"
+                              Immediate="true"/>
+            </div>
+
+            <MudCheckBox @bind-Value="IsAmountPerInstallment"
+                         Label="Valor informado é o valor de cada parcela?"/>
+            
+            <MudTable Items="@InstallmentViewModels" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@IsLoadingInstallment" LoadingProgressColor="Color.Info">
+                <HeaderContent>
+                    <MudTh>#</MudTh>
+                    <MudTh>Vencimento</MudTh>
+                    <MudTh>Valor</MudTh>
+                </HeaderContent>
+                <RowTemplate Context="installment">
+                    <MudTd DataLabel="#">@installment.Number</MudTd>
+                    <MudTd DataLabel="Vencimento">@installment.DueDate.Value.ToShortDateString()</MudTd>
+                    <MudTd DataLabel="Valor">@installment.Amount.ToString("C")</MudTd>
+                </RowTemplate>
+
+            </MudTable>
+        </MudCollapse>
+        
+        <div class="d-flex mt-8">
+            @if (IsSubmit)
+            {
+            <MudProgressCircular Color="Color.Info" Indeterminate="true" />
+            }
+            else
+            {
+            <MudButton ButtonType="ButtonType.Submit"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary">
+                Salvar
+            </MudButton>
+            }
+        </div>
+    </EditForm>
+</MudPaper>
