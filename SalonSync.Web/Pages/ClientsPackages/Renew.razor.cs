@@ -24,6 +24,7 @@ public partial class Renew : ComponentBase
     [Inject] public IClientHandler ClientHandler { get; set; } = null!;
     [Inject] public IDialogService DialogService { get; set; } = null!;
     [Inject] public PaymentService PaymentService { get; set; } = null!;
+    [Inject] public ControlAppointmentsClientService AppointmentsClientService { get; set; } = null!;
     #endregion
 
     #region Properties
@@ -117,7 +118,6 @@ public partial class Renew : ComponentBase
             
             Snackbar.Add("Pacote renovado com sucesso!", Severity.Success);
             
-            
             var response = await DialogService.ShowMessageBox("Pagamento", "Deseja efetuar o lançamento no caixa?",
                 yesText: "SIM", noText: "NÃO");
 
@@ -133,6 +133,12 @@ public partial class Renew : ComponentBase
                     CenterType = ECostCenterType.Income
                 });
             }
+            
+            response = await DialogService.ShowMessageBox("Agendamento", "Deseja efetuar o agendamento do pacote do cliente?",
+                yesText: "SIM", noText: "NÃO");
+            
+            if (response is true)
+                await AppointmentsClientService.AutoScheduleClientPackage(result.Data);
             
             NavigationManager.NavigateTo("/clients-packages");
         }

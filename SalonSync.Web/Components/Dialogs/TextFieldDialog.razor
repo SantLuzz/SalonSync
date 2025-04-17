@@ -1,0 +1,53 @@
+<MudDialog OnKeyDown="OnKeyDownAsync">
+    <DialogContent>
+        <MudTextField Label="@FieldLabel"
+                      @bind-Value="Value"
+                      Adornment="Adornment.Start"
+                      Variant="Variant.Outlined"
+                      Lines="3"
+                      Class="mt-4"
+                      MaxLength="MaxLength"
+                      AdornmentIcon="@Icons.Material.Filled.TextSnippet" />
+        <MudText Typo="Typo.caption" Class="text-muted">Mínimo: @MinLength | Máximo: @MaxLength</MudText>
+    </DialogContent>
+
+    <DialogActions>
+        <MudButton StartIcon="@Icons.Material.Filled.Check" Color="Color.Primary" Variant="Variant.Filled" OnClick="Submit">Confirmar</MudButton>
+        <MudButton StartIcon="@Icons.Material.Filled.Close" Color="Color.Error" Variant="Variant.Filled" OnClick="Cancel">Cancelar</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public string FieldLabel { get; set; } = "Informe o texto desejado";
+    [Parameter] public string Value { get; set; } = string.Empty;
+    [Parameter] public int MinLength { get; set; } = 5;
+    [Parameter] public int MaxLength { get; set; } = 255;
+    [Parameter] public EventCallback<string> OnSubmit { get; set; }
+
+    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; }
+
+    private async Task OnKeyDownAsync(KeyboardEventArgs args)
+    {
+        switch (args.Key)
+        {
+            case "Enter":
+            case "NumpadEnter":
+                await Submit();
+                break;
+            case "Escape":
+                Cancel();
+                break;
+        }
+    }
+
+    private async Task Submit()
+    {
+        if (Value.Length >= MinLength && Value.Length <= MaxLength)
+        {
+            await OnSubmit.InvokeAsync(Value);
+            MudDialog.Close(DialogResult.Ok(Value));
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}

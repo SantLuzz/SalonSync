@@ -27,7 +27,7 @@ public class OpenAppointmentByEmployeeEndpoint : IEndpoint
 
         var result = await handler.OpenByEmployeeIdAsync(request);
         return result.IsSuccess
-            ? TypedResults.Created($"/open-result/{result.Data?.Id}",result.Data)
-            : TypedResults.BadRequest(result.Data);
+            ? TypedResults.Ok(result)
+            : TypedResults.BadRequest(result);
     }
 }

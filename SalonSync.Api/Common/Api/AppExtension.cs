@@ -1,8 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using SalonSync.Api.Data;
+using SalonSync.Api.Handlers.Licenses;
 using SalonSync.Api.Models;
 using SalonSync.Core;
+using SalonSync.Core.Handlers.Licences;
 using SalonSync.Core.Models.Entities;
+using SalonSync.Core.Requests.Licenses;
 
 namespace SalonSync.Api.Common.Api;
 
@@ -35,13 +39,14 @@ public static class AppExtension
     }
 
 
-    public static async void CreateSuperAdminAndRoles(this WebApplication app)
+    public static async Task CreateSuperAdminAndRolesAsync(this WebApplication app)
     {
         using var scope = app.Services.CreateScope();
         var services = scope.ServiceProvider;
         var roleManager = services.GetRequiredService<RoleManager<IdentityRole<long>>>();
         var userManager = services.GetRequiredService<UserManager<User>>();
         var context = services.GetRequiredService<AppDbContext>();
+        var licenseHandler = services.GetRequiredService<ILicenseHandler>();
 
         string[] roleNames =
         [
@@ -77,16 +82,26 @@ public static class AppExtension
                 await userManager.AddToRoleAsync(superAdmin, Configuration.SuperAdminRole);
             }
         }
-
-        var company = new Company
-        {
-            Name = "Admin",
-            Document = "",
-            Code = new Guid("41c8b055-a3c5-4907-86fc-103bc5f053da"),
-            UserId = email
-        };
         
-        await context.Companies.AddAsync(company);
-        await context.SaveChangesAsync();
+        var companyExists = await context.Companies.AnyAsync(c => c.UserId == email);
+        if (!companyExists)
+        {
+            var company = new Company
+            {
+                Name = "Admin",
+                Document = "",
+                Code = new Guid("41c8b055-a3c5-4907-86fc-103bc5f053da"),
+                UserId = email,
+            };
+        
+            await context.Companies.AddAsync(company);
+            await context.SaveChangesAsync();
+
+            await licenseHandler.UpdateAsync(new UpdateLicenseRequest
+            {
+                LicenseEndDate = DateTime.Now.AddYears(1),
+                UserId = email
+            });
+        }
     }
 }

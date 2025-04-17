@@ -1,0 +1,57 @@
+@page "/open-appointments"
+@inherits OpenAppointmentsPage
+
+<PageTitle>Salon Sync - Agendas</PageTitle>
+<MudText Typo="Typo.h3">Abrir Agenda</MudText>
+
+@if (IsStarted)
+{
+    <Skeleton />
+}
+else
+{
+    <MudPaper Class="pa-8 mt-4">
+    <EditForm Model="@InputModel" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator />
+
+        <MudSelect T="long"
+                   Variant="Variant.Outlined"
+                   Label="Profissional"
+                   AnchorOrigin="Origin.BottomLeft"
+                   @bind-Value="InputModel.EmployeeId">
+
+            @foreach (var employee in Employees)
+            {
+                <MudSelectItem T="long" Value="employee.Id">@employee.Name</MudSelectItem>
+            }
+        </MudSelect>
+        
+        <div class="d-flex align-items-center mt-2" style="width: 100%;">
+            <MudDatePicker Label="Data de Inicio*"
+                           Variant="Variant.Outlined"
+                           @bind-Date="InputModel.StartDate"
+                           MinDate="DateTime.Today"/>
+            
+            <MudDatePicker Label="Data de Encerramento*"
+                           Class="ml-4"
+                           Variant="Variant.Outlined"
+                           @bind-Date="InputModel.EndDate"/>
+        </div>
+        
+        <div class="d-flex mt-8">
+            @if (IsSubmit)
+            {
+            <MudProgressCircular Color="Color.Info" Indeterminate="true" />
+            }
+            else
+            {
+            <MudButton ButtonType="ButtonType.Submit"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary">
+                Salvar
+            </MudButton>
+            }
+        </div>
+    </EditForm>
+</MudPaper>
+}

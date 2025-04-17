@@ -1,4 +1,26 @@
 @page "/"
+@using SalonSync.Core.Handlers.Packages
+@using SalonSync.Core.Requests.ClientsPackages
+@using SalonSync.Web.Services
 
 <PageTitle>Salon Sync - Home</PageTitle>
 <MudText Typo="Typo.h3"><MudIcon Icon="@Icons.Material.Filled.Home"/> Home</MudText>
+
+<MudButton OnClick="TestarAutoAgendamento">Testar AutoAgendamento</MudButton>
+
+@code{
+    [Inject] public ControlAppointmentsClientService AppointmentsClientService { get; set; } = null!;
+    [Inject] public IClientPackageHandler ClientPackageHandler { get; set; } = null!;    
+
+    public async Task TestarAutoAgendamento()
+    {
+        var package = await ClientPackageHandler.GetByIdAsync(new GetClientPackageByIdRequest
+        {
+            Id = 2
+        });
+        
+        if(!package.IsSuccess) return;
+
+        await AppointmentsClientService.AutoScheduleClientPackage(package.Data);
+    }
+}

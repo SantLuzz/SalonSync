@@ -6,11 +6,31 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace SalonSync.Api.Migrations
 {
     /// <inheritdoc />
-    public partial class RecriationDataBase : Migration
+    public partial class initialCreation : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "AccountsPayable",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "NVARCHAR(160)", maxLength: 160, nullable: false),
+                    Description = table.Column<string>(type: "NVARCHAR(255)", maxLength: 255, nullable: true),
+                    SupplierName = table.Column<string>(type: "NVARCHAR(255)", maxLength: 255, nullable: false),
+                    SupplierDocument = table.Column<string>(type: "NVARCHAR(20)", maxLength: 20, nullable: true),
+                    Amount = table.Column<decimal>(type: "MONEY", nullable: false),
+                    DueDate = table.Column<DateTime>(type: "DATETIME2", nullable: false),
+                    PaymentDate = table.Column<DateTime>(type: "DATETIME2", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "DATETIME2", nullable: false, defaultValueSql: "GETDATE()")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AccountsPayable", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "AppointmentGroups",
                 columns: table => new
@@ -24,6 +44,31 @@ namespace SalonSync.Api.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AppointmentGroups", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AppointmentsCancellationsHistories",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "NVARCHAR(160)", maxLength: 160, nullable: false),
+                    AppointmentId = table.Column<long>(type: "bigint", nullable: false),
+                    Date = table.Column<DateTime>(type: "DATETIME2", nullable: false),
+                    StartTime = table.Column<TimeOnly>(type: "TIME", nullable: false),
+                    EndTime = table.Column<TimeOnly>(type: "TIME", nullable: false),
+                    Status = table.Column<short>(type: "SMALLINT", nullable: false, defaultValue: (short)3),
+                    ClientId = table.Column<long>(type: "bigint", nullable: true),
+                    EmployeeId = table.Column<long>(type: "bigint", nullable: false),
+                    ServiceId = table.Column<long>(type: "bigint", nullable: true),
+                    AppointmentGroupId = table.Column<long>(type: "bigint", nullable: true),
+                    CancellationReason = table.Column<string>(type: "NVARCHAR(max)", maxLength: -1, nullable: true),
+                    CanceledBy = table.Column<string>(type: "NVARCHAR(160)", maxLength: 160, nullable: false),
+                    CanceledAt = table.Column<DateTime>(type: "DATETIME2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AppointmentsCancellationsHistories", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -48,6 +93,26 @@ namespace SalonSync.Api.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Clients", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Companies",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "NVARCHAR(160)", maxLength: 160, nullable: false),
+                    Document = table.Column<string>(type: "NVARCHAR(20)", maxLength: 20, nullable: true),
+                    Phone = table.Column<string>(type: "NVARCHAR(20)", maxLength: 20, nullable: true),
+                    UserId = table.Column<string>(type: "NVARCHAR(160)", maxLength: 160, nullable: false),
+                    Code = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "DATETIME2", nullable: false, defaultValueSql: "GETDATE()"),
+                    UpdatedAt = table.Column<DateTime>(type: "DATETIME2", nullable: true),
+                    LicenseEndDate = table.Column<string>(type: "NVARCHAR(max)", maxLength: -1, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Companies", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -85,7 +150,8 @@ namespace SalonSync.Api.Migrations
                     EndTime = table.Column<TimeOnly>(type: "TIME", nullable: true),
                     LunchStart = table.Column<TimeOnly>(type: "TIME", nullable: true),
                     LunchEnd = table.Column<TimeOnly>(type: "TIME", nullable: true),
-                    UserId = table.Column<string>(type: "NVARCHAR(160)", maxLength: 160, nullable: false)
+                    UserId = table.Column<string>(type: "NVARCHAR(160)", maxLength: 160, nullable: false),
+                    UniqueCode = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -177,7 +243,8 @@ namespace SalonSync.Api.Migrations
                     Thursday = table.Column<bool>(type: "bit", nullable: false),
                     Friday = table.Column<bool>(type: "bit", nullable: false),
                     Saturday = table.Column<bool>(type: "bit", nullable: false),
-                    Sunday = table.Column<bool>(type: "bit", nullable: false)
+                    Sunday = table.Column<bool>(type: "bit", nullable: false),
+                    OpenScheduleAutomatically = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -195,6 +262,9 @@ namespace SalonSync.Api.Migrations
                     CreatedAt = table.Column<DateTime>(type: "DATETIME2", nullable: false, defaultValueSql: "GETDATE()"),
                     PaidOrReceivedAt = table.Column<DateTime>(type: "DATETIME2", nullable: true),
                     Amount = table.Column<decimal>(type: "MONEY", nullable: false),
+                    EntityId = table.Column<long>(type: "BIGINT", nullable: false, defaultValue: 0L),
+                    EntityType = table.Column<short>(type: "SMALLINT", nullable: false, defaultValue: (short)0),
+                    PaymentType = table.Column<short>(type: "SMALLINT", nullable: false, defaultValue: (short)0),
                     CostCenterId = table.Column<long>(type: "BIGINT", nullable: false)
                 },
                 constraints: table =>
@@ -340,6 +410,48 @@ namespace SalonSync.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Appointments",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "NVARCHAR(160)", maxLength: 160, nullable: false),
+                    Date = table.Column<DateTime>(type: "DATETIME2", nullable: false),
+                    StartTime = table.Column<TimeOnly>(type: "TIME", nullable: false),
+                    EndTime = table.Column<TimeOnly>(type: "TIME", nullable: false),
+                    Status = table.Column<short>(type: "SMALLINT", nullable: false, defaultValue: (short)1),
+                    ClientId = table.Column<long>(type: "bigint", nullable: true),
+                    EmployeeId = table.Column<long>(type: "bigint", nullable: false),
+                    ServiceId = table.Column<long>(type: "bigint", nullable: true),
+                    AppointmentGroupId = table.Column<long>(type: "bigint", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Appointments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Appointments_AppointmentGroups_AppointmentGroupId",
+                        column: x => x.AppointmentGroupId,
+                        principalTable: "AppointmentGroups",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Appointments_Clients_ClientId",
+                        column: x => x.ClientId,
+                        principalTable: "Clients",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Appointments_Employees_EmployeeId",
+                        column: x => x.EmployeeId,
+                        principalTable: "Employees",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Appointments_Services_ServiceId",
+                        column: x => x.ServiceId,
+                        principalTable: "Services",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "PackageServices",
                 columns: table => new
                 {
@@ -359,75 +471,12 @@ namespace SalonSync.Api.Migrations
                         principalTable: "Packages",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Appointments",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<string>(type: "NVARCHAR(160)", maxLength: 160, nullable: false),
-                    Date = table.Column<DateTime>(type: "DATETIME2", nullable: false),
-                    StartTime = table.Column<TimeOnly>(type: "TIME", nullable: false),
-                    EndTime = table.Column<TimeOnly>(type: "TIME", nullable: false),
-                    Status = table.Column<short>(type: "SMALLINT", nullable: false, defaultValue: (short)1),
-                    ClientId = table.Column<long>(type: "bigint", nullable: true),
-                    EmployeeId = table.Column<long>(type: "bigint", nullable: false),
-                    ServiceId = table.Column<long>(type: "bigint", nullable: true),
-                    AppointmentGroupId = table.Column<long>(type: "bigint", nullable: true),
-                    ClientId1 = table.Column<long>(type: "bigint", nullable: true),
-                    EmployeeId1 = table.Column<long>(type: "bigint", nullable: true),
-                    ServiceId1 = table.Column<long>(type: "bigint", nullable: true),
-                    AppointmentGroupId1 = table.Column<long>(type: "bigint", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Appointments", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Appointments_AppointmentGroups_AppointmentGroupId",
-                        column: x => x.AppointmentGroupId,
-                        principalTable: "AppointmentGroups",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Appointments_AppointmentGroups_AppointmentGroupId1",
-                        column: x => x.AppointmentGroupId1,
-                        principalTable: "AppointmentGroups",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Appointments_Clients_ClientId",
-                        column: x => x.ClientId,
-                        principalTable: "Clients",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Appointments_Clients_ClientId1",
-                        column: x => x.ClientId1,
-                        principalTable: "Clients",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Appointments_Employees_EmployeeId",
-                        column: x => x.EmployeeId,
-                        principalTable: "Employees",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Appointments_Employees_EmployeeId1",
-                        column: x => x.EmployeeId1,
-                        principalTable: "Employees",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Appointments_Services_ServiceId",
+                        name: "FK_PackageServices_Services_ServiceId",
                         column: x => x.ServiceId,
                         principalTable: "Services",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Appointments_Services_ServiceId1",
-                        column: x => x.ServiceId1,
-                        principalTable: "Services",
-                        principalColumn: "Id");
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -444,12 +493,6 @@ namespace SalonSync.Api.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ClientsPackagesAppointments", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ClientsPackagesAppointments_Appointments_AppointmentId",
-                        column: x => x.AppointmentId,
-                        principalTable: "Appointments",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_ClientsPackagesAppointments_ClientsPackages_ClientPackageId",
                         column: x => x.ClientPackageId,
@@ -469,19 +512,9 @@ namespace SalonSync.Api.Migrations
                 column: "AppointmentGroupId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Appointments_AppointmentGroupId1",
-                table: "Appointments",
-                column: "AppointmentGroupId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Appointments_ClientId",
                 table: "Appointments",
                 column: "ClientId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Appointments_ClientId1",
-                table: "Appointments",
-                column: "ClientId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Appointments_EmployeeId",
@@ -489,19 +522,9 @@ namespace SalonSync.Api.Migrations
                 column: "EmployeeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Appointments_EmployeeId1",
-                table: "Appointments",
-                column: "EmployeeId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Appointments_ServiceId",
                 table: "Appointments",
                 column: "ServiceId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Appointments_ServiceId1",
-                table: "Appointments",
-                column: "ServiceId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ClientsPackages_ClientId",
@@ -514,11 +537,6 @@ namespace SalonSync.Api.Migrations
                 column: "PackageId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ClientsPackagesAppointments_AppointmentId",
-                table: "ClientsPackagesAppointments",
-                column: "AppointmentId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ClientsPackagesAppointments_ClientId",
                 table: "ClientsPackagesAppointments",
                 column: "ClientId");
@@ -527,6 +545,12 @@ namespace SalonSync.Api.Migrations
                 name: "IX_ClientsPackagesAppointments_ClientPackageId",
                 table: "ClientsPackagesAppointments",
                 column: "ClientPackageId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Companies_UserId",
+                table: "Companies",
+                column: "UserId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_IdentityClaim_UserId",
@@ -575,6 +599,11 @@ namespace SalonSync.Api.Migrations
                 column: "PackageId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_PackageServices_ServiceId",
+                table: "PackageServices",
+                column: "ServiceId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Transactions_CostCenterId",
                 table: "Transactions",
                 column: "CostCenterId");
@@ -584,7 +613,19 @@ namespace SalonSync.Api.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "AccountsPayable");
+
+            migrationBuilder.DropTable(
+                name: "Appointments");
+
+            migrationBuilder.DropTable(
+                name: "AppointmentsCancellationsHistories");
+
+            migrationBuilder.DropTable(
                 name: "ClientsPackagesAppointments");
+
+            migrationBuilder.DropTable(
+                name: "Companies");
 
             migrationBuilder.DropTable(
                 name: "IdentityClaim");
@@ -614,7 +655,10 @@ namespace SalonSync.Api.Migrations
                 name: "Transactions");
 
             migrationBuilder.DropTable(
-                name: "Appointments");
+                name: "AppointmentGroups");
+
+            migrationBuilder.DropTable(
+                name: "Employees");
 
             migrationBuilder.DropTable(
                 name: "ClientsPackages");
@@ -623,16 +667,10 @@ namespace SalonSync.Api.Migrations
                 name: "IdentityUser");
 
             migrationBuilder.DropTable(
-                name: "CostCenters");
-
-            migrationBuilder.DropTable(
-                name: "AppointmentGroups");
-
-            migrationBuilder.DropTable(
-                name: "Employees");
-
-            migrationBuilder.DropTable(
                 name: "Services");
+
+            migrationBuilder.DropTable(
+                name: "CostCenters");
 
             migrationBuilder.DropTable(
                 name: "Clients");

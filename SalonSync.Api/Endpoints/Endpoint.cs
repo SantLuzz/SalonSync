@@ -138,7 +138,8 @@ public static class Endpoint
             .MapEndpoints<UpdateServiceEndpoint>()
             .MapEndpoints<DeleteServiceEndpoint>()
             .MapEndpoints<GetServiceByIdEndpoint>()
-            .MapEndpoints<GetAllServicesEndpoint>();
+            .MapEndpoints<GetAllServicesEndpoint>()
+            .MapEndpoints<GetServicesByPackageIdEndpoint>();
 
         endpoint.MapGroup("v1/packages")
             .WithTags("Packages")
@@ -168,7 +169,8 @@ public static class Endpoint
             .MapEndpoints<GetActiveClientPackageEndpoint>()
             .MapEndpoints<GetAllPackagesByClientIdEndpoint>()
             .MapEndpoints<InactiveClientIsActivePackageEndpoint>()
-            .MapEndpoints<GetClientsPackagesByPackageIdEndpoint>();
+            .MapEndpoints<GetClientsPackagesByPackageIdEndpoint>()
+            .MapEndpoints<ReportSessionUsedByClientEndpoint>();
 
         endpoint.MapGroup("v1/appointments")
             .WithTags("Appointments")
@@ -180,7 +182,8 @@ public static class Endpoint
             .MapEndpoints<GetAvailableHoursByEmployeeIdEndpoint>()
             .MapEndpoints<GetAppointmentByEmployeeEndpoint>()
             .MapEndpoints<FinishScheudullingEndpoint>()
-            .MapEndpoints<CancelScheudullingEndpoint>();
+            .MapEndpoints<CancelScheudullingEndpoint>()
+            .MapEndpoints<GenerateAutoScheduleEndpoint>();
 
         endpoint.MapGroup("v1/schedules")
             .WithTags("Schedules")

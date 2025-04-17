@@ -3,7 +3,7 @@ using MudBlazor;
 using SalonSync.Core.DTOs;
 using SalonSync.Core.Handlers.Licences;
 using SalonSync.Core.Requests.Licenses;
-using SalonSync.Web.Components;
+using SalonSync.Web.Components.Dialogs;
 
 namespace SalonSync.Web.Pages.Licenses;
 

@@ -15,4 +15,7 @@ public enum EEntityType
     
     [Description("Contas a Pagar")]
     AccountPayable = 3,
+    
+    [Description("Agendamentos")]
+    Appointments = 4,
 }

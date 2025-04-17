@@ -34,7 +34,12 @@ public class ServiceHandler(IHttpClientFactory httpClientFactory) : IServiceHand
         => await _httpClient.GetFromJsonAsync<Response<Service?>>($"v1/services/{request.Id}")
            ?? new Response<Service?>(null, 404, "Serviço não encontrado!");
 
+    public async Task<PagedResponse<List<Service>?>> GetByPackageIdAsync(GetServicesByPackageIdRequest request)
+        => await _httpClient.GetFromJsonAsync<PagedResponse<List<Service>?>>(
+               $"v1/services/package/{request.PackageId}")
+           ?? new PagedResponse<List<Service>?>(null, 404, "Serviços não encontrados!");
+
     public async Task<PagedResponse<List<Service>?>> GetAllAsync(GetAllServicesRequest request)
         => await _httpClient.GetFromJsonAsync<PagedResponse<List<Service>?>>($"/v1/services")
-           ?? new PagedResponse<List<Service>?>(null, 404, "Serviço não encontrado!");
+           ?? new PagedResponse<List<Service>?>(null, 404, "Serviços não encontrado!");
 }

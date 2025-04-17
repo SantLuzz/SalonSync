@@ -2,7 +2,7 @@ using MudBlazor;
 using SalonSync.Core.Handlers.Financial;
 using SalonSync.Core.Models.Financial;
 using SalonSync.Core.Requests.Financial.Transactions;
-using SalonSync.Web.Components;
+using SalonSync.Web.Components.Dialogs;
 using SalonSync.Web.ViewModels;
 
 namespace SalonSync.Web.Services;

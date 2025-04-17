@@ -1,0 +1,21 @@
+@page "/in-development"
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="d-flex flex-column align-center justify-center mt-12 text-center">
+    <MudIcon Icon="@Icons.Material.Filled.Construction" Size="Size.Large" Color="Color.Warning" Class="mb-4" />
+    <MudText Typo="Typo.h4" Class="mb-2">Recurso em Desenvolvimento</MudText>
+    <MudText Typo="Typo.subtitle1" Class="mb-6">
+        Estamos trabalhando para trazer essa funcionalidade em breve. Fique ligado!
+    </MudText>
+    <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="@Voltar">
+        Voltar
+    </MudButton>
+</MudContainer>
+
+@code {
+    void Voltar()
+    {
+        Navigation.NavigateTo("/");
+    }
+
+    [Inject] NavigationManager Navigation { get; set; } = null!;
+}

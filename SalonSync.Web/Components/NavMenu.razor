@@ -11,21 +11,30 @@
         @if (context.User.IsInRole(Configuration.CompanyUserRole) 
              || context.User.IsInRole(Configuration.SuperAdminRole))
         {
-            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Schedule" >Agenda</MudNavLink>
-            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Schedule" >Agenda de Senhas</MudNavLink>
+            <MudNavGroup Title="Agendamentos" Icon="@Icons.Material.Filled.Schedule" Expanded="true">
+                <MudNavLink Href="/open-appointments" Match="NavLinkMatch.All">Abrir Agenda dos Profissionais</MudNavLink>
+                <MudNavLink Href="/appointments" Match="NavLinkMatch.All">Agenda</MudNavLink>
+                <MudNavLink Href="/in-development" Match="NavLinkMatch.All">Agenda de Senhas</MudNavLink>
+            </MudNavGroup>
+            
             <MudNavLink Href="/transactions" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.RequestPage" >Caixa</MudNavLink>
             <MudNavLink Href="/cost-centers" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.BusinessCenter" >Centro de Custo</MudNavLink>
             <MudNavLink Href="/clients" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Person">Clientes</MudNavLink>
             <MudNavLink Href="/accounts-payable" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.AccountBalance">Contas a Pagar</MudNavLink>
             <MudNavLink Href="/company" Match="NavLinkMatch.All" Icon="@Icons.Material.Rounded.Business">Empresa Usuária</MudNavLink>
-            <MudNavLink Href="/employees" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Person" >Funcionários</MudNavLink>
+            <MudNavGroup Title="Equipe" Icon="@Icons.Material.Filled.Receipt" Expanded="true">
+                <MudNavLink Href="/in-development" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.MonetizationOn">Comissão</MudNavLink>
+                <MudNavLink Href="/employees" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.ManageAccounts">Gestão de Profissionais</MudNavLink>
+            </MudNavGroup>
             <MudNavLink Href="/packages" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.ShoppingBag" >Pacotes</MudNavLink>
             <MudNavLink Href="/clients-packages" Icon="@Icons.Material.Filled.ShoppingBag">Pacotes dos Clientes</MudNavLink>
             <MudNavLink Href="/services" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.ShoppingBag" >Serviços</MudNavLink>
             <MudNavGroup Title="Relatórios" Icon="@Icons.Material.Filled.Receipt" Expanded="false">
-                <MudNavLink Href="/" Match="NavLinkMatch.All">Mov. por Centro de Custo</MudNavLink>
-                <MudNavLink Href="/" Match="NavLinkMatch.All">Mov. Sintético</MudNavLink>
-                <MudNavLink Href="/" Match="NavLinkMatch.All">Mov. Analítico</MudNavLink>
+                <MudNavLink Href="/in-development" Match="NavLinkMatch.All">Comissão por Profissional</MudNavLink>
+                <MudNavLink Href="/in-development" Match="NavLinkMatch.All">Histórico de Cancelamentos</MudNavLink>
+                <MudNavLink Href="/in-development" Match="NavLinkMatch.All">Mov. por Centro de Custo</MudNavLink>
+                <MudNavLink Href="/in-development" Match="NavLinkMatch.All">Mov. Sintético</MudNavLink>
+                <MudNavLink Href="/in-development" Match="NavLinkMatch.All">Mov. Analítico</MudNavLink>
             </MudNavGroup>
             
         }

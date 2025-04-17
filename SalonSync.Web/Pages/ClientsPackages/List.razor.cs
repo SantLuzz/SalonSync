@@ -1,12 +1,9 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using SalonSync.Core.DTOs;
-using SalonSync.Core.Handlers.Financial;
 using SalonSync.Core.Handlers.Packages;
 using SalonSync.Core.Requests.ClientsPackages;
-using SalonSync.Core.Requests.Entities.Clients;
 using SalonSync.Core.Requests.Packages;
-using SalonSync.Web.Common;
 
 namespace SalonSync.Web.Pages.ClientsPackages;
 

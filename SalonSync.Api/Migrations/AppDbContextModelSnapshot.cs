@@ -418,8 +418,6 @@ namespace SalonSync.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AppointmentId");
-
                     b.HasIndex("ClientId");
 
                     b.HasIndex("ClientPackageId");
@@ -1045,12 +1043,6 @@ namespace SalonSync.Api.Migrations
 
             modelBuilder.Entity("SalonSync.Core.Models.Appointments.ClientPackageAppointment", b =>
                 {
-                    b.HasOne("SalonSync.Core.Models.Appointments.Appointment", "Appointment")
-                        .WithMany()
-                        .HasForeignKey("AppointmentId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("SalonSync.Core.Models.Entities.Client", null)
                         .WithMany("Historic")
                         .HasForeignKey("ClientId");
@@ -1060,8 +1052,6 @@ namespace SalonSync.Api.Migrations
                         .HasForeignKey("ClientPackageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Appointment");
 
                     b.Navigation("ClientPackages");
                 });

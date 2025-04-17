@@ -21,4 +21,9 @@ public class Client
     public string UserId { get; set; } = string.Empty;
     public List<ClientPackage> ClientPackages { get; set; } = [];
     public List<ClientPackageAppointment>? Historic { get; set; } = [];
+
+    public override string ToString()
+    {
+        return Name;
+    }
 }

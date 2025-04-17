@@ -1,0 +1,171 @@
+@page "/appointments"
+@using SalonSync.Core.Models.Entities
+@inherits ListAppointmentsPage
+
+<PageTitle>Salon Sync - Agendamentos</PageTitle>
+<MudText Typo="Typo.h3">Agendamentos do Dia: @Date.Value.ToString("dd/MM/yyyy")</MudText>
+
+@if (IsStarted)
+{
+<Skeleton/>
+}
+else
+{
+<div class="d-flex justify-end mt-4 mb-4">
+    <MudDatePicker Label="Data da Agenda"
+                   Variant="Variant.Outlined"
+                   @bind-Date="Date" />
+
+    <MudSelect T="Employee"
+               Variant="Variant.Outlined"
+               Label="Profissional"
+               Class="ml-4"
+               AnchorOrigin="Origin.BottomLeft"
+               @bind-Value="Employee">
+        
+        @foreach (var employee in Employees)
+        {
+            <MudSelectItem T="Employee" Value="employee">@employee.Name</MudSelectItem>    
+        }
+    </MudSelect>
+    
+    <MudButton StartIcon="@Icons.Material.Filled.Refresh"
+               Class="ml-2"
+               Color="Color.Primary"
+               OnClick="OnSearchAsync"
+               aria-label="Recarregar Agendamentos"
+               Variant="Variant.Filled">
+        Buscar
+    </MudButton>
+    <MudSpacer />
+    
+    <MudButton
+        Variant="Variant.Filled"
+        Color="Color.Primary"
+        Class="ml-4"
+        StartIcon="@Icons.Material.Filled.Add"
+        OnClick="CreateNewAppointment">
+        NOVO AGENDAMENTO
+    </MudButton>
+</div>
+
+<MudDataGrid
+    Class="mt-4"
+    Style="min-width: 800px; width: 100%;"
+    Items="@Appointments"
+    Filterable="false"
+    Hideable="true">
+
+    <Columns>
+        <PropertyColumn Property="x => x.Id" Title="#" Sortable="false" HeaderStyle="width: 30px;"   />
+        <PropertyColumn Property="x => x.StartTime" Title="Hora Inicial" Sortable="false" HeaderStyle="width: 90px;" />
+        <PropertyColumn Property="x => x.EndTime" Title="Hora Final" Sortable="false" HeaderStyle="width: 90px;" />
+        <TemplateColumn HeaderStyle="width: 150px;">
+            <HeaderTemplate>Status</HeaderTemplate>
+            <CellTemplate>
+                @switch (context.Item.Status)
+                {
+                    case EAppointmentStatus.Free:
+                        <MudChip Color="Color.Success">Disponível</MudChip>
+                        break;
+                    case EAppointmentStatus.Scheduled:
+                        <MudChip Color="Color.Info">Agendado</MudChip>
+                        break;
+                    case EAppointmentStatus.Completed:
+                        <MudChip Color="Color.Primary">Concluído</MudChip>
+                        break;
+                    case EAppointmentStatus.Cancelled:
+                        <MudChip Color="Color.Error">Cancelado</MudChip>
+                        break;
+                    default:
+                        <MudChip Color="Color.Default">Desconhecido</MudChip>
+                        break;
+                }
+               
+            </CellTemplate>
+        </TemplateColumn>
+
+        <TemplateColumn CellStyle="width: 220px;">
+            <HeaderTemplate>Cliente</HeaderTemplate>
+            <CellTemplate>
+                @if (context.Item.Client is not null)
+                {
+                    @($"({@context.Item.Client.Id}) {@context.Item.Client.Name}")
+                }
+                
+            </CellTemplate>
+        </TemplateColumn>
+
+        <TemplateColumn CellStyle="width: 120px;">
+            <HeaderTemplate>Tipo de Cliente</HeaderTemplate>
+            <CellTemplate>
+                @if (context.Item.Client is not null)
+                {
+                    EClientType clientType = context.Item.Client.GetEnum<EClientType>();
+                    if (clientType == EClientType.Common)
+                    {
+                        <MudChip Color="Color.Info">@clientType.GetDescription()</MudChip>
+                    }
+                    else
+                    {
+                        <MudChip Color="Color.Success">@clientType.GetDescription()</MudChip>
+                    }
+                }
+
+            </CellTemplate>
+        </TemplateColumn>
+
+        <TemplateColumn CellStyle="width: 190px;">
+            <HeaderTemplate>Serviço</HeaderTemplate>
+            <CellTemplate>
+                @if (context.Item.Service is not null)
+                {
+                    @($"{context.Item.Service.Name} ({context.Item.Service.Duration} min)")
+                }
+                
+            </CellTemplate>
+        </TemplateColumn>
+        
+        <PropertyColumn Property="x => x.Service != null && (x.Client != null && x.Client.GetEnum<EClientType>() == EClientType.Common) ? x.Service.Price : 0" Format="C"
+                        Title="Valor do Serviço" Sortable="false" CellStyle="width: 120px;">
+            <FooterTemplate>
+                @context.Items.Where(x => x.Service != null && (x.Client != null && x.Client.GetEnum<EClientType>() == EClientType.Common)).Sum(x => x.Service.Price).ToString("C")
+            </FooterTemplate>
+        </PropertyColumn>
+        
+        <TemplateColumn CellStyle="width: 220px;" Class="d-flex justify-end align-end">
+            <HeaderTemplate>
+                Ações
+            </HeaderTemplate>
+            <CellTemplate>
+                <MudStack Row>
+                    @{
+                        var isScheduled = context.Item.Status == EAppointmentStatus.Scheduled;
+                    }
+                    <MudButton StartIcon="@Icons.Material.Filled.Check"
+                               Color="Color.Success"
+                               Variant="Variant.Filled"
+                               aria-label="Finalizar"
+                               Disabled="!isScheduled"
+                               Size="Size.Small"
+                               Class="mud-typography-body2"
+                               OnClick="() => OnCloseAppointment(context.Item)">
+                        Finalizar
+                    </MudButton>
+
+                    <MudButton StartIcon="@Icons.Material.Filled.Cancel"
+                               Color="Color.Error"
+                               Variant="Variant.Filled"
+                               aria-label="Cancelar"
+                               Class="ml-2 mud-typography-body2"
+                               Disabled="!isScheduled"
+                               Size="Size.Small"
+                               OnClick="() => OnDeleteButtonClickedAsync(context.Item)">
+                        Cancelar
+                    </MudButton>
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+</MudDataGrid>
+}
