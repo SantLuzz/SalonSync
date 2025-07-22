@@ -681,6 +681,33 @@ namespace SalonSync.Api.Migrations
                     b.ToTable("AccountsPayable", (string)null);
                 });
 
+            modelBuilder.Entity("SalonSync.Core.Models.Financial.Commission", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<long?>("AppointmentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppointmentId");
+
+                    b.ToTable("Commissions", (string)null);
+                });
+
             modelBuilder.Entity("SalonSync.Core.Models.Financial.CostCenter", b =>
                 {
                     b.Property<long>("Id")
@@ -1054,6 +1081,15 @@ namespace SalonSync.Api.Migrations
                         .IsRequired();
 
                     b.Navigation("ClientPackages");
+                });
+
+            modelBuilder.Entity("SalonSync.Core.Models.Financial.Commission", b =>
+                {
+                    b.HasOne("SalonSync.Core.Models.Appointments.Appointment", "Appointment")
+                        .WithMany()
+                        .HasForeignKey("AppointmentId");
+
+                    b.Navigation("Appointment");
                 });
 
             modelBuilder.Entity("SalonSync.Core.Models.Financial.Transaction", b =>

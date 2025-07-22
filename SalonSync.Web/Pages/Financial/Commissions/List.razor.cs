@@ -110,6 +110,12 @@ namespace SalonSync.Web.Pages.Financial.Commissions
                     CenterType = ECostCenterType.Expense
                 });
 
+                if(payment is null || payment?.Id == 0)
+                {
+                    Snackbar.Add("Pagamento cancelado!", Severity.Warning);
+                    return;
+                }
+
                 var result = await Handler.CreateAsync(new CreateCommissionRequest
                 {
                     EmployeeId = unpaidCommission.EmployeeId,

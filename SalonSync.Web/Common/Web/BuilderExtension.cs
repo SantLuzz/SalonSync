@@ -74,6 +74,7 @@ public static class BuilderExtension
         builder.Services.AddTransient<ITransactionHandler, TransactionHandler>();
         builder.Services.AddTransient<IAccountPayableHandler, AccountPayableHandler>();
         builder.Services.AddTransient<IAppointmentHandler, AppointmentHandler>();
+        builder.Services.AddTransient<ICommissionHandler, CommissionHandler>();
     }
 
     public static void AddLocalization(this WebAssemblyHostBuilder builder)

@@ -50,7 +50,8 @@ public class CommissionHandler(AppDbContext context) : ICommissionHandler
                 SUM(tr.Amount) AS Total,
                 app.EmployeeId,
                 ep.Name,
-                ep.Commission
+                ep.Commission,
+                0.00 AS TotalPayable
             FROM Transactions AS tr
             INNER JOIN Appointments AS app ON tr.EntityId = app.Id
             INNER JOIN Employees AS ep ON app.EmployeeId = ep.Id
@@ -58,10 +59,10 @@ public class CommissionHandler(AppDbContext context) : ICommissionHandler
             GROUP BY app.EmployeeId, ep.Name, ep.Commission";
 
             var transactions = await context
-                .Set<UnpaidCommissionDto>()
-                .FromSqlRaw(sql)
+                .Database
+                .SqlQueryRaw<UnpaidCommissionDto>(sql)
                 .ToListAsync();
-            
+
             var commissions = await context
                 .Commissions
                 .AsNoTracking()

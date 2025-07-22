@@ -31,9 +31,9 @@ else
     <Columns>
         <PropertyColumn Property="x => x.EmployeeId" Title="#" />
         <PropertyColumn Property="x => x.Name" Title="Profissíonal" />
-        <PropertyColumn Property="x => x.Commission" Title="(%)" />
-        <PropertyColumn Property="x => x.Total" Title="Total Entrada" />
-        <PropertyColumn Property="x => x.TotalPayable" Title="Valor Pagável" />
+        <PropertyColumn Property="x => x.Commission" Title="(%)" Format="N2"/>
+        <PropertyColumn Property="x => x.Total" Title="Total Entrada" Format="C" />
+        <PropertyColumn Property="x => x.TotalPayable" Title="Valor Pagável" Format="C" />
         
         <TemplateColumn Class="">
             <HeaderTemplate>
