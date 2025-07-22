@@ -27,7 +27,7 @@ public class GetBirthdaysOfWeekEndpoint : IEndpoint
         
         var result = await handler.GetBirthdaysOfWeek(request);
         return result.IsSuccess
-            ? TypedResults.Ok(result.Data)
-            : TypedResults.NotFound(result.Data);
+            ? TypedResults.Ok(result)
+            : TypedResults.NotFound(result);
     }
 }

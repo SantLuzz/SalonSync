@@ -27,7 +27,7 @@ public class UpdateImageClientEndpoint : IEndpoint
         
         var result = await handler.UpdateImageAsync(request);
         return result.IsSuccess
-            ? TypedResults.Ok(result.Data)
-            : TypedResults.NotFound(result.Data);
+            ? TypedResults.Ok(result)
+            : TypedResults.NotFound(result);
     }
 }

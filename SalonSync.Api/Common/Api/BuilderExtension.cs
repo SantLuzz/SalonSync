@@ -120,6 +120,7 @@ public static class BuilderExtension
         builder.Services.AddTransient<ISystemConfigHandler, SystemConfigHandler>();
         builder.Services.AddTransient<ICostCenterHandler, CostCenterHandler>();
         builder.Services.AddTransient<ITransactionHandler, TransactionHandler>();
+        builder.Services.AddTransient<IAccountPayableHandler, AccountPayableHandler>();
         builder.Services.AddTransient<IClientHandler, ClientHandler>();
         builder.Services.AddTransient<IEmployeeHandler, EmployeeHandler>();
         builder.Services.AddTransient<ICompanyHandler, CompanyHandler>();
@@ -128,6 +129,7 @@ public static class BuilderExtension
         builder.Services.AddTransient<IPackageServiceHandler, PackageServiceHandler>();
         builder.Services.AddTransient<IClientPackageHandler, ClientPackageHandler>();
         builder.Services.AddTransient<IAppointmentHandler, AppointmentHandler>();
+        builder.Services.AddTransient<ICommissionHandler, CommissionHandler>();
     }
 
     public static void AddCrossOrigin(this WebApplicationBuilder builder)

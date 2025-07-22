@@ -8,8 +8,8 @@ public class OpenAppointmentByEmployeeRequest : Request
     public long EmployeeId { get; set; }
 
     [Required(ErrorMessage = "Informe a data Inicial da agenda!")]
-    public DateTime StartDate { get; set; }
+    public DateTime? StartDate { get; set; } = null!;
     
     [Required(ErrorMessage = "Informe a data Final da agenda!")]
-    public DateTime EndDate { get; set; }
+    public DateTime? EndDate { get; set; }= null!;
 }

@@ -1,11 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using SalonSync.Api.Data;
+using SalonSync.Api.Handlers.Packages;
 using SalonSync.Api.ViewModels;
 using SalonSync.Core.DTOs;
 using SalonSync.Core.Enums;
 using SalonSync.Core.Handlers.Appointments;
 using SalonSync.Core.Models.Appointments;
 using SalonSync.Core.Requests.Appointments;
+using SalonSync.Core.Requests.ClientsPackages;
 using SalonSync.Core.Responses;
 
 namespace SalonSync.Api.Handlers.Appointments;
@@ -13,6 +15,8 @@ namespace SalonSync.Api.Handlers.Appointments;
 public class AppointmentHandler(AppDbContext context) : IAppointmentHandler
 {
     private readonly SystemConfigHandler _systemConfigHandler = new (context);
+    private readonly ClientPackageAppointmentHandler _clientPackageAppointmentHandler = new(context);
+    private readonly ClientPackageHandler _clientPackageHandler = new(context);
     private string _userId = string.Empty;
     
     public async Task<Response<AppointmentCreatedDto?>> CreateAsync(GenerateScheduleWithEmployeeRequest request)
@@ -72,6 +76,7 @@ public class AppointmentHandler(AppDbContext context) : IAppointmentHandler
                 await context.SaveChangesAsync();
             }
             
+            
             foreach (var appointment in appointments)
             {
                 appointment.ClientId = request.ClientId;
@@ -94,6 +99,25 @@ public class AppointmentHandler(AppDbContext context) : IAppointmentHandler
                 }
                 return new Response<AppointmentCreatedDto?>(null, 500, "(SSA006) Não foi reservar os horários!");
             }
+
+            ClientPackageAppointment? clientPackageAppointment = null;
+            if (client.Type == EClientType.Monthly)
+            {
+                //verificando se possui pacote ativo
+                var clientPackage = await _clientPackageAppointmentHandler.GetActivePackageByClient(request.ClientId, request.UserId);
+
+                if (clientPackage is not null)
+                {
+                    long appointmentId = appointments
+                        .OrderBy(x => x.Id)
+                        .FirstOrDefault()?.Id ?? 0;
+
+                    clientPackageAppointment =
+                        await _clientPackageAppointmentHandler.CreateAsync(clientPackage.Id, appointmentId,
+                            request.UserId);
+                }
+            }
+            
             
             AppointmentCreatedDto appointmentCreatedDto = new ()
             {
@@ -120,7 +144,9 @@ public class AppointmentHandler(AppDbContext context) : IAppointmentHandler
                         ClientId = x.ClientId,
                         EmployeeId = x.EmployeeId,
                         ServiceId = x.ServiceId,
+                        Service = service,
                         AppointmentGroupId = x.AppointmentGroupId,
+                        ClientPackageAppointments = clientPackageAppointment
                     }).ToList()
             };
             
@@ -129,6 +155,33 @@ public class AppointmentHandler(AppDbContext context) : IAppointmentHandler
         catch (Exception)
         {
             return new Response<AppointmentCreatedDto?>(null, 500, "(SSA005) Não foi possível criar o agendamento!");
+        }
+    }
+
+    public async Task<Response<List<AppointmentCreatedDto>?>> CreateAsync(GenerateAutoScheduleRequest request)
+    {
+        try
+        {
+            if (!request.Schedules.Any())
+                return new Response<List<AppointmentCreatedDto>?>(null, 400, "Informe os agendamentos!");
+
+            List<AppointmentCreatedDto> appointments = [];
+            
+            foreach (var schedule in request.Schedules)
+            {
+                schedule.UserId = request.UserId;
+                var result = await CreateAsync(schedule);
+                
+                if(result.IsSuccess && result.Data is not null)
+                    appointments.Add(result.Data);
+            }
+
+            return new Response<List<AppointmentCreatedDto>?>(appointments,
+                message: "Agendamentos realizados com sucesso!");
+        }
+        catch (Exception)
+        {
+            return new Response<List<AppointmentCreatedDto>?>(null, 500, "(SSA009) Não foi possível criar os agendamentos!");
         }
     }
 
@@ -154,7 +207,7 @@ public class AppointmentHandler(AppDbContext context) : IAppointmentHandler
 
             List<Appointment> appointments = [];
 
-            if (request.AppointmentGroupId == 0)
+            if (request.AppointmentGroupId is null || request.AppointmentGroupId == 0)
             {
                 var appointment = await context
                     .Appointments
@@ -182,12 +235,20 @@ public class AppointmentHandler(AppDbContext context) : IAppointmentHandler
                                 && x.AppointmentGroupId == request.AppointmentGroupId)
                     .ToListAsync();
             }
-
-            foreach (var appointment in appointments)
-                appointment.Status = EAppointmentStatus.Completed;
+            
+            appointments.ForEach(x=> x.Status = EAppointmentStatus.Completed);
             
             context.Appointments.UpdateRange(appointments);
             await context.SaveChangesAsync();
+
+            var ap = appointments.OrderBy(x => x.Id).FirstOrDefault()?.Id ?? 0;
+            ClientPackageAppointment? clientPackageAppointment = null;
+            if (ap > 0)
+            {
+                clientPackageAppointment = await _clientPackageAppointmentHandler
+                    .GetByAppointmentId(ap, request.UserId);
+            }
+            
             
             return new Response<SchedullingClosedDTO?>(new SchedullingClosedDTO
             {
@@ -209,7 +270,9 @@ public class AppointmentHandler(AppDbContext context) : IAppointmentHandler
                         ClientId = x.ClientId,
                         EmployeeId = x.EmployeeId,
                         ServiceId = x.ServiceId,
+                        Service = service,
                         AppointmentGroupId = x.AppointmentGroupId,
+                        ClientPackageAppointments = clientPackageAppointment
                     }).ToList()
             }, message:"Agendamento finalizado com sucesso!");
         }
@@ -245,6 +308,7 @@ public class AppointmentHandler(AppDbContext context) : IAppointmentHandler
             {
                 var appointment = await context
                     .Appointments
+                    .Include(x => x.Client)
                     .Where(x => x.UserId == request.UserId
                                 && x.EmployeeId == request.EmployeeId
                                 && x.Date == request.Date.Date
@@ -263,6 +327,7 @@ public class AppointmentHandler(AppDbContext context) : IAppointmentHandler
             {
                 appointments = await context
                     .Appointments
+                    .Include(x => x.Client)
                     .Where(x => x.UserId == request.UserId
                                 && x.EmployeeId == request.EmployeeId
                                 && x.Date == request.Date
@@ -288,11 +353,32 @@ public class AppointmentHandler(AppDbContext context) : IAppointmentHandler
                     Status = x.Status
                 }).ToList();
 
-            appointments.ForEach(x => x.Status = EAppointmentStatus.Cancelled);
+            appointments.ForEach(x =>
+            {
+                x.ClientId = null;
+                x.ServiceId = null;
+                x.AppointmentGroupId = null;
+                x.Status = EAppointmentStatus.Free;
+            });
             
             context.Appointments.UpdateRange(appointments);
             await context.CancellationHistories.AddRangeAsync(cancellationHistories);
             await context.SaveChangesAsync();
+
+            //A priori só reporto a sessão quando finalizo o agendamento
+            // var client = appointments.FirstOrDefault()?.Client;
+            // if (client is not null)
+            // {
+            //     if (client.Type == EClientType.Monthly)
+            //     {
+            //         var clientPackage = await _clientPackageAppointmentHandler.GetActivePackageByClient(client.Id, request.UserId);
+            //         if (clientPackage is not null)
+            //         {
+            //             await _clientPackageAppointmentHandler.CancelReportSessionUsedAsync(client.Id,
+            //                 clientPackage.PackageId, request.UserId);
+            //         }
+            //     }
+            // }
             
             return new Response<SchedullingClosedDTO?>(new SchedullingClosedDTO
             {
@@ -314,6 +400,7 @@ public class AppointmentHandler(AppDbContext context) : IAppointmentHandler
                         ClientId = x.ClientId,
                         EmployeeId = x.EmployeeId,
                         ServiceId = x.ServiceId,
+                        Service = service,
                         AppointmentGroupId = x.AppointmentGroupId,
                     }).ToList()
             }, message:"Agendamento finalizado com sucesso!");
@@ -338,11 +425,11 @@ public class AppointmentHandler(AppDbContext context) : IAppointmentHandler
                 return new Response<EmployeeAvailabilityScheduleDTO?>(null, 404,
                     "Não foi possível encontrar o profissional!");
 
-            if(request.StartDate.Date < DateTime.Today) return new Response<EmployeeAvailabilityScheduleDTO?>(null, 404, 
+            if(request.StartDate.Value.Date < DateTime.Today) return new Response<EmployeeAvailabilityScheduleDTO?>(null, 404, 
                 "A data inicial da abertura de agenda não pode ser menor que o dia atual!");
             
-            request.StartDate = request.StartDate.Date;
-            request.EndDate = request.EndDate.Date;
+            request.StartDate = request.StartDate.Value.Date;
+            request.EndDate = request.EndDate.Value.Date;
             
             if(await CheckForScheduleConflictsAsync(request))
                 return new Response<EmployeeAvailabilityScheduleDTO?>(null, 400,
@@ -363,7 +450,7 @@ public class AppointmentHandler(AppDbContext context) : IAppointmentHandler
 
             _userId = request.UserId;
             
-            var dateRange = SetDateRange(request.StartDate, request.EndDate);
+            var dateRange = SetDateRange(request.StartDate.Value, request.EndDate.Value);
             if (!dateRange.Any())
                 return new Response<EmployeeAvailabilityScheduleDTO?>(null, 400,
                     "Não foi possível definir as datas para agendamento!");
@@ -452,7 +539,7 @@ public class AppointmentHandler(AppDbContext context) : IAppointmentHandler
                     AvailableSlots = [],
                     NextAvaliabeDate = nextDay,
                     UserId = request.UserId
-                }, 404, 
+                }, 200, 
                     $"Não existem horários disponíveis para a data informada{(nextDay.HasValue ? $", próxima data disponível {nextDay.Value:dd/MM/yyyy}" : "!")}");
             }
                 
@@ -590,7 +677,7 @@ public class AppointmentHandler(AppDbContext context) : IAppointmentHandler
                 {
                     Date = x.Key,
                 }).ToList(), message: "Dias recuperados com sucesso!")
-                : new Response<List<AvailableDateDto>?>(null,404, "Não existem agendas abertas no momento!");
+                : new Response<List<AvailableDateDto>?>(null,200, "Não existem agendas abertas no momento!");
         }
         catch (Exception)
         {
@@ -665,7 +752,8 @@ public class AppointmentHandler(AppDbContext context) : IAppointmentHandler
                 if (currentGroup == null || 
                     currentGroup.AppointmentGroupId != appointment.AppointmentGroupId || 
                     appointment.Status == EAppointmentStatus.Free || 
-                    currentGroup.EndTime < appointment.StartTime) 
+                    currentGroup.Status == EAppointmentStatus.Free || 
+                    currentGroup.EndTime != appointment.StartTime)
                 {
                     // Inicia um novo grupo
                     currentGroup = new AppointmentDto
@@ -679,19 +767,23 @@ public class AppointmentHandler(AppDbContext context) : IAppointmentHandler
                         ClientId = appointment.ClientId,
                         EmployeeId = appointment.EmployeeId,
                         ServiceId = appointment.ServiceId,
+                        Service = appointment.Service,
                         AppointmentGroupId = appointment.AppointmentGroupId,
                         Client = appointment.Client is null ? null : new()
                         {
                             Id = appointment.Client.Id,
                             Name = appointment.Client.Name,
                             UserId = appointment.Client.UserId,
+                            EnumEntity = appointment.Client.Type.ToString()
                         },
                         Employee = new()
                         {
                             Id = employee.Id,
                             Name = employee.Name,
                             UserId = employee.UserId
-                        }
+                        },
+                        ClientPackageAppointments = await _clientPackageAppointmentHandler
+                            .GetByAppointmentId(appointment.Id, request.UserId)
                     };
                     appointmentDtos.Add(currentGroup);
                 }
@@ -757,19 +849,23 @@ public class AppointmentHandler(AppDbContext context) : IAppointmentHandler
                         ClientId = appointment.ClientId,
                         EmployeeId = appointment.EmployeeId,
                         ServiceId = appointment.ServiceId,
+                        Service = appointment.Service,
                         AppointmentGroupId = appointment.AppointmentGroupId,
                         Client = appointment.Client is null ? null : new()
                         {
                             Id = appointment.Client.Id,
                             Name = appointment.Client.Name,
                             UserId = appointment.Client.UserId,
+                            EnumEntity = appointment.Client.Type.ToString()
                         },
                         Employee = new()
                         {
                             Id = employee.Id,
                             Name = employee.Name,
                             UserId = employee.UserId
-                        }
+                        },
+                        ClientPackageAppointments = await _clientPackageAppointmentHandler
+                            .GetByAppointmentId(appointment.Id, employee.UserId)
                     };
                     appointmentDtos.Add(currentGroup);
                 }
@@ -799,7 +895,7 @@ public class AppointmentHandler(AppDbContext context) : IAppointmentHandler
                 .AsNoTracking()
                 .AnyAsync(x => x.UserId == request.UserId
                      && x.EmployeeId == request.EmployeeId
-                     && x.Date >= request.StartDate.Date && x.Date <= request.EndDate.Date);
+                     && x.Date >= request.StartDate.Value.Date && x.Date <= request.EndDate.Value.Date);
 
             return conflict;
         }

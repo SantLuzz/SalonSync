@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using SalonSync.Core.Enums;
 
 namespace SalonSync.Core.Requests.Financial.Transactions;
 
@@ -8,6 +9,7 @@ public class CreateTransactionRequest : Request
     public string Description { get; set; } = string.Empty;
     
     [Required(ErrorMessage = "Informe um valor para a movimentação!")]
+    [Range(0.01, double.MaxValue, ErrorMessage = "O valor tem que ser maior que zero!")]
     public decimal Amount { get; set; }
 
     [Required(ErrorMessage = "O centro de custo é obrigatório!")]
@@ -16,4 +18,8 @@ public class CreateTransactionRequest : Request
     [Required(ErrorMessage = "A data de pagamento é obrigatório!")]
     public DateTime? PaidOrReceivedAt { get; set; }
     
+    public long EntityId { get; set; }
+    public EEntityType EntityType { get; set; } = EEntityType.DirectTransaction;
+    [Required(ErrorMessage = "A forma de pagamento é obrigatório!")]
+    public EPaymentType PaymentType { get; set; } = EPaymentType.Cash;
 }

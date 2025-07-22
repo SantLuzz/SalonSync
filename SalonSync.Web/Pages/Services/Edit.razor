@@ -1,0 +1,53 @@
+@page "/services/edit/{id}"
+<PageTitle>Salon Sync - Serviços</PageTitle>
+<MudText Typo="Typo.h3">Serviço</MudText>
+
+@if(IsSubmit)
+{
+    <Skeleton/>
+}
+else
+{
+    <MudPaper Class="pa-8 mt-4">
+        <EditForm Model="@InputModel" OnValidSubmit="OnValidSubmit">
+            <DataAnnotationsValidator />
+            <MudTextField Label="Nome*"
+                          HelperText="Campo Obrigatório"
+                          Variant="Variant.Outlined"
+                          @bind-Value="InputModel.Name"
+                          For="@(() => InputModel.Name)"
+                          MaxLength="255"/>
+
+            <MudTextField T="int"
+                          Label="Duração (minutos)*"
+                          HelperText="Campo Obrigatório"
+                          Variant="Variant.Outlined"
+                          @bind-Value="InputModel.Duration"
+                          For="@(() => InputModel.Duration)" />
+        
+            <MudTextField T="decimal"
+                          Label="Preço*"
+                          Format="C"
+                          HelperText="Campo Obrigatório"
+                          Variant="Variant.Outlined"
+                          @bind-Value="InputModel.Price"
+                          For="@(() => InputModel.Price)"/>
+        
+        
+            <div class="d-flex mt-8">
+                @if (IsSubmit)
+                {
+                    <MudProgressCircular Color="Color.Info" Indeterminate="true" />
+                }
+                else
+                {
+                    <MudButton ButtonType="ButtonType.Submit"
+                               Variant="Variant.Filled"
+                               Color="Color.Primary">
+                        Salvar
+                    </MudButton>
+                }
+            </div>
+        </EditForm>
+    </MudPaper>
+}

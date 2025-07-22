@@ -8,6 +8,7 @@ namespace SalonSync.Core.Handlers.Appointments;
 public interface IAppointmentHandler
 {
     Task<Response<AppointmentCreatedDto?>> CreateAsync(GenerateScheduleWithEmployeeRequest request);
+    Task<Response<List<AppointmentCreatedDto>?>> CreateAsync(GenerateAutoScheduleRequest request);
     Task<Response<List<AvailableDateDto>?>> GetAvailableDatesAsync(GetAvailableDateRequest request);
     Task<Response<List<AvailableDateDto>?>> GetAvailableDatesByCompanyCodeAsync(GetAvailableDateByCompanyRequest request);
     Task<Response<EmployeeAvailabilitySlotsDTO?>> GetAvailablesHoursByEmployeeIdAsync(GetAvailableHoursByServicesAndEmployeeRequest request);

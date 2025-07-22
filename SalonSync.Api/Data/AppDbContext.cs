@@ -38,7 +38,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     public DbSet<ClientPackageAppointment> ClientPackageAppointments { get; set; } = null!;
     public DbSet<CostCenter> CostCenters { get; set; } = null!;
     public DbSet<Transaction> Transactions { get; set; } = null!;
-    
+    public DbSet<AccountPayable> AccountPayables { get; set; } = null!;
+    public DbSet<Commission> Commissions { get; set; } = null!; 
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

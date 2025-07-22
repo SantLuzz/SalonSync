@@ -1,0 +1,75 @@
+@page "/clients/create"
+@using SalonSync.Core.Enums
+@using SalonSync.Web.Components.Fields
+
+<PageTitle>Salon Sync - Clientes</PageTitle>
+<MudText Typo="Typo.h3">Novo Cliente</MudText>
+
+<MudPaper Class="pa-8 mt-4">
+    <EditForm Model="@InputModel" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator />
+        <MudTextField Label="Nome*"
+                      HelperText="Campo Obrigatório"
+                      Variant="Variant.Outlined"
+                      @bind-Value="InputModel.Name"
+                      For="@(() => InputModel.Name)"
+                      MaxLength="255"/>
+
+        <MudTextField Label="E-mail*"
+                      HelperText="Campo Obrigatório"
+                      Variant="Variant.Outlined"
+                      @bind-Value="InputModel.Email"
+                      For="@(() => InputModel.Email)" 
+                      MaxLength="160"/>
+        
+        <PhoneMudTextField
+            @bind-Value="InputModel.Phone" />
+
+        <MudTextField Label="Preferência de Serviço"
+                      Variant="Variant.Outlined"
+                      @bind-Value="InputModel.PreferredService"
+                      For="@(() => InputModel.PreferredService)"
+                      MaxLength="255"/>
+
+        <MudTextField Label="Observações"
+                      Lines="3"
+                      Variant="Variant.Outlined"
+                      @bind-Value="InputModel.Observations"
+                      For="@(() => InputModel.Observations)"
+                      MaxLength="255"/>
+        
+        <div class="d-flex align-items-center mt-2" style="width: 100%;">
+            <MudSelect T="EClientType"
+                       Variant="Variant.Outlined"
+                       Label="Tipo de Cliente"
+                       AnchorOrigin="Origin.BottomLeft"
+                       @bind-Value="InputModel.Type"
+                       ReadOnly="true">
+
+                <MudSelectItem T="EClientType" Value="EClientType.Common">Comum</MudSelectItem>
+                <MudSelectItem T="EClientType" Value="EClientType.Monthly">Mensal</MudSelectItem>
+            </MudSelect>
+
+            <MudDatePicker 
+                Label="Data de Nascimento"
+                Class="ml-4"
+                Variant="Variant.Outlined"
+                @bind-Date="InputModel.Birthdate"/>
+        </div>
+        
+        <div class="d-flex mt-8">
+            @if (IsSubmit)
+            {
+                 <MudProgressCircular Color="Color.Info" Indeterminate="true" />
+            }
+            else
+            {
+            <MudButton ButtonType="ButtonType.Submit"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary">
+                Salvar
+            </MudButton>
+            }
+        </div>
+    </EditForm>
+</MudPaper>

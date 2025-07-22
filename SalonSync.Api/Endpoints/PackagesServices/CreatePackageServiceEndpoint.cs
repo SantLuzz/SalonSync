@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using SalonSync.Api.Common.Api;
+using SalonSync.Core.DTOs;
 using SalonSync.Core.Handlers.Packages;
-using SalonSync.Core.Models.Packages;
 using SalonSync.Core.Requests.PackagesServices;
 using SalonSync.Core.Responses;
 
@@ -14,7 +14,7 @@ public class CreatePackageServiceEndpoint : IEndpoint
             .WithName("Package Service: Create")
             .WithDescription("Creates a new relation package service.")
             .WithOrder(1)
-            .Produces<Response<PackageService?>>();
+            .Produces<Response<PackageDto?>>();
 
     private static async Task<IResult> HandlerAsync(
         ClaimsPrincipal user,

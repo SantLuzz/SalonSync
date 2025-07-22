@@ -1,0 +1,123 @@
+@page "/transactions"
+@inherits ListTransactionPage
+
+<PageTitle>Salon Sync - Caixa</PageTitle>
+<MudText Typo="Typo.h3">Caixa</MudText>
+
+@if (IsStarted)
+{
+<Skeleton/>
+}
+else
+{
+<div class="d-flex justify-end mt-4 mb-4">
+    <MudDatePicker Label="Data do Caixa"
+                   Variant="Variant.Outlined"
+                   @bind-Date="Date" />
+    
+    <MudButton StartIcon="@Icons.Material.Filled.Refresh"
+               Class="ml-2"
+               Color="Color.Primary"
+               OnClick="OnSearchAsync"
+               aria-label="Recarregar Lançamentos"
+               Variant="Variant.Filled">
+        Buscar
+    </MudButton>
+    <MudSpacer />
+    
+
+    <MudButton
+        Variant="Variant.Filled"
+        Color="Color.Primary"
+        Class="ml-4"
+        StartIcon="@Icons.Material.Filled.Add"
+        Href="/transactions/create">
+        NOVO LANÇAMENTO
+    </MudButton>
+</div>
+
+<MudDataGrid
+    Class="mt-4"
+    Style="min-width: 800px; width: 100%;"
+    Items="@Transactions"
+    Filterable="true"
+    QuickFilter="Filter"
+    Hideable="true">
+
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Caixa</MudText>
+        <MudSpacer/>
+        <MudTextField @bind-Value="SearchTerm" Placeholder="Filtrar..."
+                      Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search"
+                      Immediate="true"
+                      IconSize="Size.Medium"
+                      Class="mt-0"/>
+    </ToolBarContent>
+    <Columns>
+        <PropertyColumn Property="x => x.Id" Title="#" />
+        <PropertyColumn Property="x => x.Description" Title="Descrição" />
+        <PropertyColumn Property="x => x.CostCenter.Description" Title="Centro de Custo" />
+        <TemplateColumn>
+            <HeaderTemplate>Tipo</HeaderTemplate>
+            <CellTemplate>
+                @if (@context.Item.CostCenter.Type == ECostCenterType.Income)
+                {
+                    <MudChip Color="Color.Success" Size="Size.Small" Variant="Variant.Filled">
+                        @context.Item.CostCenter.Type.GetDescription()
+                    </MudChip>
+                }
+                else
+                {
+                    <MudChip Color="Color.Error" Size="Size.Small" Variant="Variant.Filled">
+                        @context.Item.CostCenter.Type.GetDescription()
+                    </MudChip>
+                }
+            </CellTemplate>
+        </TemplateColumn>
+        <TemplateColumn>
+            <HeaderTemplate>Forma de Pagamento</HeaderTemplate>
+            <CellTemplate>
+                <MudChip Color="Color.Info" Size="Size.Small" Variant="Variant.Filled">
+                    @context.Item.PaymentType.GetDescription()
+                </MudChip>
+            </CellTemplate>
+        </TemplateColumn>
+        
+        <PropertyColumn Property="x => x.Amount" Format="C"
+                        Title="Valor" Sortable="true">
+            <FooterTemplate>
+                @{
+                    var income = context.Items
+                        .Where(x => x.CostCenter.Type == ECostCenterType.Income)
+                        .Sum(x => x.Amount);
+                    var expense = context.Items
+                        .Where(x => x.CostCenter.Type == ECostCenterType.Expense)
+                        .Sum(x => x.Amount);
+
+                    var total = income - expense;
+                }
+                SALDO: @total.ToString("C")
+            </FooterTemplate>
+        </PropertyColumn>
+        <TemplateColumn Class="d-flex justify-end align-end">
+            <HeaderTemplate>
+                Ações
+            </HeaderTemplate>
+            <CellTemplate>
+                <MudStack Row>
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                   Href="@($"/transactions/edit/{context.Item.Id}")"
+                                   Color="Color.Primary"
+                                   aria-label="Editar"/>
+
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                   Color="Color.Error"
+                                   aria-label="Excluir"
+                                   OnClick="() => OnDeleteButtonClickedAsync(context.Item.Id, context.Item.Description)"/>
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+</MudDataGrid>
+}

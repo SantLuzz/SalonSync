@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using SalonSync.Core.Models.Entities;
 
 namespace SalonSync.Core.Requests.Appointments;
 
@@ -9,6 +8,7 @@ public class GenerateScheduleWithEmployeeRequest : Request
     public long EmployeeId { get; set; }
 
     [Required(ErrorMessage = "Informe o servilo a ser executado!")]
+    [Range(0.01, long.MaxValue, ErrorMessage = "Informe o serviço para continuar!")]
     public long ServiceId { get; set; }
     public long ClientId { get; set; }
     
@@ -20,4 +20,6 @@ public class GenerateScheduleWithEmployeeRequest : Request
     
     [Required(ErrorMessage = "Informe a hora final do agendamento!")]
     public TimeOnly EndTime { get; set; }
+
+    public bool ClientUsedPackage { get; set; } = false;
 }

@@ -1,0 +1,87 @@
+@using SalonSync.Core.Models.Entities
+@using SalonSync.Core.Models.Services
+@using SalonSync.Core.Requests.Appointments
+@using SalonSync.Web.Components.Fields
+@inherits AutoScheduleDialogCode
+
+<MudDialog OnKeyDown="OnKeyDownAsync">
+    <DialogContent>
+        @if (IsBusy)
+        {
+            <Skeleton/>
+        }
+        else
+        {
+            <MudSelect T="Employee"
+                       Variant="Variant.Outlined"
+                       Label="Profissional"
+                       Class="mt-5"
+                       AnchorOrigin="Origin.BottomLeft"
+                       Value="SelectedEmployee"
+                       ValueChanged="OnChangedEmployee">
+
+                @foreach (var employee in Employees)
+                {
+                    <MudSelectItem T="Employee" Value="employee">@employee.Name</MudSelectItem>
+                }
+            </MudSelect>
+
+            <MudSelect T="Service" Class="mt-5"
+                       Label="Serviço"
+                       Value="SelectedService"
+                       ValueChanged="OnChangedService">
+                @foreach (var service in Services)
+                {
+                    TotalRemaining = GetTotalSessionsService(service.Id);
+                    <MudSelectItem Value="service">
+                        @($"{service.Name} ({TotalRemaining})")
+                    </MudSelectItem>
+                }
+            </MudSelect>
+
+            <DateSelector AvailableDates="AvailableDateDtos"
+                          OnDateSelected="SelectedDate"/>
+
+            <TimerSelector AvailabilitySlotsDto="AvailabilitySlotsDto"
+                           DateIsSelected="DateIsSelected"
+                           OnHourSelected="SelectedTime"/>
+            
+            <div class="d-flex justify-center my-4">
+                @if (IsAddschedule)
+                {
+                    <MudProgressCircular Color="Color.Info" Indeterminate="true" />
+                }
+                else
+                {
+                    <MudButton Color="Color.Primary"
+                               Variant="Variant.Filled"
+                               StartIcon="@Icons.Material.Filled.Add"
+                               Disabled="@(IsFullySchedule)"
+                               OnClick="OnAddSchedule">
+                        Adicionar
+                    </MudButton>
+                }
+            </div>
+
+            <MudDivider Class="mb-4" />
+            
+            <div class="d-flex flex-wrap gap-2 mt-4">
+                @foreach (var schedule in CreateSchedules)
+                {
+                    <MudChip
+                         T="GenerateScheduleWithEmployeeRequest"
+                         OnClose="@(() => OnRemoveSchedule(schedule))"
+                         Color="Color.Primary"
+                         Variant="Variant.Filled"
+                         Class="px-3 py-2">
+                        @schedule.Date.ToString("dd/MM/yyyy"), das @schedule.StartTime.ToString("HH:mm") às @schedule.EndTime.ToString("HH:mm")
+                    </MudChip>
+                }
+            </div>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Submit" Color="Color.Primary">Agendar</MudButton>
+        <MudButton OnClick="Cancel" Color="Color.Secondary">Cancelar</MudButton>
+    </DialogActions>
+</MudDialog>

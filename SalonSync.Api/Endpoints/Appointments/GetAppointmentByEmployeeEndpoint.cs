@@ -23,8 +23,6 @@ public class GetAppointmentByEmployeeEndpoint : IEndpoint
             long id,
             [FromQuery] DateTime date)
         {
-            
-            
             var request = new GetAppointmentByEmployeeRequest()
             {
                 UserId = user.Identity?.Name ?? string.Empty,

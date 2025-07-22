@@ -1,0 +1,23 @@
+@typeparam T
+
+<MudCard @onclick="HandleClick" Class="@($"{SelectableStyle} pa-4")" Style="width: 300px; height: 180px;">
+    <MudCardContent Class="mr-2 d-flex justify-center align-items-center flex-column">
+        <MudIcon Class="d-flex align-center" Icon="@Icon" />
+        <MudText Typo="Typo.h6" Class="mt-2" Align="Align.Center">@CardText</MudText>
+        <MudText Align="Align.Center" Class="mt-2">@CardValueText?.ToString()</MudText>
+    </MudCardContent>
+</MudCard>
+
+@code {
+    [Parameter] public T CardValue { get; set; }
+    [Parameter] public string? Icon { get; set; } = Icons.Material.Filled.Info;
+    [Parameter] public string CardValueText { get; set; } = string.Empty;
+    [Parameter] public string CardText { get; set; } = string.Empty;
+    [Parameter] public EventCallback<T> OnValueSelected { get; set; }
+    [Parameter] public string SelectableStyle { get; set; } = string.Empty;
+
+    private async Task HandleClick()
+    {
+        await OnValueSelected.InvokeAsync(CardValue);
+    }
+}

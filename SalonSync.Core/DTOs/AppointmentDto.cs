@@ -1,4 +1,6 @@
 using SalonSync.Core.Enums;
+using SalonSync.Core.Models.Appointments;
+using SalonSync.Core.Models.Services;
 
 namespace SalonSync.Core.DTOs;
 
@@ -16,4 +18,6 @@ public class AppointmentDto
     public long? AppointmentGroupId { get; set; }
     public EntityDto? Client { get; set; }
     public EntityDto? Employee { get; set; }
+    public Service? Service { get; set; }
+    public ClientPackageAppointment? ClientPackageAppointments { get; set; } = new();
 }

@@ -11,5 +11,6 @@ public interface ITransactionHandler
     Task<Response<Transaction?>> DeleteAsync(DeleteTransactionRequest request);
     Task<Response<Transaction?>> GetByIdAsync(GetTransactionByIdRequest request);
     Task<PagedResponse<List<Transaction>?>> GetByCostCenterAsync(GetTransactionsByCostCenterRequest request);
+    Task<PagedResponse<List<Transaction>?>> GetByDayAsync(GetTransactionsByPeriodRequest request);
     Task<PagedResponse<List<Transaction>?>> GetByPeriodAsync(GetTransactionsByPeriodRequest request);
 }

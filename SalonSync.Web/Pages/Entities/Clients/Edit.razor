@@ -1,0 +1,141 @@
+@page "/clients/edit/{id}"
+@using SalonSync.Core.Enums
+@using SalonSync.Web.Components.Fields
+
+<PageTitle>Salon Sync - Clientes</PageTitle>
+<MudText Typo="Typo.h3">Editar Cliente</MudText>
+
+@if (IsBusy)
+{
+    <Skeleton />
+}
+else
+{
+    <MudPaper Class="pa-8 mt-4">
+        <EditForm Model="@InputModel" OnValidSubmit="OnValidSubmit">
+            <DataAnnotationsValidator />
+            <PictureProfilePickcer
+                @bind-Value="InputModel.ImageRequest.UrlImage"
+                Base64="@InputModel.ImageRequest.Base64Image"
+                OnUpload="OnFileUploadAsync"/>
+            
+            <MudTextField Label="Nome*"
+                          Class="mt-4"
+                          HelperText="Campo Obrigatório"
+                          Variant="Variant.Outlined"
+                          @bind-Value="InputModel.UpdateRequest.Name"
+                          For="@(() => InputModel.UpdateRequest.Name)"
+                          MaxLength="255"/>
+
+            <MudTextField Label="E-mail*"
+                          HelperText="Campo Obrigatório"
+                          Variant="Variant.Outlined"
+                          @bind-Value="InputModel.UpdateRequest.Email"
+                          For="@(() => InputModel.UpdateRequest.Email)" 
+                          MaxLength="160"/>
+            
+            <PhoneMudTextField
+                @bind-Value="InputModel.UpdateRequest.Phone" />
+
+            <MudTextField Label="Preferência de Serviço"
+                          Variant="Variant.Outlined"
+                          @bind-Value="InputModel.UpdateRequest.PreferredService"
+                          For="@(() => InputModel.UpdateRequest.PreferredService)"
+                          MaxLength="255"/>
+
+            <MudTextField Label="Observações"
+                          Lines="3"
+                          Variant="Variant.Outlined"
+                          @bind-Value="InputModel.UpdateRequest.Observations"
+                          For="@(() => InputModel.UpdateRequest.Observations)"
+                          MaxLength="255"/>
+
+            <div class="d-flex align-items-center mt-2" style="width: 100%;">
+                <MudDatePicker
+                    Label="Data de Nascimento"
+                    Variant="Variant.Outlined"
+                    @bind-Date="InputModel.UpdateRequest.Birthdate"/>
+
+                <MudTextField Label="Ultima Visita"
+                              Class="ml-4"
+                              Variant="Variant.Outlined"
+                              @bind-Value="InputModel.UpdateRequest.LastProcedure"
+                              For="@(() => InputModel.UpdateRequest.LastProcedure)"
+                              Disabled="true"/>
+            </div>
+            
+            
+            <MudSelect T="EClientType"
+                       Variant="Variant.Outlined"
+                       Label="Tipo de Cliente"
+                       AnchorOrigin="Origin.BottomLeft"
+                       @bind-Value="InputModel.UpdateRequest.Type"
+                       ReadOnly="true">
+
+                <MudSelectItem T="EClientType" Value="EClientType.Common">Comum</MudSelectItem>
+                <MudSelectItem T="EClientType" Value="EClientType.Monthly">Mensal</MudSelectItem>
+            </MudSelect>
+            
+            <MudCollapse Expanded="@CheckMonthlyCustomer()">
+                <div class="d-flex align-items-center mt-2" style="width: 100%;">
+                    <MudSelect T="long"
+                               Variant="Variant.Outlined"
+                               Label="Pacote do Cliente"
+                               AnchorOrigin="Origin.BottomLeft"
+                               @bind-Value="InputModel.CreateClientPackageRequest.PackageId"
+                               ReadOnly="true">
+                               @* Disabled="@(InputModel.UpdateRequest?.Type == EClientType.Common)"> *@
+                        @foreach (var package in PackageDtos)
+                        {
+                            <MudSelectItem T="long" Value="@package.Id">@package.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+
+                    <MudDatePicker
+                        Label="Data de Inicio"
+                        Class="ml-4"
+                        Variant="Variant.Outlined"
+                        @bind-Date="InputModel.CreateClientPackageRequest.StartDate"
+                        ReadOnly="true"/>
+
+                    <MudDatePicker
+                        Label="Data de Final"
+                        Class="ml-4"
+                        Variant="Variant.Outlined"
+                        @bind-Date="InputModel.CreateClientPackageRequest.EndDate"
+                        ReadOnly="true"/>
+                </div>
+                @* <div class="d-flex align-items-center mt-8"> *@
+                @*     @if (IsSubmit) *@
+                @*     { *@
+                @*         <MudProgressCircular Color="Color.Info" Indeterminate="true" /> *@
+                @*     } *@
+                @*     else *@
+                @*     { *@
+                @*         <MudButton Variant="Variant.Filled" *@
+                @*                    Color="Color.Primary" *@
+                @*                    OnClick="OnSubmitPackage"> *@
+                @*             Definir Pacote *@
+                @*         </MudButton> *@
+                @*     } *@
+                @* </div> *@
+                
+            </MudCollapse>
+            
+            <div class="d-flex mt-8">
+                @if (IsSubmit)
+                {
+                     <MudProgressCircular Color="Color.Info" Indeterminate="true" />
+                }
+                else
+                {
+                <MudButton ButtonType="ButtonType.Submit"
+                           Variant="Variant.Filled"
+                           Color="Color.Primary">
+                    Salvar
+                </MudButton>
+                }
+            </div>
+        </EditForm>
+    </MudPaper>
+}

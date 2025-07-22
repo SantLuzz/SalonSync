@@ -6,7 +6,10 @@ using SalonSync.Api.Endpoints.Configs;
 using SalonSync.Api.Endpoints.Entities.Clients;
 using SalonSync.Api.Endpoints.Entities.Companies;
 using SalonSync.Api.Endpoints.Entities.Employees;
+using SalonSync.Api.Endpoints.Financial.AccountsPayable;
+using SalonSync.Api.Endpoints.Financial.Commissions;
 using SalonSync.Api.Endpoints.Financial.CostCenters;
+using SalonSync.Api.Endpoints.Financial.Transactions;
 using SalonSync.Api.Endpoints.Identity;
 using SalonSync.Api.Endpoints.Licenses;
 using SalonSync.Api.Endpoints.Packages;
@@ -15,6 +18,8 @@ using SalonSync.Api.Endpoints.Schedules;
 using SalonSync.Api.Endpoints.Services;
 using SalonSync.Api.Models;
 using SalonSync.Api.Services;
+using SalonSync.Core.Requests.ClientsPackages;
+using SalonSync.Core.Requests.Financial.AccountsPayable;
 
 namespace SalonSync.Api.Endpoints;
 
@@ -85,6 +90,13 @@ public static class Endpoint
             .MapEndpoints<DeleteCompanyEndpoint>()
             .MapEndpoints<GetCompanyEndpoint>();
 
+        endpoint.MapGroup("v1/commission")
+            .WithTags("Commission")
+            .RequireAuthorization()
+            .MapEndpoints<CreateCommissionEndpoint>()
+            .MapEndpoints<DeleteCommissionEndpoint>()
+            .MapEndpoints<GetUnpaidCommissionInPeriodEndpoint>();
+
         endpoint.MapGroup("v1/employees")
             .WithTags("Employees")
             .RequireAuthorization()
@@ -106,6 +118,27 @@ public static class Endpoint
             .MapEndpoints<GetAllCostCentersByTypeEndpoint>()
             .MapEndpoints<GetCostCenterByIdEndpoint>();
 
+        endpoint.MapGroup("v1/transactions")
+            .WithTags("Transactions")
+            .RequireAuthorization()
+            .MapEndpoints<CreateTransactionEndpoint>()
+            .MapEndpoints<UpdateTransactionEndpoint>()
+            .MapEndpoints<DeleteTransactionEndpoint>()
+            .MapEndpoints<GetTransactionByIdEndpoint>()
+            .MapEndpoints<GetTransactionsByCostCenterEndpoint>()
+            .MapEndpoints<GetTransactionsByPeriodEndpoint>()
+            .MapEndpoints<GetTransactionsByDateEndpoint>();
+
+        endpoint.MapGroup("v1/account-payable")
+            .WithTags("Accounts Payable")
+            .RequireAuthorization()
+            .MapEndpoints<CreateAccountPayableEndpoint>()
+            .MapEndpoints<UpdateAccountPayableEndpoint>()
+            .MapEndpoints<DeleteAccountPayableEndpoint>()
+            .MapEndpoints<CloseAccountPayableEndpoint>()
+            .MapEndpoints<GetAccountPayableByIdEndpoint>()
+            .MapEndpoints<GetAccountPayableByPeriodEndpoint>();
+
         endpoint.MapGroup("v1/services")
             .WithTags("Services")
             .RequireAuthorization()
@@ -113,7 +146,8 @@ public static class Endpoint
             .MapEndpoints<UpdateServiceEndpoint>()
             .MapEndpoints<DeleteServiceEndpoint>()
             .MapEndpoints<GetServiceByIdEndpoint>()
-            .MapEndpoints<GetAllServicesEndpoint>();
+            .MapEndpoints<GetAllServicesEndpoint>()
+            .MapEndpoints<GetServicesByPackageIdEndpoint>();
 
         endpoint.MapGroup("v1/packages")
             .WithTags("Packages")
@@ -122,8 +156,9 @@ public static class Endpoint
             .MapEndpoints<UpdatePackageEndpoint>()
             .MapEndpoints<DeletePackageEndpoint>()
             .MapEndpoints<GetPackageByIdEndpoint>()
-            .MapEndpoints<GetAllPackagesEndpoint>();
-            
+            .MapEndpoints<GetAllPackagesEndpoint>()
+            .MapEndpoints<GetPackageServiceDtoByIdEndpoint>();
+
         endpoint.MapGroup("v1/packages-services")
             .WithTags("Packages-Services")
             .RequireAuthorization()
@@ -139,7 +174,11 @@ public static class Endpoint
             .MapEndpoints<DeleteClientPackageEndpoint>()
             .MapEndpoints<InactiveClientPackageEndpoint>()
             .MapEndpoints<GetClientPackagesByIdEndpoint>()
-            .MapEndpoints<GetAllPackagesByClientIdEndpoint>();
+            .MapEndpoints<GetActiveClientPackageEndpoint>()
+            .MapEndpoints<GetAllPackagesByClientIdEndpoint>()
+            .MapEndpoints<InactiveClientIsActivePackageEndpoint>()
+            .MapEndpoints<GetClientsPackagesByPackageIdEndpoint>()
+            .MapEndpoints<ReportSessionUsedByClientEndpoint>();
 
         endpoint.MapGroup("v1/appointments")
             .WithTags("Appointments")
@@ -151,7 +190,8 @@ public static class Endpoint
             .MapEndpoints<GetAvailableHoursByEmployeeIdEndpoint>()
             .MapEndpoints<GetAppointmentByEmployeeEndpoint>()
             .MapEndpoints<FinishScheudullingEndpoint>()
-            .MapEndpoints<CancelScheudullingEndpoint>();
+            .MapEndpoints<CancelScheudullingEndpoint>()
+            .MapEndpoints<GenerateAutoScheduleEndpoint>();
 
         endpoint.MapGroup("v1/schedules")
             .WithTags("Schedules")

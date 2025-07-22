@@ -1,0 +1,26 @@
+<MudSelect T="EPaymentType" 
+           Label="@Label" 
+           Variant="Variant.Outlined"
+           Class="@Class"
+           Value="Value"
+           ValueChanged="OnValueChanged">
+    @foreach (var payment in Enum.GetValues<EPaymentType>())
+    {
+        <MudSelectItem T="EPaymentType" Value="payment">
+            @payment.GetDescription()
+        </MudSelectItem>
+    }
+</MudSelect>
+
+@code {
+[Parameter] public EPaymentType Value { get; set; }
+[Parameter] public string Label { get; set; } = "Forma de Pagamento";
+[Parameter] public EventCallback<EPaymentType> ValueChanged { get; set; }
+[Parameter] public string? Class { get; set; }
+
+private async Task OnValueChanged(EPaymentType newValue)
+{
+    Value = newValue;
+    await ValueChanged.InvokeAsync(newValue);
+}
+}

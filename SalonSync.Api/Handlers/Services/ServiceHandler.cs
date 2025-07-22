@@ -116,6 +116,33 @@ public class ServiceHandler(AppDbContext context) : IServiceHandler
         }
     }
 
+    public async Task<PagedResponse<List<Service>?>> GetByPackageIdAsync(GetServicesByPackageIdRequest request)
+    {
+        try
+        {
+            /*Select s.* from PackageServices ps
+              INNER JOIN Services s ON ps.ServiceId = s.Id
+              Where ps.PackageId = 1 
+              AND ps.UserId = 'contato@salonsyncapp.com'*/
+            
+            var services = await context.PackageServices
+                .Where(ps => ps.PackageId == request.PackageId && ps.UserId == request.UserId)
+                .Join(
+                    context.Services,
+                    ps => ps.ServiceId,
+                    s => s.Id,
+                    (ps, s) => s
+                )
+                .ToListAsync();
+            
+            return new PagedResponse<List<Service>?>(services, 0, 1,100);
+        }
+        catch (Exception)
+        {
+            return new PagedResponse<List<Service>?>(null, 500, "(SSS006) Não foi possível recuperar os serviços!");
+        }
+    }
+
     public async Task<PagedResponse<List<Service>?>> GetAllAsync(GetAllServicesRequest request)
     {
         try

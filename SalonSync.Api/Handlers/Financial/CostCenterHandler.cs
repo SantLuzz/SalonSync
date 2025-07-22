@@ -68,11 +68,24 @@ public class CostCenterHandler(AppDbContext context) : ICostCenterHandler
 
             if (cost is null)
                 return new Response<CostCenter?>(null, 404, "Centro de custo não encontrado!");
+
+
+            var transactions = await context
+                .Transactions
+                .AsNoTracking()
+                .Where(x => x.CostCenterId == cost.Id
+                            && x.UserId == request.UserId)
+                .CountAsync();
+
+            if (transactions > 0)
+                return new Response<CostCenter?>(null, 400,
+                    $"Não é possível excluir o centro de custo pois o mesmo está vinculado a lançamentos no caixa!");
+            
             
             context.Remove(cost);
             await context.SaveChangesAsync();
             
-            return new Response<CostCenter?>(cost, message:"Centro de custo excluída com sucesso!");
+            return new Response<CostCenter?>(cost, message:"Centro de custo excluído com sucesso!");
         }
         catch (Exception)
         {
@@ -130,7 +143,8 @@ public class CostCenterHandler(AppDbContext context) : ICostCenterHandler
             var query = context
                 .CostCenters
                 .AsNoTracking()
-                .Where(x => x.UserId == request.UserId && x.Type == request.Type);
+                .Where(x => x.UserId == request.UserId 
+                            && x.Type == request.Type);
 
             var costs = await query
                 .Skip((request.PageNumber - 1) * request.PageSize)

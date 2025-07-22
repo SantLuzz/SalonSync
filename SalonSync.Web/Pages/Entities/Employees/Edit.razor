@@ -1,4 +1,5 @@
 @page "/employees/edit/{id}"
+@using SalonSync.Web.Components.Fields
 
 <PageTitle>Salon Sync - Funcionários</PageTitle>
 <MudText Typo="Typo.h3">Editar Funcionário</MudText>
@@ -53,6 +54,7 @@ else
             <MudTextField T="Decimal"
                           Label="Comissão (%)"
                           Class="ml-2"
+                              Format="N2"
                           Variant="Variant.Outlined"
                           @bind-Value="InputModel.UpdateRequest.Commission"/>
         </div>

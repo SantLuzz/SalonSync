@@ -1,0 +1,101 @@
+@using SalonSync.Core.Handlers.Entities
+@using SalonSync.Core.Requests.Entities.Clients
+
+<MudDialog OnKeyDown="OnKeyDownAsync">
+    <DialogContent>
+        <MudTextField Label="Nome*"
+                      @bind-Value="InputModel.Name"
+                      Variant="Variant.Outlined"
+                      Error="@ValidationErrors.ContainsKey(nameof(InputModel.Name))"
+                      ErrorText="@ValidationErrors.GetValueOrDefault(nameof(InputModel.Name))" />
+
+        <MudTextField Label="E-mail*"
+                      @bind-Value="InputModel.Email"
+                      Variant="Variant.Outlined"
+                      Error="@ValidationErrors.ContainsKey(nameof(InputModel.Email))"
+                      ErrorText="@ValidationErrors.GetValueOrDefault(nameof(InputModel.Email))" />
+
+    </DialogContent>
+    <DialogActions>
+        <MudButton StartIcon="@Icons.Material.Filled.Check" 
+                   Color="Color.Primary" 
+                   Variant="Variant.Filled" 
+                   OnClick="Save">Salvar</MudButton>
+        <MudButton StartIcon="@Icons.Material.Filled.Close" 
+                   Color="Color.Error" 
+                   Variant="Variant.Filled" 
+                   OnClick="Cancel">Cancelar</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public long ClientId { get; set; } = 0;
+    [Parameter] public EventCallback<long> OnSubmit { get; set; }
+    
+    [Inject] public IClientHandler ClientHandler { get; set; } = null!;
+    [Inject] public ISnackbar Snackbar { get; set; } = null!;
+    
+    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; }
+
+    private CreateClientRequest InputModel { get; set; } = new();
+    private Dictionary<string, string> ValidationErrors { get; set; } = new();
+
+    private async Task OnKeyDownAsync(KeyboardEventArgs args)
+    {
+        switch (args.Key)
+        {
+            case "Enter":
+            case "NumpadEnter":
+                await Save();
+                break;
+            case "Escape":
+                Cancel();
+                break;
+        }
+    }
+    
+    private async Task Save()
+    {
+        ValidationErrors.Clear();
+        var context = new ValidationContext(InputModel);
+        var results = new List<ValidationResult>();
+
+        if (!Validator.TryValidateObject(InputModel, context, results, true))
+        {
+            foreach (var validationResult in results)
+            {
+                foreach (var memberName in validationResult.MemberNames)
+                {
+                    ValidationErrors[memberName] = validationResult.ErrorMessage;
+                }
+            }
+            return;
+        }
+        
+        await SaveClient();
+    }
+    
+    private async Task SaveClient()
+    {
+        try
+        {
+            var result = await ClientHandler.CreateAsync(InputModel);
+
+            if (result.IsSuccess)
+            {
+                Snackbar.Add("Cliente cadastrado com sucesso!", Severity.Success);
+                await OnSubmit.InvokeAsync(result.Data.Id);
+                
+                MudDialog.Close(DialogResult.Ok(result.Data.Id));
+            }
+            else
+                Snackbar.Add(result.Message, Severity.Error);
+        }
+        catch (Exception e)
+        {
+            Snackbar.Add("Não foi possível salvar o cliente!", Severity.Error);
+        }
+    }
+    
+    private void Cancel() => MudDialog.Cancel();
+}

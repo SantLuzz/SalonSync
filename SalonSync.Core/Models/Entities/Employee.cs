@@ -21,4 +21,9 @@ public class Employee
     public string UserId { get; set; } = string.Empty;
     public Guid? UniqueCode { get; set; }
     public List<Appointment> Appointments { get; set; } = [];
+
+    public override string ToString()
+    {
+        return Name;
+    }
 }

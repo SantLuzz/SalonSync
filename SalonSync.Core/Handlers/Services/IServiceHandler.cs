@@ -11,5 +11,6 @@ public interface IServiceHandler
     Task<Response<Service?>> UpdateAsync(UpdateServiceRequest request);
     Task<Response<Service?>> DeleteAsync(DeleteServiceRequest request);
     Task<Response<Service?>> GetByIdAsync(GetServiceByIdRequest request);
+    Task<PagedResponse<List<Service>?>> GetByPackageIdAsync(GetServicesByPackageIdRequest request);
     Task<PagedResponse<List<Service>?>> GetAllAsync(GetAllServicesRequest request);
 }

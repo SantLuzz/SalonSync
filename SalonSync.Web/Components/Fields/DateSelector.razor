@@ -1,0 +1,92 @@
+@using SalonSync.Core.DTOs
+<MudText Typo="Typo.h6">Selecione a Data:</MudText>
+<div id="dateContainer" class="scroll-container mt-10"
+     @onpointerdown="@StartSwipe"
+     @onpointermove="@OnSwipe"
+     @onpointerup="EndSwipe">
+    <div class="scroll-content">
+        @foreach (var availableDate in AvailableDates)
+        {
+            <SelectableCard T="AvailableDateDto"
+                            Icon="@Icons.Material.Filled.CalendarToday"
+                            CardValue="availableDate"
+                            CardValueText="@availableDate.ToString()"
+                            CardText="@availableDate.Day"
+                            SelectableStyle="@GetCardClass(availableDate)"
+                            OnValueSelected="HandleDateSelection" />
+        }
+    </div>
+</div>
+
+
+<style>
+    .scroll-container {
+        overflow-x: auto; /* Ativa a rolagem horizontal */
+        white-space: nowrap; /* Impede que os itens quebrem a linha */
+        padding: 10px;
+        scroll-behavior: smooth; /* Faz a rolagem ser suave */
+        -webkit-overflow-scrolling: touch; /* Suaviza rolagem no iOS */
+    }
+
+    .scroll-content {
+        display: flex; /* Garante que os itens fiquem lado a lado */
+        gap: 10px; /* Espaçamento entre os cards */
+    }
+
+    .scroll-container::-webkit-scrollbar {
+        display: none; /* Oculta a barra de rolagem */
+    }
+
+    .selected-card {
+        background-color: #5EAEE1; 
+        color: white;
+        border: 2px solid #073b5d; 
+    }
+</style>
+
+@code {
+    [Parameter] public List<AvailableDateDto> AvailableDates { get; set; } = new();
+    [Parameter] public EventCallback<AvailableDateDto> OnDateSelected { get; set; }
+    
+    [Inject] public IJSRuntime JsRuntime { get; set; } = null!;
+    
+    private double startX;
+    private ElementReference scrollContainer;
+    private AvailableDateDto? SelectedDate;
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+            await JsRuntime.InvokeVoidAsync("enableSwipeScroll", "dateContainer");
+    }
+    
+    private async Task HandleDateSelection(AvailableDateDto selectedDate)
+    {
+        SelectedDate = selectedDate;
+        await OnDateSelected.InvokeAsync(selectedDate);
+    }
+    
+    private async Task StartSwipe(PointerEventArgs e)
+    {
+        startX = e.ClientX;
+    }
+
+    private async Task OnSwipe(PointerEventArgs e)
+    {
+        double deltaX = e.ClientX - startX;
+
+        await JsRuntime.InvokeVoidAsync("scrollHorizontally", "dateContainer", -deltaX);
+    
+        startX = e.ClientX;
+    }
+
+    private async Task EndSwipe(PointerEventArgs e)
+    {
+        startX = 0;
+    }
+    
+    private string GetCardClass(AvailableDateDto date)
+    {
+        return date.Equals(SelectedDate) ? "selected-card" : "";
+    }
+}

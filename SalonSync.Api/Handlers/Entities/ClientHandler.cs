@@ -34,7 +34,7 @@ public class ClientHandler(AppDbContext context) : IClientHandler
                 Type = request.Type,
                 CreatedAt = DateTime.Now,
                 UserId = request.UserId,
-                
+                Birthdate = request.Birthdate
             };
             
             await context.Clients.AddAsync(client);
@@ -96,26 +96,49 @@ public class ClientHandler(AppDbContext context) : IClientHandler
                 .FirstOrDefaultAsync(x => x.UserId == request.UserId
                                           && x.Id == request.Id);
             
-            if (client is null)
-                return new Response<Client?>(null, 404, "Cliente não encontrado!");
-            
-            var fileName = $"{Guid.NewGuid().ToString()}.jpg";
-            
-            var data = new Regex(@"^data:image/[a-z]+;base64,")
-                .Replace(request.Base64Image, string.Empty);
-            
-            var bytes = Convert.FromBase64String(data);
-
-            try
+            if (request.Base64Image is not null)
             {
-                await File.WriteAllBytesAsync($"{ApiConfiguration.FileFolder}{fileName}", bytes);
-            }
-            catch (Exception)
-            {
-                return new Response<Client?>(null, 500, "(SSCL004) Não foi possível gravar a imagem do cliente!");
-            }
+                if (client is null)
+                    return new Response<Client?>(null, 404, "Cliente não encontrado!");
+            
+                var fileName = $"{Guid.NewGuid().ToString()}.jpg";
+            
+                var data = new Regex(@"^data:image/[a-z]+;base64,")
+                    .Replace(request.Base64Image, string.Empty);
+            
+                var bytes = Convert.FromBase64String(data);
 
-            client.Image = ApiConfiguration.UrlFiles + fileName;
+                try
+                {
+                    await File.WriteAllBytesAsync($"{ApiConfiguration.FileFolder}{fileName}", bytes);
+                }
+                catch (Exception)
+                {
+                    return new Response<Client?>(null, 500, "(SSCL004) Não foi possível gravar a imagem do cliente!");
+                }
+
+                client.Image = ApiConfiguration.UrlFiles + fileName;
+            }
+            else
+            {
+                try
+                {
+                    string fileName = client.Image.Replace(ApiConfiguration.UrlFiles, "");
+
+                    if (File.Exists(ApiConfiguration.FileFolder + fileName))
+                    {
+                        File.Delete(ApiConfiguration.FileFolder + fileName);
+                    }
+                }
+                catch
+                {
+                    // ignored
+                }
+
+                client.Image = null;
+            }
+            
+            
             client.UpdatedAt = DateTime.Now;
             
             context.Clients.Update(client);

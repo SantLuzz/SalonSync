@@ -56,7 +56,7 @@ public partial class Edit : ComponentBase
             if (employee is { IsSuccess: false, Data: null })
             {
                 Snackbar.Add("Não foi possível carregar o profissional!", Severity.Error);
-                NavigationManager.NavigateTo("/employees/list");
+                NavigationManager.NavigateTo("/employees");
                 return;
             }
 
@@ -110,8 +110,8 @@ public partial class Edit : ComponentBase
 
             if (result.IsSuccess)
             {
-                Snackbar.Add("Funcionário criado com sucesso!", Severity.Success);
-                NavigationManager.NavigateTo("/employees/list");
+                Snackbar.Add("Funcionário alterado com sucesso!", Severity.Success);
+                NavigationManager.NavigateTo("/employees");
             }
             else
                 Snackbar.Add(result.Message, Severity.Error);

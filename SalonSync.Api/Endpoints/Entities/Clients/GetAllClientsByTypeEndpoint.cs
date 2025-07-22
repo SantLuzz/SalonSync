@@ -36,7 +36,7 @@ public class GetAllClientsByTypeEndpoint : IEndpoint
         
         var result = await handler.GetAllByTypeAsync(request);
         return result.IsSuccess
-            ? TypedResults.Ok(result.Data)
-            : TypedResults.NotFound(result.Data);
+            ? TypedResults.Ok(result)
+            : TypedResults.NotFound(result);
     }
 }

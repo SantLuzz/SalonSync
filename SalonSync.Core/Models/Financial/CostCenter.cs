@@ -9,4 +9,9 @@ public class CostCenter
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public ECostCenterType Type { get; set; } = ECostCenterType.Income;
+
+    public override string ToString()
+    {
+        return Title;
+    }
 }

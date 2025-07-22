@@ -1,0 +1,77 @@
+@page "/appointments/create"
+@using SalonSync.Core.Models.Entities
+@using SalonSync.Web.Components.Fields
+@inherits CreateAppointmentsPage
+
+<PageTitle>Salon Sync - Agendamentos</PageTitle>
+<MudText Typo="Typo.h4">Novo Agendamento: Profissional - @(string.IsNullOrWhiteSpace(Employee.Name) 
+                                                             ? "Não Identificado" 
+                                                             : Employee.Name)</MudText>
+                                                            
+@if (IsStarted)
+{
+    <Skeleton />
+}
+else
+{
+   <MudPaper Class="pa-8 mt-4">
+        <EditForm Model="@InputModel" OnValidSubmit="OnValidSubmit">
+            <DataAnnotationsValidator />
+
+            <div class="d-flex justify-end mt-4 mb-4">
+                <MudSelect T="Client" Label="Selecione o Cliente"
+                           Value="SelectedClient"
+                           Variant="Variant.Outlined"
+                           AnchorOrigin="Origin.BottomLeft"
+                           ValueChanged="OnChangedClient">
+                    @foreach (var client in Clients)
+                    {
+                        <MudSelectItem T="Client" Value="@client">@client.Name</MudSelectItem>
+                    }
+                </MudSelect>
+                <MudButton StartIcon="@Icons.Material.Filled.Add"
+                           Color="Color.Primary"
+                           Class="ml-4"
+                           OnClick="OnAddClient"
+                           Variant="Variant.Filled"
+                           aria-label="Adicionar novo Cliente">
+                    Adicionar Cliente
+                </MudButton>
+            </div>
+            <MudSelect T="long" Variant="Variant.Outlined"
+                       Label="Selecione o Serviço"
+                       Value="InputModel.ServiceId"
+                       ValueChanged="OnChangedService">
+                @foreach (var service in Services)
+                {
+                    <MudSelectItem T="long" Value="@service.Id">@service.Name</MudSelectItem>
+                }
+            </MudSelect>
+            
+            <DateSelector AvailableDates="AvailableDateDtos" 
+                          OnDateSelected="SelectedDate" />
+            
+            
+            <TimerSelector AvailabilitySlotsDto="AvailabilitySlotsDto" 
+                           DateIsSelected="DateIsSelected" 
+                           OnHourSelected="SelectedTime" />
+
+
+            <div class="d-flex mt-8">
+                @if (IsSubmit)
+                {
+                    <MudProgressCircular Color="Color.Info" Indeterminate="true" />
+                }
+                else
+                {
+                    <MudButton ButtonType="ButtonType.Submit"
+                               Variant="Variant.Filled"
+                               Color="Color.Primary">
+                        Salvar
+                    </MudButton>
+                }
+            </div>
+            
+        </EditForm>
+    </MudPaper>
+}

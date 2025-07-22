@@ -25,7 +25,7 @@ public class CreateClientPackageEndpoint : IEndpoint
 
         var result = await handler.CreateAsync(request);
         return result.IsSuccess
-            ? TypedResults.Created($"/{result.Data?.Id}",result.Data)
-            : TypedResults.BadRequest(result.Data);
+            ? TypedResults.Created($"/{result.Data?.Id}",result)
+            : TypedResults.BadRequest(result);
     }
 }
