@@ -1,0 +1,10 @@
+SELECT 
+    SUM(tr.Amount) AS Total,
+    app.EmployeeId,
+    ep.Name,
+    ep.Commission
+FROM Transactions AS tr
+INNER JOIN Appointments AS app ON tr.EntityId = app.Id
+INNER JOIN Employees AS ep ON app.EmployeeId = ep.Id
+WHERE tr.EntityType = 4 AND EmployeeId = 1
+GROUP BY app.EmployeeId, ep.Name, ep.Commission

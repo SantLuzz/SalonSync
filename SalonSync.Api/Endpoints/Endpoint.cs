@@ -7,6 +7,7 @@ using SalonSync.Api.Endpoints.Entities.Clients;
 using SalonSync.Api.Endpoints.Entities.Companies;
 using SalonSync.Api.Endpoints.Entities.Employees;
 using SalonSync.Api.Endpoints.Financial.AccountsPayable;
+using SalonSync.Api.Endpoints.Financial.Commissions;
 using SalonSync.Api.Endpoints.Financial.CostCenters;
 using SalonSync.Api.Endpoints.Financial.Transactions;
 using SalonSync.Api.Endpoints.Identity;
@@ -88,6 +89,13 @@ public static class Endpoint
             .MapEndpoints<GenerateCodeByCompanyEndpoint>()
             .MapEndpoints<DeleteCompanyEndpoint>()
             .MapEndpoints<GetCompanyEndpoint>();
+
+        endpoint.MapGroup("v1/commission")
+            .WithTags("Commission")
+            .RequireAuthorization()
+            .MapEndpoints<CreateCommissionEndpoint>()
+            .MapEndpoints<DeleteCommissionEndpoint>()
+            .MapEndpoints<GetUnpaidCommissionInPeriodEndpoint>();
 
         endpoint.MapGroup("v1/employees")
             .WithTags("Employees")

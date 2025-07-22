@@ -50,6 +50,7 @@ public partial class AutoScheduleDialogCode : ComponentBase
     protected bool IsBusy { get; set; }
     protected bool IsAddschedule { get; set; }
     protected bool IsFullySchedule { get; set; } = true;
+    protected string TotalRemaining { get; set; } = string.Empty;
     #endregion
     
     
@@ -60,6 +61,7 @@ public partial class AutoScheduleDialogCode : ComponentBase
         await GetEmployeesAsync();
         await GetAvailableDate();
         await GetServicesByClientPackage();
+        IsServiceFullyScheduled(SelectedService.Id);
         MaxSessions = ClientPackage.Package?.TotalSessions ?? 0;
         Create.ClientId = ClientPackage.ClientId;
         IsBusy = false;
@@ -116,13 +118,13 @@ public partial class AutoScheduleDialogCode : ComponentBase
         }
     }
 
-    protected string GetTotalSessionsService(Service service)
+    protected string GetTotalSessionsService(long serviceId)
     {
-        int total = GetTotalSessionByServiceId(service.Id);
-        int used = GetTotalUsedService(service.Id);
-        int remaing = total - used;
+        int total = GetTotalSessionByServiceId(serviceId);
+        int used = GetTotalUsedService(serviceId);
+        int remaining = total - used;
         
-        return $"{remaing} de {total} sessões restantes";
+        return $"{remaining} de {total} sessões restantes";
     }
 
     protected async Task OnAddSchedule()
@@ -167,7 +169,9 @@ public partial class AutoScheduleDialogCode : ComponentBase
         try
         {
             CreateSchedules.Remove(schedule);
+            TotalRemaining = GetTotalSessionsService(schedule.ServiceId);
             IsServiceFullyScheduled(schedule.ServiceId);
+            
         }
         catch (Exception ex)
         {
@@ -320,9 +324,9 @@ public partial class AutoScheduleDialogCode : ComponentBase
     {
         try
         {
-            var packageClient = await ClientPackageHandler.GetByClientIdAsync(new GetActiveClientPackageRequest
+            var packageClient = await ClientPackageHandler.GetByIdAsync(new GetClientPackageByIdRequest
             {
-                ClientId = ClientPackage.ClientId,
+                Id = ClientPackage.Id
             });
 
             if (packageClient.Data is null)

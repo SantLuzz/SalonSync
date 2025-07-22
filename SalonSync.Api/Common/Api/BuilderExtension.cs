@@ -129,6 +129,7 @@ public static class BuilderExtension
         builder.Services.AddTransient<IPackageServiceHandler, PackageServiceHandler>();
         builder.Services.AddTransient<IClientPackageHandler, ClientPackageHandler>();
         builder.Services.AddTransient<IAppointmentHandler, AppointmentHandler>();
+        builder.Services.AddTransient<ICommissionHandler, CommissionHandler>();
     }
 
     public static void AddCrossOrigin(this WebApplicationBuilder builder)

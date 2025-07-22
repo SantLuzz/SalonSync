@@ -1,0 +1,58 @@
+﻿@page "/employees/commission"
+@inherits ListCommission
+
+<PageTitle>Salon Sync - Comissão</PageTitle>
+<MudText Typo="Typo.h3">Comissão</MudText>
+
+@if (IsStarted)
+{
+<Skeleton/>
+}
+else
+{
+<MudDataGrid
+    Class="mt-4"
+    Style="min-width: 800px; width: 100%;"
+    Items="@Commissions"
+    Filterable="true"
+    QuickFilter="Filter"
+    Hideable="true">
+
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Comissão</MudText>
+        <MudSpacer/>
+        <MudTextField @bind-Value="SearchTerm" Placeholder="Filtrar..."
+                      Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search"
+                      Immediate="true"
+                      IconSize="Size.Medium"
+                      Class="mt-0"/>
+    </ToolBarContent>
+    <Columns>
+        <PropertyColumn Property="x => x.EmployeeId" Title="#" />
+        <PropertyColumn Property="x => x.Name" Title="Profissíonal" />
+        <PropertyColumn Property="x => x.Commission" Title="(%)" />
+        <PropertyColumn Property="x => x.Total" Title="Total Entrada" />
+        <PropertyColumn Property="x => x.TotalPayable" Title="Valor Pagável" />
+        
+        <TemplateColumn Class="">
+            <HeaderTemplate>
+                Ações
+            </HeaderTemplate>
+            <CellTemplate>
+                    <MudStack Row>
+                        <MudButton StartIcon="@Icons.Material.Filled.AttachMoney"
+                                   Color="Color.Success"
+                                   Variant="Variant.Filled"
+                                   aria-label="Pagar comissão"
+                                   Size="Size.Small"
+                                   Class="mud-typography-body2"
+                                   OnClick="() => PayCommission(context.Item)">
+                            Pagar
+                        </MudButton>
+                    </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+</MudDataGrid>
+}

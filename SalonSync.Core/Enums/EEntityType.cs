@@ -18,4 +18,7 @@ public enum EEntityType
     
     [Description("Agendamentos")]
     Appointments = 4,
+    
+    [Description("Comissão")]
+    Comission = 5,
 }

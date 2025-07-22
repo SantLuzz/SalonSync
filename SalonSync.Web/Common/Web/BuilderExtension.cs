@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Microsoft.AspNetCore.Http;
 using MudBlazor.Services;
 using SalonSync.Core.Handlers;
 using SalonSync.Core.Handlers.Appointments;

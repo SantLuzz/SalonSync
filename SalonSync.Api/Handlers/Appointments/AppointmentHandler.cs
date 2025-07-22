@@ -162,7 +162,7 @@ public class AppointmentHandler(AppDbContext context) : IAppointmentHandler
     {
         try
         {
-            if (request.Schedules.Any())
+            if (!request.Schedules.Any())
                 return new Response<List<AppointmentCreatedDto>?>(null, 400, "Informe os agendamentos!");
 
             List<AppointmentCreatedDto> appointments = [];

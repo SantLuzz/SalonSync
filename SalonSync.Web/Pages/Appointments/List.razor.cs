@@ -152,6 +152,7 @@ public partial class ListAppointmentsPage : ComponentBase
             }
 
             await GetAppointmentsAsync();
+            IsStarted = false;
             StateHasChanged();
         }
         catch (Exception ex)

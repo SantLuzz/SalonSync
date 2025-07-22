@@ -74,7 +74,14 @@
         if (firstRender)
             await JsRuntime.InvokeVoidAsync("enableSwipeScroll", "hourContainer");
     }
-    
+
+    protected override Task OnParametersSetAsync()
+    {
+        if (!DateIsSelected)
+            SelectedHour = null;
+        return base.OnParametersSetAsync();
+    }
+
     private async Task HandleHourSelection(Hours selectedHour)
     {
         SelectedHour = selectedHour;
