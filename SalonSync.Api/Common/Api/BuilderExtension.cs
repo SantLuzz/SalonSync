@@ -35,6 +35,7 @@ public static class BuilderExtension
 
         Configuration.BackEndUrl = builder.Configuration.GetValue<string>("BackEndUrl") ?? string.Empty;
         Configuration.FrontEndUrl = builder.Configuration.GetValue<string>("FrontEndUrl") ?? string.Empty;
+        Configuration.SystemVersion = builder.Configuration.GetValue<string>("SystemVersion") ?? string.Empty;
         ApiConfiguration.SuperAdminPass = builder.Configuration.GetValue<string>("SuperAdminPass") ?? string.Empty;
     }
 
