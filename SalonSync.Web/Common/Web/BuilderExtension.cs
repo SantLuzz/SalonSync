@@ -51,6 +51,10 @@ public static class BuilderExtension
     public static void AddExternalComponets(this WebAssemblyHostBuilder builder)
     {
         builder.Services.AddMudServices();
+        builder.Services.AddHttpClient(WebConfiguration.HttpPublicClientName, opt =>
+        {
+            opt.BaseAddress = new Uri(WebConfiguration.BackendUrl);
+        });
         builder.Services.AddHttpClient(WebConfiguration.HttpClientName, opt =>
         {
             opt.BaseAddress = new Uri(WebConfiguration.BackendUrl);

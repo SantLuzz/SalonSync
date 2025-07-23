@@ -177,7 +177,7 @@ public partial class Edit : ComponentBase
     {
         if (code is null) return null;
         
-        return WebConfiguration.FrontendUrl + "/scheudules?id=" + code;
+        return WebConfiguration.FrontendUrl + "/professional-schedule?id=" + code;
     }
     #endregion
 }

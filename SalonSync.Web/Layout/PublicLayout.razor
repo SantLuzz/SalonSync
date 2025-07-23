@@ -1,0 +1,32 @@
+﻿@inherits LayoutComponentBase
+
+<MudThemeProvider @ref="_mudThemeProvider"
+                  @bind-IsDarkMode="_isDarkMode" 
+                  Theme="WebConfiguration.Theme" />
+<MudPopoverProvider />
+<MudSnackbarProvider />
+<MudDialogProvider />
+
+<MudLayout>
+    <MudAppBar>
+        <MudText Typo="Typo.h6" Class="d-flex align-items-center">
+            <span style="font-size: 1.5rem; font-weight: 600;">Salon Sync</span>
+            <span class="ml-1" style="font-size: 0.75rem; color: gray;">@version</span>
+        </MudText>
+    </MudAppBar>
+
+    <MudMainContent>
+        <MudContainer Class="mt-4">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+@code{
+    private bool _isDarkMode = true;
+
+    private MudThemeProvider _mudThemeProvider = null!;
+
+    private string version = $"v{WebConfiguration.SystemVersion}";
+}
+

@@ -132,7 +132,7 @@ public partial class Company : ComponentBase
     
     private string GenerateUrl(Guid code)
     {
-        return WebConfiguration.FrontendUrl + "/chat?id=" + code;
+        return WebConfiguration.FrontendUrl + "/customer-booking?id=" + code;
     }
     
     #endregion

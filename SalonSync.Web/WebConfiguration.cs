@@ -5,6 +5,7 @@ namespace SalonSync.Web
     public static class WebConfiguration
     {
         public const string HttpClientName = "salonsyncapi";
+        public const string HttpPublicClientName = "publicsalonsyncapi";
 
         public static string BackendUrl { get; set; } = string.Empty;
         public static string FrontendUrl { get; set; } = string.Empty;
