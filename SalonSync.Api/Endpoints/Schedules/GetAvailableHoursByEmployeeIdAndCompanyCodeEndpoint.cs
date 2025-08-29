@@ -17,6 +17,7 @@ public class GetAvailableHoursByEmployeeIdAndCompanyCodeEndpoint : IEndpoint
             .WithName("Schedules: Get available hours for employee id")
             .WithDescription("Get available hours for employee id.")
             .WithOrder(5)
+            .AllowAnonymous()
             .Produces<PagedResponse<List<EmployeeAvailabilitySlotsDTO>?>>();
 
     private static async Task<IResult> HandlerAsync(

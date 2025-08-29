@@ -14,6 +14,7 @@ public class GetAvailableDateByCompanyEndpoint : IEndpoint
             .WithName("Schedules: Get available date by code company")
             .WithDescription("Get Available by company.")
             .WithOrder(2)
+            .AllowAnonymous()
             .Produces<Response<List<AvailableDateDto>?>>();
 
     private static async Task<IResult> HandlerAsync(

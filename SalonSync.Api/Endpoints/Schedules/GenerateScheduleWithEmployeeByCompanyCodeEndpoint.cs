@@ -17,6 +17,7 @@ public class GenerateScheduleWithEmployeeByCompanyCodeEndpoint : IEndpoint
             .WithName("Schedules: Open Appointment")
             .WithDescription("Open Appointment.")
             .WithOrder(3)
+            .AllowAnonymous()
             .Produces<Response<AppointmentCreatedDto?>>();
 
     private static async Task<IResult> HandlerAsync(

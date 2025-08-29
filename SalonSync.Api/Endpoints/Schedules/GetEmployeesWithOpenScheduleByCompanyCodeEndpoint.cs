@@ -17,6 +17,7 @@ public class GetEmployeesWithOpenScheduleByCompanyCodeEndpoint : IEndpoint
             .WithName("Schedules: Get employees with open schedule")
             .WithDescription("Get employees with open schedule.")
             .WithOrder(4)
+            .AllowAnonymous()
             .Produces<PagedResponse<List<EmployeeAvailabilitySlotsDTO>?>>();
 
     private static async Task<IResult> HandlerAsync(

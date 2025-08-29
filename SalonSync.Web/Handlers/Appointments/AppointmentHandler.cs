@@ -80,7 +80,13 @@ public class AppointmentHandler(IHttpClientFactory httpClientFactory) : IAppoint
 
     public async Task<PagedResponse<List<AppointmentDto>?>> GetByEmployeeCodeAsync(GetAppointmentByEmployeeCodeRequest request)
     {
-        throw new NotImplementedException();
+        var date = request.Date != DateTime.MinValue || request.Date != DateTime.MaxValue
+            ? request.Date.ToString(Format)
+            : DateTime.Now.GetFirstDay().ToString(Format);
+
+        var url = $"v1/schedules/employees-appointments?id={request.Code}&date={date}";
+        return await _httpClient.GetFromJsonAsync<PagedResponse<List<AppointmentDto>?>>(url)
+            ?? new PagedResponse<List<AppointmentDto>?>(null, 404, "Não foi possível recuperar os agendamentos do profissíonal!");
     }
     
     public async Task<Response<List<AvailableDateDto>?>> GetAvailableDatesByCompanyCodeAsync(GetAvailableDateByCompanyRequest request)

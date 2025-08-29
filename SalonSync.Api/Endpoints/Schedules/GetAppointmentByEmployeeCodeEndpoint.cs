@@ -14,6 +14,7 @@ public class GetAppointmentByEmployeeCodeEndpoint : IEndpoint
             .WithName("Schedules: Get Appointments by code employee")
             .WithDescription("Get Schedules by employee.")
             .WithOrder(1)
+            .AllowAnonymous()
             .Produces<PagedResponse<List<AppointmentDto>?>>();
 
     private static async Task<IResult> HandlerAsync(
