@@ -1,7 +1,0 @@
-ADICIONAR SERVIÇO DE EMAIL
-ADICIONAR GERENCIAMENTO DE SENHAS
-ADICIONAR CONTAS A PAGAR
-
-dotnet user-secrets set "Smtp:UserName" "luiz.santos1749@outlook.com" 
-dotnet user-secrets set "Smtp:Password" "xsmtpsib-bd0e8e4cd2e63ec585ca3daee6d50a9d41691685a848c1f7a915ded840f4b5d9-3p1vtQyFncTjCrzX"
-dotnet user-secrets set "SuperAdminPass" "1436329501Feeh-@"
